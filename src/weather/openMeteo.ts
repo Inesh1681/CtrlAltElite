@@ -12,10 +12,14 @@ export const WEATHER_LOCATIONS: WeatherLocation[] = [
   { name: 'Chennai', lat: 13.0827, lon: 80.2707 },
   { name: 'Bengaluru', lat: 12.9716, lon: 77.5946 },
   { name: 'Kolkata', lat: 22.5726, lon: 88.3639 },
-  { name: 'Dhaka', lat: 23.8103, lon: 90.4125 },
-  { name: 'Jakarta', lat: -6.2088, lon: 106.8456 },
-  { name: 'Houston', lat: 29.7604, lon: -95.3698 },
-  { name: 'London', lat: 51.5074, lon: -0.1278 },
+  { name: 'Delhi', lat: 28.6139, lon: 77.209 },
+  { name: 'Hyderabad', lat: 17.385, lon: 78.4867 },
+  { name: 'Patna (Gandak/Kosi)', lat: 25.5941, lon: 85.1376 },
+  { name: 'Bettiah, W. Champaran', lat: 26.8022, lon: 84.5032 },
+  { name: 'Guwahati', lat: 26.1445, lon: 91.7362 },
+  { name: 'Kochi', lat: 9.9312, lon: 76.2673 },
+  { name: 'Surat', lat: 21.1702, lon: 72.8311 },
+  { name: 'Kathmandu (upstream)', lat: 27.7172, lon: 85.324 },
 ]
 
 export interface WeatherResult {

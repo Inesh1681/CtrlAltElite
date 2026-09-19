@@ -172,6 +172,11 @@ function ZoneCell({
         filter={hot || selected ? 'url(#glow)' : undefined}
       />
       {(selected || hovered) && <rect x={x} y={y} width={s} height={s} rx="3" fill="#ffffff" opacity={selected ? 0.06 : 0.04} />}
+      {z.isInlet && (
+        <text x={x + 7} y={y + 32} fontSize="9" fontFamily="IBM Plex Mono, monospace" fill="#22d3ee" opacity="0.85">
+          ▶ RIVER INLET
+        </text>
+      )}
       {/* labels: name, status, water depth (id and elevation live in the tooltip) */}
       {!compact && (
         <text x={x + 8} y={y + 18} fontSize="12" fontFamily="Inter, sans-serif" fontWeight={600} fill="#e6e9ef" opacity="0.92">

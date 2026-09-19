@@ -5,7 +5,7 @@ import { createInitialState, DEFAULT_PARAMS, step } from './engine'
 import { computeFlows } from './flow'
 import { forecast } from './forecast'
 import { computeRisk, levelFor } from './risk'
-import { customProfile, HEAVY_MONSOON, NORMAL_RAIN } from './scenarios'
+import { customProfile, HEAVY_MONSOON, NORMAL_RAIN, UPSTREAM_SURGE } from './scenarios'
 import type { SimParams } from './types'
 import { compareDrainage } from './whatif'
 
@@ -138,6 +138,27 @@ describe('risk', () => {
     }
     expect(floodedNormal).toBe(0)
     expect(floodedMonsoon).toBeGreaterThan(0)
+  })
+})
+
+describe('upstream surge scenario', () => {
+  it('floods the river corridor from the inlet while the hills stay safe', () => {
+    let s = createInitialState(city)
+    let firstFlooded: string | null = null
+    for (let i = 0; i < 48; i++) {
+      s = step(s, DEFAULT_PARAMS, UPSTREAM_SURGE)
+      if (!firstFlooded) {
+        const f = s.zones.find((z) => z.waterLevel >= z.floodThreshold)
+        if (f) firstFlooded = f.id
+      }
+    }
+    // the first district to flood is an inlet cell (the wave arrives from outside)
+    const inletIds = city.filter((z) => z.isInlet).map((z) => z.id)
+    expect(firstFlooded).not.toBeNull()
+    expect(inletIds).toContain(firstFlooded)
+    // high ground is untouched
+    const high = s.zones.filter((z) => z.elevation > 20)
+    for (const z of high) expect(computeRisk(z).level).toBe('SAFE')
   })
 })
 

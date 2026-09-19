@@ -13,13 +13,14 @@ export const GRID_ROWS = 6
 
 export const TERRAIN_SOURCE = 'SYNTHETIC TERRAIN' as const
 
+/** district names for the synthetic twin — a generic Indian river city with a harbour */
 const NAMES: string[] = [
-  'Northgate', 'Highfield', 'Cedar Ridge', 'Mill Heights', 'Ashcroft', 'Kingsway', 'Stonebridge', 'Elm Park',
-  'Westmoor', 'Oakhaven', 'Foundry Row', 'Market Square', 'Riverside', 'Ferry Lane', 'Copperfield', 'Larkspur',
-  'Brookvale', 'Old Town', 'Union Yards', 'Central Station', 'Canal Street', 'Waterfront', 'Dockside', 'Greywharf',
-  'Fairmont', 'Linden Cross', 'Tannery Flats', 'Civic Centre', 'Meadowbank', 'Lower Marsh', 'Harbour Basin', 'Saltmere',
-  'Pinecrest', 'Grange Hill', 'Ironworks', 'Southbank', 'Willow Bend', 'Reedmoor', 'Bayfront', 'Eastport',
-  'Summit Park', 'Hillcrest', 'Beacon Rise', 'Vale End', 'Thornfield', 'Mossbrook', 'Quayside', 'Cape Point',
+  'Pahadganj', 'Vidya Nagar', 'Ashok Vihar', 'Shivaji Nagar', 'Gandhi Nagar', 'Nehru Colony', 'Indira Puram', 'Shastri Nagar',
+  'Rajendra Nagar', 'Sunder Bagh', 'Mill Line', 'Sadar Bazaar', 'Nadi Kinara', 'Ghat Road', 'Tilak Marg', 'Vasant Nagar',
+  'Bhagat Tola', 'Purana Shahar', 'Railway Colony', 'Junction Station', 'Nahar Road', 'Bandar Road', 'Dockyard', 'Ganga Vihar',
+  'Model Town', 'Lohia Chowk', 'Chamda Mandi', 'Civil Lines', 'Bela Colony', 'Talab Para', 'Bandargah', 'Namak Tola',
+  'Chir Bagh', 'Ambedkar Nagar', 'Lohakhana', 'Dakshin Tat', 'Bargad Mor', 'Sarkanda Tola', 'Samudra Tat', 'Purva Bandar',
+  'Shikhar Park', 'Tila Colony', 'Prakash Nagar', 'Ghati Mohalla', 'Kanta Tola', 'Kai Nagar', 'Jetty Road', 'Sagar Kinara',
 ]
 
 /** deterministic hash → [0,1) */
@@ -145,6 +146,8 @@ export function generateCity(): ZoneStatic[] {
         initialWaterLevel,
         neighbors,
         isOutlet: outlet[idx],
+        // the river enters from the west edge: the col-0 cell(s) nearest the river line
+        isInlet: col === 0 && Math.abs(row - riverRow(0)) < 1,
         landUse,
       })
     }

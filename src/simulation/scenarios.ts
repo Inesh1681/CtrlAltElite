@@ -24,7 +24,7 @@ export function piecewise(points: Array<[number, number]>): (t: number) => numbe
 export const NORMAL_RAIN: RainfallProfile = {
   id: 'normal',
   name: 'NORMAL RAIN',
-  description: 'Steady seasonal rain, ~18–26 mm/h. Drains keep up; a few low districts reach WATCH.',
+  description: 'Steady monsoon showers, ~18–26 mm/h (≈ 90 mm over the storm — IMD "heavy" band). Drains keep up; a few low districts reach WATCH.',
   intensityAt: piecewise([
     [0, 12],
     [30, 22],
@@ -39,7 +39,7 @@ export const NORMAL_RAIN: RainfallProfile = {
 export const HEAVY_MONSOON: RainfallProfile = {
   id: 'monsoon',
   name: 'HEAVY MONSOON',
-  description: 'Three-hour monsoon band peaking near 110 mm/h. Low-lying and downstream districts overwhelm their drains.',
+  description: 'Three-hour monsoon band peaking near 110 mm/h (≈ 330 mm — IMD "extremely heavy", like Mumbai 26 July 2005 or Chennai Dec 2015). Low-lying and downstream districts overwhelm their drains.',
   intensityAt: piecewise([
     [0, 20],
     [30, 60],
@@ -56,7 +56,7 @@ export const HEAVY_MONSOON: RainfallProfile = {
 export const EXTREME_STORM: RainfallProfile = {
   id: 'extreme',
   name: 'EXTREME STORM',
-  description: 'Convective cell peaking at 150 mm/h. Rapid, city-wide inundation of the valley and harbour.',
+  description: 'Cloudburst-type cell peaking at 150 mm/h (≈ 300 mm in 3 h — IMD "cloudburst" scale). Rapid, city-wide inundation of the valley and harbour.',
   intensityAt: piecewise([
     [0, 35],
     [20, 95],
@@ -69,7 +69,38 @@ export const EXTREME_STORM: RainfallProfile = {
   source: 'synthetic',
 }
 
-export const SCENARIOS: RainfallProfile[] = [NORMAL_RAIN, HEAVY_MONSOON, EXTREME_STORM]
+/**
+ * Cross-border upstream surge: light local rain, but a flood wave enters through the
+ * river inlet at the city edge — the mechanism behind the Aug–Sep 2026 Nepal floods
+ * (Langtang glacier collapse → Trishuli/Bhote Koshi → Gandak), when Bihar projected
+ * Gandak Barrage inflows rising from ~80,000 to ~250,000 cusecs and evacuated
+ * riverine West Champaran. The hydrograph below is illustrative, not measured.
+ */
+export const UPSTREAM_SURGE: RainfallProfile = {
+  id: 'surge',
+  name: 'UPSTREAM SURGE',
+  description:
+    'Light rain (15–30 mm/h) but a flood wave arrives through the river inlet — a Nepal→Bihar (Gandak/Kosi) style release. Illustrative hydrograph inspired by the Aug–Sep 2026 Nepal floods; the river corridor floods from upstream while local drains hold.',
+  intensityAt: piecewise([
+    [0, 12],
+    [60, 28],
+    [180, 22],
+    [300, 10],
+  ]),
+  upstreamSurgeAt: piecewise([
+    [0, 0],
+    [30, 0],
+    [60, 1000],
+    [120, 3000],
+    [180, 3000],
+    [240, 1500],
+    [300, 400],
+    [360, 0],
+  ]),
+  source: 'synthetic',
+}
+
+export const SCENARIOS: RainfallProfile[] = [NORMAL_RAIN, HEAVY_MONSOON, EXTREME_STORM, UPSTREAM_SURGE]
 
 export function customProfile(mmPerHour: number): RainfallProfile {
   return {

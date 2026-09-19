@@ -58,7 +58,7 @@ export function ScenarioControls({ sim }: { sim: Simulation }) {
     <div className="space-y-3">
       <div>
         <div className="label mb-1.5">Storm scenario</div>
-        <div className="grid grid-cols-3 gap-1">
+        <div className="grid grid-cols-2 gap-1">
           {SCENARIOS.map((s) => (
             <button
               key={s.id}
@@ -66,7 +66,7 @@ export function ScenarioControls({ sim }: { sim: Simulation }) {
               onClick={() => sim.setScenario({ kind: 'preset', id: s.id })}
               title={s.description}
             >
-              {s.name.replace(' RAIN', '').replace('HEAVY ', '').replace(' STORM', '')}
+              {s.name.replace(' RAIN', '').replace('HEAVY ', '').replace(' STORM', '').replace('UPSTREAM ', '↘ ')}
             </button>
           ))}
         </div>

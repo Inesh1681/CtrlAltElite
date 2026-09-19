@@ -29,6 +29,8 @@ export interface ZoneStatic {
   neighbors: string[]
   /** true for harbour cells that discharge directly to the sea */
   isOutlet: boolean
+  /** true for the cells where the river enters the city (receive upstream surge) */
+  isInlet: boolean
   landUse: 'residential' | 'commercial' | 'industrial' | 'park' | 'waterfront'
 }
 
@@ -74,6 +76,12 @@ export interface RainfallProfile {
   description: string
   /** rainfall in mm/h at simulated minute t */
   intensityAt: (minutes: number) => number
+  /**
+   * optional external river inflow arriving at the inlet cells, expressed as an
+   * equivalent depth rate (mm/h) added to each inlet cell — e.g. a barrage release
+   * or a flood wave from upstream of the city
+   */
+  upstreamSurgeAt?: (minutes: number) => number
   /** true when the profile comes from a live forecast */
   source: 'synthetic' | 'open-meteo'
 }

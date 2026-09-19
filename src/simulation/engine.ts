@@ -41,12 +41,14 @@ export function createInitialState(statics: ZoneStatic[]): SimState {
 export function step(state: SimState, params: SimParams, profile: RainfallProfile): SimState {
   const { dtMinutes } = params
   const baseRain = profile.intensityAt(state.minutes) * params.rainfallMultiplier
+  const surge = profile.upstreamSurgeAt ? profile.upstreamSurgeAt(state.minutes) : 0
   const flows = computeFlows(state.zones, params)
 
   const zones: Zone[] = state.zones.map((z, i) => {
     const rainfallIntensity = baseRain * z.rainFactor
     const rainInput = mmPerHourToMetresPerTick(rainfallIntensity, dtMinutes) * z.catchmentFactor
-    const inflow = flows.inflow[i]
+    // external river inflow (barrage release / upstream flood wave) enters at the inlet cells
+    const inflow = flows.inflow[i] + (z.isInlet ? mmPerHourToMetresPerTick(surge, dtMinutes) : 0)
     const outflow = flows.outflow[i]
     const capacity = mmPerHourToMetresPerTick(z.drainageCapacity * params.drainageMultiplier, dtMinutes)
 

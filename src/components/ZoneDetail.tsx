@@ -29,6 +29,7 @@ export function ZoneDetail({ sim }: { sim: Simulation }) {
             <div className="mono text-[10px] text-muted">
               {z.id} · {z.landUse.toUpperCase()}
               {z.isOutlet && ' · SEA OUTLET'}
+              {z.isInlet && ' · RIVER INLET'}
             </div>
             <div className="text-[16px] font-semibold tracking-wide">{z.name.toUpperCase()}</div>
           </div>
