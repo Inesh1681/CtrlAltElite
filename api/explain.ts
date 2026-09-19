@@ -60,7 +60,8 @@ function rateLimited(ip: string): boolean {
   return rec.count > RATE_LIMIT_PER_HOUR
 }
 
-export default async function handler(request: Request): Promise<Response> {
+/** Core handler on the Web standard Request/Response API. */
+export async function handle(request: Request): Promise<Response> {
   const apiKey = process.env.ANTHROPIC_API_KEY
   const enabled = Boolean(apiKey)
 
@@ -116,4 +117,44 @@ export default async function handler(request: Request): Promise<Response> {
     if (err instanceof Anthropic.APIError) return json({ error: `Claude API error ${err.status}` }, 502)
     return json({ error: 'AI explanation failed.' }, 500)
   }
+}
+
+// ---------------------------------------------------------------------------
+// Vercel entry point. Supports both the Web signature (request) and the
+// Node.js signature (req, res) so it works whichever the runtime picks.
+// ---------------------------------------------------------------------------
+
+interface NodeReq {
+  method?: string
+  url?: string
+  headers: Record<string, string | string[] | undefined>
+  on: (ev: string, cb: (chunk?: Buffer) => void) => void
+}
+interface NodeRes {
+  statusCode: number
+  setHeader: (k: string, v: string) => void
+  end: (body?: Buffer) => void
+}
+
+export default async function handler(reqOrRequest: Request | NodeReq, res?: NodeRes): Promise<Response | void> {
+  if (!res || typeof res.setHeader !== 'function') return handle(reqOrRequest as Request)
+
+  const req = reqOrRequest as NodeReq
+  const body = await new Promise<Buffer>((resolve) => {
+    const chunks: Buffer[] = []
+    req.on('data', (c) => c && chunks.push(c))
+    req.on('end', () => resolve(Buffer.concat(chunks)))
+  })
+  const headers: [string, string][] = []
+  for (const [k, v] of Object.entries(req.headers)) if (typeof v === 'string') headers.push([k, v])
+  const method = req.method ?? 'GET'
+  const request = new Request(`https://flowshield.local${req.url ?? '/api/explain'}`, {
+    method,
+    headers,
+    body: method === 'POST' ? new Uint8Array(body) : undefined,
+  })
+  const response = await handle(request)
+  res.statusCode = response.status
+  response.headers.forEach((v, k) => res.setHeader(k, v))
+  res.end(Buffer.from(await response.arrayBuffer()))
 }
