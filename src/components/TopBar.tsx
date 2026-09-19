@@ -15,12 +15,12 @@ export function systemStatus(sim: Simulation): { label: string; level: RiskLevel
   return { label: 'NOMINAL', level: 'SAFE' }
 }
 
-export function TopBar({ sim, mode, setMode }: { sim: Simulation; mode: ViewMode; setMode: (m: ViewMode) => void }) {
+export function TopBar({ sim, mode, setMode, onHome }: { sim: Simulation; mode: ViewMode; setMode: (m: ViewMode) => void; onHome?: () => void }) {
   const status = systemStatus(sim)
   return (
     <header className="flex h-12 shrink-0 items-center justify-between gap-4 overflow-hidden border-b border-line bg-panel px-4">
       <div className="flex min-w-0 items-center gap-4 overflow-hidden">
-        <div className="flex shrink-0 items-center gap-2">
+        <button className="flex shrink-0 items-center gap-2" onClick={onHome} title="Back to landing page">
           <svg width="22" height="22" viewBox="0 0 32 32">
             <rect width="32" height="32" rx="6" fill="#0e2a35" />
             <path d="M6 20c3-4 6-4 10 0s7 4 10 0" stroke="#22d3ee" strokeWidth="2.5" fill="none" strokeLinecap="round" />
@@ -28,7 +28,7 @@ export function TopBar({ sim, mode, setMode }: { sim: Simulation; mode: ViewMode
           </svg>
           <span className="text-[15px] font-semibold tracking-[0.18em]">FLOWSHIELD</span>
           <span className="label ml-1 hidden whitespace-nowrap 2xl:inline">Flood Digital Twin · Early Warning</span>
-        </div>
+        </button>
         <div className="mx-2 h-5 w-px bg-line-2" />
         <div className="flex items-center gap-2">
           <span className="label">System</span>

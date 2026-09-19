@@ -28,6 +28,10 @@ depends on network access.
 
 ## Demo (60 seconds)
 
+The app opens on a landing page (`/`) with a live monsoon preview. **Run the 60-second demo** jumps
+into the dashboard with the demo already running (`#demo`); **Open dashboard** goes to `#app`;
+`#command` opens the Command Center directly.
+
 1. Press **▶ Run Demo Scenario** (or key `D`). Switch to **Command Center** (key `C`).
 2. T+00:30 — low-lying districts along the river enter **WATCH**; alerts list projected
    time-to-critical.
