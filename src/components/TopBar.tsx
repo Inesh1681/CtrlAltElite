@@ -70,11 +70,12 @@ export function TopBar({ sim, mode, setMode, onHome }: { sim: Simulation; mode: 
         )}
         {user && (
           <div className="ml-1 flex items-center gap-2 border-l border-line-2 pl-3">
+            {user.photoUrl && <img src={user.photoUrl} alt="" className="h-6 w-6 rounded-full border border-line-2" referrerPolicy="no-referrer" />}
             <div className="hidden text-right leading-tight lg:block">
               <div className="text-[11px] font-medium">{user.name}</div>
-              <div className="label text-[8px]">{ROLE_LABEL[role]}</div>
+              <div className="label text-[8px]">{ROLE_LABEL[role]}{user.method === 'google' ? ' · Google' : ''}</div>
             </div>
-            <button className="btn h-6 px-2 text-[10px]" onClick={signOut} title="Sign out">
+            <button className="btn h-6 px-2 text-[10px]" onClick={() => void signOut()} title="Sign out">
               Sign out
             </button>
           </div>

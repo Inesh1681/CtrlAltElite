@@ -18,7 +18,7 @@ function routeFromHash(): Route {
 
 export default function App() {
   const sim = useSimulation()
-  const { user, role } = useAuth()
+  const { user, role, loading } = useAuth()
   const isMobile = useMediaQuery(MOBILE_QUERY)
   const [route, setRoute] = useState<Route>(routeFromHash)
   const [mode, setMode] = useState<ViewMode>(() => (window.location.hash === '#command' ? 'command' : 'ops'))
@@ -78,7 +78,7 @@ export default function App() {
     )
   }
 
-  if (!user) return <Login onBack={goHome} />
+  if (loading || !user) return <Login onBack={goHome} />
 
   if (isMobile) return <MobileDashboard sim={sim} onHome={goHome} />
 

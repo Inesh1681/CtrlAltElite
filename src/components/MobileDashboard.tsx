@@ -54,7 +54,7 @@ export function MobileDashboard({ sim, onHome }: { sim: Simulation; onHome: () =
             {status.label}
           </span>
           <span className="mono text-[12px] font-semibold text-water">{formatSimTime(sim.state.minutes)}</span>
-          <button className="btn h-6 px-2 text-[9px]" onClick={signOut}>
+          <button className="btn h-6 px-2 text-[9px]" onClick={() => void signOut()}>
             Out
           </button>
         </div>

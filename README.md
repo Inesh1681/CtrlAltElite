@@ -38,9 +38,28 @@ email, the access code (**`flowshield`** by default — set `VITE_ACCESS_CODE` t
 | **Operator** | run simulations and interventions |
 | **Viewer** | read-only: watch the simulation, alerts and analyst; controls disabled |
 
-Sessions last 12 h in `localStorage`. This is a shared-code gate suitable for a demo — there is no
-backend. The provider lives in `src/auth/auth.tsx` behind a small interface, so Firebase /
-Supabase / Clerk can be dropped in without touching the UI.
+Access-code sessions last 12 h in `localStorage`. This is a shared-code gate suitable for a demo —
+there is no backend.
+
+### Google sign-in (Firebase) — optional, ~5 minutes
+
+1. Go to https://console.firebase.google.com → **Add project** (Analytics not needed).
+2. **Build → Authentication → Get started → Sign-in method → Google → Enable** (pick a support email) → Save.
+3. **Project settings (gear) → Your apps → Web (`</>`)** → register an app → copy the `firebaseConfig`.
+4. Put the four values in `.env` (locally) and in Vercel → Project → Settings → Environment Variables:
+   ```
+   VITE_FIREBASE_API_KEY=…
+   VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+   VITE_FIREBASE_PROJECT_ID=your-project
+   VITE_FIREBASE_APP_ID=…
+   ```
+5. **Authentication → Settings → Authorized domains** → add your Vercel domain (e.g. `ctrlaltelite.vercel.app`). `localhost` is pre-authorised.
+6. Optional roles for Google accounts: `VITE_COMMANDER_EMAILS=a@x.com,b@y.com` / `VITE_VIEWER_EMAILS=…`. Everyone else is an operator.
+
+When the four keys are present the login page shows **Continue with Google**; the access code stays
+available as a fallback (“Use an access code instead”). Google sessions persist via Firebase and
+show the account photo in the header. Firebase web config values are not secrets (they identify
+the project; access is governed by the authorized-domain list and Firebase rules).
 
 ## Demo (60 seconds)
 
@@ -98,12 +117,13 @@ src/
   hooks/useSimulation.ts   play loop, params, alerts, forecast, what-if target selection, demo
   components/          CityMap (SVG twin), Timeline (Recharts), ZoneDetail, WhatIfPanel,
                        AlertsFeed, AiPanel, CommandCenter, Operations, TopBar, Controls, Kpis
+  auth/                access-code + Firebase Google sign-in behind one context; roles
   ai/explain.ts        structured-state → Claude (official SDK) with deterministic fallback
   weather/openMeteo.ts hourly precipitation forecast → rainfall profile
 scripts/               calibration helpers (`npx tsx scripts/calibrate.ts`)
 ```
 
-Stack: Vite · React 19 · TypeScript · Tailwind v4 · Recharts · Vitest · `@anthropic-ai/sdk`.
+Stack: Vite · React 19 · TypeScript · Tailwind v4 · Recharts · Vitest · `@anthropic-ai/sdk` · `firebase` (auth only).
 
 ## Model (simplified, physically inspired)
 
