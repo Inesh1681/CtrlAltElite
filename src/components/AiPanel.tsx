@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { AI_ENABLED, explain, fallbackExplanation, type Explanation } from '../ai/explain'
+import { explain, fallbackExplanation, isAiEnabled, probeAi, type Explanation } from '../ai/explain'
 import type { Simulation } from '../hooks/useSimulation'
 import { formatSimTime } from '../simulation/engine'
 
@@ -9,6 +9,10 @@ export function AiPanel({ sim, auto }: { sim: Simulation; auto?: boolean }) {
   const [stamp, setStamp] = useState<string>('')
   const abortRef = useRef<AbortController | null>(null)
   const lastAutoTick = useRef(-1)
+  const [aiOn, setAiOn] = useState<boolean>(isAiEnabled())
+  useEffect(() => {
+    void probeAi().then(setAiOn)
+  }, [])
 
   const input = {
     state: sim.state,
@@ -59,7 +63,7 @@ export function AiPanel({ sim, auto }: { sim: Simulation; auto?: boolean }) {
         <div className="flex items-center gap-2">
           <span className="label">Analyst</span>
           <span className={`mono rounded px-1.5 py-0.5 text-[9px] ${result?.source === 'claude' ? 'bg-[#0e2a35] text-water' : 'bg-panel-2 text-muted'}`}>
-            {AI_ENABLED ? (result?.source === 'claude' ? 'CLAUDE OPUS 5' : busy ? 'CLAUDE · thinking' : 'CLAUDE') : 'RULE ENGINE'}
+            {aiOn ? (result?.source === 'claude' ? 'CLAUDE OPUS 5' : busy ? 'CLAUDE · thinking' : 'CLAUDE') : 'RULE ENGINE'}
           </span>
           {stamp && <span className="mono text-[9px] text-dim">@ {stamp}</span>}
         </div>
@@ -73,7 +77,7 @@ export function AiPanel({ sim, auto }: { sim: Simulation; auto?: boolean }) {
         ) : (
           <div className="text-[11px] text-muted">
             The analyst reads the structured simulation state — never the map — and explains why zones are at risk, which factors dominate, and what to do about it.
-            {!AI_ENABLED && <div className="mt-2 text-dim">Set VITE_ANTHROPIC_API_KEY to enable Claude; the deterministic rule engine is active.</div>}
+            {!aiOn && <div className="mt-2 text-dim">Set ANTHROPIC_API_KEY on the server (Vercel env / .env) to enable Claude; the deterministic rule engine is active.</div>}
           </div>
         )}
       </div>

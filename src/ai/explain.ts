@@ -1,4 +1,3 @@
-import Anthropic from '@anthropic-ai/sdk'
 import { formatDuration, formatSimTime } from '../simulation/engine'
 import type { Forecast } from '../simulation/forecast'
 import { computeRisk, inflowLabel, isHighRisk } from '../simulation/risk'
@@ -27,7 +26,25 @@ export interface Explanation {
   text: string
 }
 
-export const AI_ENABLED = Boolean(import.meta.env.VITE_ANTHROPIC_API_KEY)
+/**
+ * Whether the server-side analyst (/api/explain, holds the Anthropic key) is available.
+ * Resolved once at runtime; null until the probe completes.
+ */
+let aiEnabled: boolean | null = null
+let aiProbe: Promise<boolean> | null = null
+export function probeAi(): Promise<boolean> {
+  if (aiEnabled !== null) return Promise.resolve(aiEnabled)
+  if (!aiProbe) {
+    aiProbe = fetch('/api/explain', { method: 'GET' })
+      .then((r) => (r.ok ? r.json() : { enabled: false }))
+      .then((j: { enabled?: boolean }) => (aiEnabled = Boolean(j.enabled)))
+      .catch(() => (aiEnabled = false))
+  }
+  return aiProbe
+}
+export function isAiEnabled(): boolean {
+  return aiEnabled === true
+}
 
 /** Structured, model-facing summary of the state (this is the only data the model sees). */
 export function buildStructuredState(input: ExplainInput) {
@@ -166,52 +183,26 @@ function capitalize(s: string): string {
 }
 
 // ---------------------------------------------------------------------------
-// Claude-backed explainer
+// Claude-backed explainer (via the serverless function; the key never reaches the browser)
 // ---------------------------------------------------------------------------
 
-const SYSTEM = `You are the analyst inside FLOWSHIELD, a flood early-warning command centre.
-You receive a JSON snapshot produced by a deterministic flood simulation. That snapshot is the only source of truth.
-Rules:
-- Never invent, estimate or round differently any number that is not in the snapshot. Quote values exactly as given.
-- Do not speculate about zones or data that are not present.
-- Be concise and operational: plain sentences, no markdown headings other than the four uppercase section labels below, no bullet symbols other than "•".
-Respond with exactly these sections, each on its own lines:
-SITUATION — one or two sentences on the city-wide picture.
-WHY <ZONE> IS <LEVEL> — explain the focus zone (or the top-risk zone if none) using its factors and numbers.
-RECOMMENDED INTERVENTIONS — 2 to 3 bullets; if a what-if comparison is present, state its delay explicitly.
-MONITOR — the zones that should be watched next and why, one line.`
-
-let client: Anthropic | null = null
-function getClient(): Anthropic | null {
-  const key = import.meta.env.VITE_ANTHROPIC_API_KEY as string | undefined
-  if (!key) return null
-  if (!client) client = new Anthropic({ apiKey: key, dangerouslyAllowBrowser: true, maxRetries: 1, timeout: 30_000 })
-  return client
-}
-
 export async function explain(input: ExplainInput, signal?: AbortSignal): Promise<Explanation> {
-  const c = getClient()
-  if (!c) return fallbackExplanation(input)
+  if (!(await probeAi())) return fallbackExplanation(input)
   try {
     const snapshot = buildStructuredState(input)
-    const response = await c.messages.create(
-      {
-        model: 'claude-opus-5',
-        max_tokens: 1200,
-        system: SYSTEM,
-        output_config: { effort: 'low' },
-        messages: [{ role: 'user', content: `Simulation snapshot:\n${JSON.stringify(snapshot, null, 1)}` }],
-      },
-      { signal },
-    )
-    if (response.stop_reason === 'refusal') return fallbackExplanation(input)
-    const text = response.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map((b) => b.text)
-      .join('\n')
-      .trim()
-    if (!text) return fallbackExplanation(input)
-    return { source: 'claude', text }
+    const res = await fetch('/api/explain', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(snapshot),
+      signal,
+    })
+    if (!res.ok) {
+      console.warn('[FLOWSHIELD] /api/explain', res.status, await res.text().catch(() => ''))
+      return fallbackExplanation(input)
+    }
+    const data = (await res.json()) as { text?: string }
+    if (!data.text) return fallbackExplanation(input)
+    return { source: 'claude', text: data.text }
   } catch (err) {
     if (signal?.aborted) throw err
     console.warn('[FLOWSHIELD] AI explanation failed, using fallback:', err)

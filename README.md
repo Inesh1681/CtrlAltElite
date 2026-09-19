@@ -22,9 +22,10 @@ npm test           # simulation engine tests (vitest)
 npm run build      # production build → dist/
 ```
 
-Optional: copy `.env.example` to `.env` and set `VITE_ANTHROPIC_API_KEY` to have the Analyst
-panel use Claude. Without it the deterministic rule-based explainer is used — the demo never
-depends on network access.
+Optional: copy `.env.example` to `.env` and set `ANTHROPIC_API_KEY` (server-side only) to have the
+Analyst panel use Claude through the serverless function `api/explain.ts` — the key never reaches
+the browser. Locally the same function runs inside `npm run dev`. Without it the deterministic
+rule-based explainer is used — the demo never depends on network access.
 
 ## Sign-in
 
@@ -118,7 +119,8 @@ src/
   components/          CityMap (SVG twin), Timeline (Recharts), ZoneDetail, WhatIfPanel,
                        AlertsFeed, AiPanel, CommandCenter, Operations, TopBar, Controls, Kpis
   auth/                access-code + Firebase Google sign-in behind one context; roles
-  ai/explain.ts        structured-state → Claude (official SDK) with deterministic fallback
+  ai/explain.ts        structured-state → POST /api/explain, with deterministic fallback
+api/explain.ts         Vercel function: holds ANTHROPIC_API_KEY, cache + rate limit, calls Claude
   weather/openMeteo.ts hourly precipitation forecast → rainfall profile
 scripts/               calibration helpers (`npx tsx scripts/calibrate.ts`)
 ```
@@ -151,5 +153,4 @@ inflow, with hard overrides at 25 / 50 / 75 / 100 % of the flood threshold.
 - Synthetic city and terrain (Indian-style district names, not a real city); no real DEM or GIS layers. Open-Meteo provides real rainfall only; the surge hydrograph is illustrative.
 - Simplified routing (no Manning/St-Venant), 4-neighbour connectivity, single water column per zone.
 - "Drainage capacity" is a single city-wide multiplier in the what-if; no per-district interventions.
-- Claude calls are made directly from the browser (hackathon convenience); production would proxy.
 - Auth is a shared access code checked client-side (no backend) — a gate for the demo, not security.
