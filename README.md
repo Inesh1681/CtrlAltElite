@@ -26,6 +26,22 @@ Optional: copy `.env.example` to `.env` and set `VITE_ANTHROPIC_API_KEY` to have
 panel use Claude. Without it the deterministic rule-based explainer is used — the demo never
 depends on network access.
 
+## Sign-in
+
+The dashboard is behind an operator sign-in (the landing page is public). Enter any name and
+email, the access code (**`flowshield`** by default — set `VITE_ACCESS_CODE` to change it, and
+`VITE_SHOW_DEMO_HINT=false` to hide the hint on the login page), and pick a role:
+
+| Role | Can do |
+|---|---|
+| **Commander** | everything — scenarios, drainage interventions, demo, Command Center |
+| **Operator** | run simulations and interventions |
+| **Viewer** | read-only: watch the simulation, alerts and analyst; controls disabled |
+
+Sessions last 12 h in `localStorage`. This is a shared-code gate suitable for a demo — there is no
+backend. The provider lives in `src/auth/auth.tsx` behind a small interface, so Firebase /
+Supabase / Clerk can be dropped in without touching the UI.
+
 ## Demo (60 seconds)
 
 The app opens on a landing page (`/`) with a live monsoon preview. **Run the 60-second demo** jumps
@@ -116,3 +132,4 @@ inflow, with hard overrides at 25 / 50 / 75 / 100 % of the flood threshold.
 - Simplified routing (no Manning/St-Venant), 4-neighbour connectivity, single water column per zone.
 - "Drainage capacity" is a single city-wide multiplier in the what-if; no per-district interventions.
 - Claude calls are made directly from the browser (hackathon convenience); production would proxy.
+- Auth is a shared access code checked client-side (no backend) — a gate for the demo, not security.

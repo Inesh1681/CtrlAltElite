@@ -1,3 +1,4 @@
+import { CAN, ROLE_LABEL, useAuth } from '../auth/auth'
 import { formatSimTime } from '../simulation/engine'
 import type { Simulation } from '../hooks/useSimulation'
 import { RISK_COLOR } from '../lib/format'
@@ -17,6 +18,7 @@ export function systemStatus(sim: Simulation): { label: string; level: RiskLevel
 
 export function TopBar({ sim, mode, setMode, onHome }: { sim: Simulation; mode: ViewMode; setMode: (m: ViewMode) => void; onHome?: () => void }) {
   const status = systemStatus(sim)
+  const { user, role, signOut } = useAuth()
   return (
     <header className="flex h-12 shrink-0 items-center justify-between gap-4 overflow-hidden border-b border-line bg-panel px-4">
       <div className="flex min-w-0 items-center gap-4 overflow-hidden">
@@ -55,13 +57,28 @@ export function TopBar({ sim, mode, setMode, onHome }: { sim: Simulation; mode: 
           <button className={`btn h-6 border-0 ${mode === 'ops' ? 'bg-panel-2 text-water' : 'bg-transparent text-muted'}`} onClick={() => setMode('ops')}>
             Operations
           </button>
-          <button className={`btn h-6 border-0 ${mode === 'command' ? 'bg-panel-2 text-water' : 'bg-transparent text-muted'}`} onClick={() => setMode('command')}>
-            Command Center
-          </button>
+          {CAN.commandCenter(role) && (
+            <button className={`btn h-6 border-0 ${mode === 'command' ? 'bg-panel-2 text-water' : 'bg-transparent text-muted'}`} onClick={() => setMode('command')}>
+              Command Center
+            </button>
+          )}
         </div>
-        <button className="btn btn-primary" onClick={sim.runDemo} disabled={sim.demoRunning}>
-          {sim.demoRunning ? '● Demo running' : '▶ Run Demo Scenario'}
-        </button>
+        {CAN.runDemo(role) && (
+          <button className="btn btn-primary" onClick={sim.runDemo} disabled={sim.demoRunning}>
+            {sim.demoRunning ? '● Demo running' : '▶ Run Demo Scenario'}
+          </button>
+        )}
+        {user && (
+          <div className="ml-1 flex items-center gap-2 border-l border-line-2 pl-3">
+            <div className="hidden text-right leading-tight lg:block">
+              <div className="text-[11px] font-medium">{user.name}</div>
+              <div className="label text-[8px]">{ROLE_LABEL[role]}</div>
+            </div>
+            <button className="btn h-6 px-2 text-[10px]" onClick={signOut} title="Sign out">
+              Sign out
+            </button>
+          </div>
+        )}
       </div>
     </header>
   )

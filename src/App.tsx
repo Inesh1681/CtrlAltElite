@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
+import { CAN, useAuth } from './auth/auth'
 import { CommandCenter } from './components/CommandCenter'
 import { Landing } from './components/Landing'
+import { Login } from './components/Login'
 import { MobileDashboard } from './components/MobileDashboard'
 import { Operations } from './components/Operations'
 import { TopBar, type ViewMode } from './components/TopBar'
@@ -16,6 +18,7 @@ function routeFromHash(): Route {
 
 export default function App() {
   const sim = useSimulation()
+  const { user, role } = useAuth()
   const isMobile = useMediaQuery(MOBILE_QUERY)
   const [route, setRoute] = useState<Route>(routeFromHash)
   const [mode, setMode] = useState<ViewMode>(() => (window.location.hash === '#command' ? 'command' : 'ops'))
@@ -25,13 +28,18 @@ export default function App() {
     const onHash = () => {
       setRoute(routeFromHash())
       if (window.location.hash === '#command') setMode('command')
-      if (window.location.hash === '#demo') sim.runDemo()
     }
     window.addEventListener('hashchange', onHash)
-    if (window.location.hash === '#demo') sim.runDemo()
     return () => window.removeEventListener('hashchange', onHash)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // #demo: start the demo once a permitted user is signed in (only once per visit)
+  const [demoStarted, setDemoStarted] = useState(false)
+  useEffect(() => {
+    if (window.location.hash !== '#demo' || demoStarted || !user || !CAN.runDemo(role)) return
+    setDemoStarted(true)
+    sim.runDemo()
+  }, [route, user, role, demoStarted, sim])
 
   const goHome = () => {
     sim.pause()
@@ -49,13 +57,13 @@ export default function App() {
         sim.toggle()
       } else if (e.key === 'r') sim.reset()
       else if (e.key === 'n') sim.stepOnce()
-      else if (e.key === 'd') sim.runDemo()
-      else if (e.key === 'c') setMode('command')
+      else if (e.key === 'd' && CAN.runDemo(role)) sim.runDemo()
+      else if (e.key === 'c' && CAN.commandCenter(role)) setMode('command')
       else if (e.key === 'o') setMode('ops')
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [sim, route])
+  }, [sim, route, role])
 
   if (route === 'landing') {
     return (
@@ -70,12 +78,14 @@ export default function App() {
     )
   }
 
+  if (!user) return <Login onBack={goHome} />
+
   if (isMobile) return <MobileDashboard sim={sim} onHome={goHome} />
 
   return (
     <div className="scanline flex h-full min-w-[1180px] flex-col bg-bg text-text">
       <TopBar sim={sim} mode={mode} setMode={setMode} onHome={goHome} />
-      <main className="min-h-0 flex-1">{mode === 'command' ? <CommandCenter sim={sim} /> : <Operations sim={sim} />}</main>
+      <main className="min-h-0 flex-1">{mode === 'command' && CAN.commandCenter(role) ? <CommandCenter sim={sim} /> : <Operations sim={sim} />}</main>
     </div>
   )
 }

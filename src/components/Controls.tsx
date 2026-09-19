@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { CAN, useAuth } from '../auth/auth'
 import { SPEEDS, type Simulation, type Speed } from '../hooks/useSimulation'
 import { SCENARIOS } from '../simulation/scenarios'
 import { fetchPrecipitationForecast, WEATHER_LOCATIONS, type WeatherResult } from '../weather/openMeteo'
@@ -33,6 +34,8 @@ export function TransportControls({ sim }: { sim: Simulation }) {
 export function ScenarioControls({ sim }: { sim: Simulation }) {
   const [custom, setCustom] = useState(60)
   const [advanced, setAdvanced] = useState(false)
+  const { role } = useAuth()
+  const canEdit = CAN.changeScenario(role)
   const [weatherLoc, setWeatherLoc] = useState(0)
   const [weather, setWeather] = useState<{ status: 'idle' | 'loading' | 'ok' | 'error'; result?: WeatherResult; error?: string }>({ status: 'idle' })
 
@@ -55,7 +58,8 @@ export function ScenarioControls({ sim }: { sim: Simulation }) {
   const active = sim.scenario
 
   return (
-    <div className="space-y-3">
+    <fieldset disabled={!canEdit} className={`space-y-3 ${canEdit ? '' : 'opacity-70'}`}>
+      {!canEdit && <div className="rounded border border-line bg-panel-2 px-2 py-1.5 text-[10px] text-muted">Observer role — controls are read-only. Sign in as operator or commander to change the storm.</div>}
       <div>
         <div className="label mb-1.5">Storm scenario</div>
         <div className="grid grid-cols-2 gap-1">
@@ -141,7 +145,7 @@ export function ScenarioControls({ sim }: { sim: Simulation }) {
       </div>
       </>
       )}
-    </div>
+    </fieldset>
   )
 }
 

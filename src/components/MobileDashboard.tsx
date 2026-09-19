@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { CAN, useAuth } from '../auth/auth'
 import type { Simulation } from '../hooks/useSimulation'
 import { RISK_COLOR } from '../lib/format'
 import { formatSimTime } from '../simulation/engine'
@@ -22,6 +23,7 @@ type Tab = 'storm' | 'zone' | 'alerts' | 'analyst' | 'timeline'
 export function MobileDashboard({ sim, onHome }: { sim: Simulation; onHome: () => void }) {
   const [tab, setTab] = useState<Tab>('storm')
   const status = systemStatus(sim)
+  const { role, signOut } = useAuth()
 
   // jump to the zone tab when a district is tapped
   const [lastSel, setLastSel] = useState<string | null>(null)
@@ -52,6 +54,9 @@ export function MobileDashboard({ sim, onHome }: { sim: Simulation; onHome: () =
             {status.label}
           </span>
           <span className="mono text-[12px] font-semibold text-water">{formatSimTime(sim.state.minutes)}</span>
+          <button className="btn h-6 px-2 text-[9px]" onClick={signOut}>
+            Out
+          </button>
         </div>
       </header>
 
@@ -130,9 +135,11 @@ export function MobileDashboard({ sim, onHome }: { sim: Simulation; onHome: () =
           <button className="btn h-9" onClick={() => sim.setSpeed(sim.speed === 4 ? 0.5 : sim.speed === 0.5 ? 1 : sim.speed === 1 ? 2 : 4)} title="Speed">
             {sim.speed}×
           </button>
-          <button className="btn btn-primary h-9" onClick={sim.runDemo} disabled={sim.demoRunning}>
-            Demo
-          </button>
+          {CAN.runDemo(role) && (
+            <button className="btn btn-primary h-9" onClick={sim.runDemo} disabled={sim.demoRunning}>
+              Demo
+            </button>
+          )}
         </div>
         <div className="flex border-t border-line">
           {tabs.map((t) => (
