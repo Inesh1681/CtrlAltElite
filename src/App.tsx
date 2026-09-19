@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { CommandCenter } from './components/CommandCenter'
 import { Landing } from './components/Landing'
+import { MobileDashboard } from './components/MobileDashboard'
 import { Operations } from './components/Operations'
 import { TopBar, type ViewMode } from './components/TopBar'
+import { MOBILE_QUERY, useMediaQuery } from './hooks/useMediaQuery'
 import { useSimulation } from './hooks/useSimulation'
 
 type Route = 'landing' | 'app'
@@ -14,6 +16,7 @@ function routeFromHash(): Route {
 
 export default function App() {
   const sim = useSimulation()
+  const isMobile = useMediaQuery(MOBILE_QUERY)
   const [route, setRoute] = useState<Route>(routeFromHash)
   const [mode, setMode] = useState<ViewMode>(() => (window.location.hash === '#command' ? 'command' : 'ops'))
 
@@ -66,6 +69,8 @@ export default function App() {
       />
     )
   }
+
+  if (isMobile) return <MobileDashboard sim={sim} onHome={goHome} />
 
   return (
     <div className="scanline flex h-full min-w-[1180px] flex-col bg-bg text-text">

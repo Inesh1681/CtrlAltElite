@@ -58,6 +58,10 @@ into the dashboard with the demo already running (`#demo`); **Open dashboard** g
   [Vajiram – Nepal Floods 2026](https://vajiramandravi.com/current-affairs/nepal-flood/),
   [Nepal MoFA update, 6 Sep 2026](https://mofa.gov.np/content/1878/daily-update-6-september-2026/).
 
+On screens narrower than 900 px the dashboard switches to a stacked **mobile layout** (map + KPIs,
+sticky play bar, bottom tabs for Storm / Zone / Alerts / Analyst / Timeline). The Command Center is
+desktop-only.
+
 Keys: `Space` play/pause · `N` step · `R` reset · `D` demo · `C` command center · `O` operations.
 
 ## Architecture

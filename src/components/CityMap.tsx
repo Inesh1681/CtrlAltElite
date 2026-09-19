@@ -106,7 +106,7 @@ export function CityMap({ state, selectedZoneId, onSelect, compact, showHint }: 
 
       {showHint && (
         <div className="pointer-events-none absolute inset-x-0 bottom-3 flex justify-center">
-          <div className="panel flex items-center gap-3 px-4 py-2 text-[12px] shadow-xl" style={{ borderColor: '#22d3ee66' }}>
+          <div className="panel mx-2 flex items-center gap-3 px-3 py-2 text-[11px] shadow-xl sm:px-4 sm:text-[12px]" style={{ borderColor: '#22d3ee66' }}>
             <span className="text-water">▶</span>
             <span>
               Press <b>Play</b> or <b>Run Demo</b> to start the storm. Water flows from the hills (light) into the valley and harbour (dark).

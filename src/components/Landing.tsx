@@ -27,19 +27,21 @@ export function Landing({ onOpen, onDemo }: { onOpen: () => void; onDemo: () => 
   return (
     <div className="h-full overflow-y-auto bg-bg text-text">
       {/* nav */}
-      <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-line bg-bg/85 px-6 backdrop-blur">
+      <header className="sticky top-0 z-20 flex h-14 items-center justify-between border-b border-line bg-bg/85 px-4 backdrop-blur sm:px-6">
         <div className="flex items-center gap-2">
           <Logo />
           <span className="text-[15px] font-semibold tracking-[0.18em]">FLOWSHIELD</span>
           <span className="label ml-2 hidden sm:inline">Flood digital twin</span>
         </div>
         <nav className="flex items-center gap-2">
-          <a href="#how" className="btn border-0 bg-transparent text-muted">
-            How it works
-          </a>
-          <a href="https://github.com/Inesh1681/CtrlAltElite" target="_blank" rel="noreferrer" className="btn border-0 bg-transparent text-muted">
-            GitHub
-          </a>
+          <div className="hidden items-center gap-2 sm:flex">
+            <a href="#how" className="btn border-0 bg-transparent text-muted">
+              How it works
+            </a>
+            <a href="https://github.com/Inesh1681/CtrlAltElite" target="_blank" rel="noreferrer" className="btn border-0 bg-transparent text-muted">
+              GitHub
+            </a>
+          </div>
           <button className="btn btn-primary" onClick={onOpen}>
             Open dashboard →
           </button>
@@ -47,13 +49,13 @@ export function Landing({ onOpen, onDemo }: { onOpen: () => void; onDemo: () => 
       </header>
 
       {/* hero */}
-      <section className="mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-10 px-6 pb-12 pt-16 lg:grid-cols-[1.05fr_1fr]">
+      <section className="mx-auto grid max-w-[1200px] grid-cols-1 items-center gap-8 px-5 pb-12 pt-10 sm:px-6 sm:pt-16 lg:grid-cols-[1.05fr_1fr]">
         <div>
           <div className="label mb-4 flex items-center gap-2 text-water">
             <span className="inline-block h-1.5 w-1.5 rounded-full bg-water" />
             Flood simulation · early warning · decision support
           </div>
-          <h1 className="text-[40px] font-semibold leading-[1.08] tracking-tight sm:text-[52px]">
+          <h1 className="text-[34px] font-semibold leading-[1.08] tracking-tight sm:text-[52px]">
             See the flood
             <br />
             <span className="text-water">before it arrives.</span>
