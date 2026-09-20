@@ -10,6 +10,8 @@ const PAD = 14
 
 interface Props {
   state: SimState
+  /** ids of districts with a blocked drainage channel */
+  blocked?: string[]
   selectedZoneId: string | null
   onSelect: (id: string | null) => void
   compact?: boolean
@@ -17,7 +19,7 @@ interface Props {
   showHint?: boolean
 }
 
-export function CityMap({ state, selectedZoneId, onSelect, compact, showHint }: Props) {
+export function CityMap({ state, selectedZoneId, onSelect, compact, showHint, blocked = [] }: Props) {
   const [hover, setHover] = useState<string | null>(null)
   const W = GRID_COLS * CELL + PAD * 2
   const H = GRID_ROWS * CELL + PAD * 2
@@ -59,6 +61,7 @@ export function CityMap({ state, selectedZoneId, onSelect, compact, showHint }: 
             selected={selectedZoneId === z.id}
             hovered={hover === z.id}
             compact={compact}
+            blocked={blocked.includes(z.id)}
             onClick={() => onSelect(selectedZoneId === z.id ? null : z.id)}
             onHover={() => setHover(z.id)}
           />
@@ -127,6 +130,7 @@ function ZoneCell({
   selected,
   hovered,
   compact,
+  blocked,
   onClick,
   onHover,
 }: {
@@ -134,6 +138,7 @@ function ZoneCell({
   selected: boolean
   hovered: boolean
   compact?: boolean
+  blocked?: boolean
   onClick: () => void
   onHover: () => void
 }) {
@@ -176,6 +181,14 @@ function ZoneCell({
         <text x={x + 7} y={y + 32} fontSize="9" fontFamily="IBM Plex Mono, monospace" fill="#22d3ee" opacity="0.85">
           ▶ RIVER INLET
         </text>
+      )}
+      {blocked && (
+        <g>
+          <circle cx={x + s - 14} cy={y + 14} r={8} fill="#160D10" stroke="#ff4d4d" strokeWidth={1.2} />
+          <text x={x + s - 14} y={y + 18} fontSize="11" fontFamily="IBM Plex Mono, monospace" fill="#ff4d4d" textAnchor="middle" fontWeight={700}>
+            ⊘
+          </text>
+        </g>
       )}
       {/* labels: name, status, water depth (id and elevation live in the tooltip) */}
       {!compact && (

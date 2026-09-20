@@ -9,6 +9,7 @@ export const DEFAULT_PARAMS: SimParams = {
   conductance: 0.35,
   maxOutflowFraction: 0.4,
   outletFraction: 0.6,
+  blockedZones: [],
 }
 
 /** mm/h → metres per tick */
@@ -50,7 +51,8 @@ export function step(state: SimState, params: SimParams, profile: RainfallProfil
     // external river inflow (barrage release / upstream flood wave) enters at the inlet cells
     const inflow = flows.inflow[i] + (z.isInlet ? mmPerHourToMetresPerTick(surge, dtMinutes) : 0)
     const outflow = flows.outflow[i]
-    const capacity = mmPerHourToMetresPerTick(z.drainageCapacity * params.drainageMultiplier, dtMinutes)
+    const blocked = params.blockedZones.length > 0 && params.blockedZones.includes(z.id)
+    const capacity = blocked ? 0 : mmPerHourToMetresPerTick(z.drainageCapacity * params.drainageMultiplier, dtMinutes)
 
     const beforeDrain = Math.max(0, z.waterLevel + rainInput + inflow - outflow)
     const drained = Math.min(beforeDrain, capacity)
@@ -103,13 +105,21 @@ export function snapshot(state: SimState, rainfall: number): SimSnapshot {
   let sumUtil = 0
   let high = 0
   let flooded = 0
+  let popRisk = 0
+  let popFlooded = 0
   for (const z of state.zones) {
     sumWater += z.waterLevel
     maxWater = Math.max(maxWater, z.waterLevel)
     sumUtil += Math.min(1, z.drainageUtilization)
     const r = computeRisk(z)
-    if (r.level === 'CRITICAL' || r.level === 'FLOODED' || r.level === 'WARNING') high++
-    if (r.level === 'FLOODED') flooded++
+    if (r.level === 'CRITICAL' || r.level === 'FLOODED' || r.level === 'WARNING') {
+      high++
+      popRisk += z.population
+    }
+    if (r.level === 'FLOODED') {
+      flooded++
+      popFlooded += z.population
+    }
   }
   return {
     tick: state.tick,
@@ -120,6 +130,8 @@ export function snapshot(state: SimState, rainfall: number): SimSnapshot {
     avgDrainageUtil: sumUtil / n,
     highRiskCount: high,
     floodedCount: flooded,
+    populationAtRisk: popRisk,
+    populationFlooded: popFlooded,
   }
 }
 

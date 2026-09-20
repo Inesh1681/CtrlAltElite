@@ -63,6 +63,9 @@ export function buildStructuredState(input: ExplainInput) {
     cityAvgWater_m: Number(snap.avgWater.toFixed(3)),
     avgDrainageUtilization: Number(snap.avgDrainageUtil.toFixed(2)),
     counts: countLevels(state),
+    populationAtRisk: snap.populationAtRisk,
+    populationFlooded: snap.populationFlooded,
+    blockedDrains: params.blockedZones.map((id) => zoneName(state, id)),
     firstZoneToGoCritical: fc.firstCritical
       ? { zone: zoneName(state, fc.firstCritical.zoneId), inMinutes: fc.firstCritical.minutes }
       : null,

@@ -1,9 +1,12 @@
 import type { Simulation } from '../hooks/useSimulation'
 import { formatDuration } from '../simulation/engine'
 
+function fmtPeople(n: number): string {
+  return n >= 100000 ? `${(n / 100000).toFixed(1)} L` : n >= 1000 ? `${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : String(n)
+}
+
 export function Kpis({ sim, columns = 4 }: { sim: Simulation; columns?: number }) {
   const snap = sim.state.history[sim.state.history.length - 1]
-  const crit = sim.state.zones.filter((z) => z.waterLevel / z.floodThreshold >= 0.75).length
   const util = snap.avgDrainageUtil
   const next = sim.forecast.firstCritical
   const items = columns >= 6
@@ -12,7 +15,7 @@ export function Kpis({ sim, columns = 4 }: { sim: Simulation; columns?: number }
         { label: 'Avg water level', value: snap.avgWater.toFixed(3), unit: 'm', color: '#22d3ee' },
         { label: 'Drainage load', value: `${Math.round(util * 100)}`, unit: '%', color: util >= 0.95 ? '#ff4d4d' : util > 0.7 ? '#f5c451' : undefined },
         { label: 'High-risk zones', value: `${snap.highRiskCount}`, unit: `/ ${sim.state.zones.length}`, color: snap.highRiskCount > 0 ? '#f2913d' : '#3ddc97' },
-        { label: 'Critical + flooded', value: `${crit}`, unit: `· ${snap.floodedCount} flooded`, color: crit > 0 ? '#ff4d4d' : '#3ddc97' },
+        { label: 'People at risk', value: fmtPeople(snap.populationAtRisk), unit: `· ${fmtPeople(snap.populationFlooded)} in flooded`, color: snap.populationFlooded > 0 ? '#ff4d4d' : snap.populationAtRisk > 0 ? '#f2913d' : '#3ddc97' },
         {
           label: 'Next critical',
           value: next ? formatDuration(next.minutes) : '—',
@@ -23,7 +26,7 @@ export function Kpis({ sim, columns = 4 }: { sim: Simulation; columns?: number }
     : [
         { label: 'Rain right now', value: `${Math.round(snap.rainfall)}`, unit: 'mm/h', color: snap.rainfall > 60 ? '#f2913d' : undefined },
         { label: 'Drains under load', value: `${Math.round(util * 100)}`, unit: '% of capacity', color: util >= 0.95 ? '#ff4d4d' : util > 0.7 ? '#f5c451' : undefined },
-        { label: 'Districts at risk', value: `${snap.highRiskCount}`, unit: `of ${sim.state.zones.length} · ${snap.floodedCount} flooded`, color: snap.floodedCount > 0 ? '#ff4d4d' : snap.highRiskCount > 0 ? '#f2913d' : '#3ddc97' },
+        { label: 'People at risk', value: fmtPeople(snap.populationAtRisk), unit: `in ${snap.highRiskCount} districts · ${snap.floodedCount} flooded`, color: snap.floodedCount > 0 ? '#ff4d4d' : snap.highRiskCount > 0 ? '#f2913d' : '#3ddc97' },
         {
           label: 'Next district to go critical',
           value: next ? formatDuration(next.minutes) : 'none',

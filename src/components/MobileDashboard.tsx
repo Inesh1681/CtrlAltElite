@@ -9,7 +9,7 @@ import { CityMap, RiskLegend } from './CityMap'
 import { ScenarioControls } from './Controls'
 import { Kpis } from './Kpis'
 import { Logo } from './Landing'
-import { Timeline, TimelineLegend } from './Timeline'
+import { Timeline, TimelineLegend, TimeScrubber } from './Timeline'
 import { systemStatus } from './TopBar'
 import { WhatIfStrip } from './WhatIfPanel'
 import { ZoneDetail } from './ZoneDetail'
@@ -71,7 +71,7 @@ export function MobileDashboard({ sim, onHome }: { sim: Simulation; onHome: () =
               <span className="mono text-[9px] text-muted">tap a district</span>
             </div>
             <div className="aspect-[4/3] p-1">
-              <CityMap state={sim.state} selectedZoneId={sim.selectedZoneId} onSelect={sim.selectZone} compact showHint={!sim.playing && sim.state.tick === 0} />
+              <CityMap state={sim.state} blocked={sim.params.blockedZones} selectedZoneId={sim.selectedZoneId} onSelect={sim.selectZone} compact showHint={!sim.playing && sim.state.tick === 0} />
             </div>
             <div className="overflow-x-auto border-t border-line px-2 py-1.5">
               <RiskLegend />
@@ -112,6 +112,9 @@ export function MobileDashboard({ sim, onHome }: { sim: Simulation; onHome: () =
                 </div>
                 <div className="overflow-x-auto px-3 py-2">
                   <TimelineLegend />
+                </div>
+                <div className="border-t border-line px-3 py-2">
+                  <TimeScrubber tick={sim.state.tick} maxTick={sim.maxTick} onScrub={sim.scrubTo} />
                 </div>
               </div>
             )}

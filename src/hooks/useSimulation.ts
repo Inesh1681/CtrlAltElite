@@ -33,6 +33,8 @@ export interface Simulation {
   whatIfIsFallback: boolean
   demoRunning: boolean
   finished: boolean
+  /** number of recorded ticks that can be scrubbed to (0..maxTick) */
+  maxTick: number
 
   play: () => void
   pause: () => void
@@ -46,6 +48,10 @@ export interface Simulation {
   setWhatIfDrainage: (m: number) => void
   selectZone: (id: string | null) => void
   runDemo: () => void
+  /** block / unblock a district's drainage channel */
+  toggleBlocked: (id: string) => void
+  /** rewind (or fast-forward within recorded history) to a tick; pauses */
+  scrubTo: (tick: number) => void
 }
 
 function resolveProfile(choice: ScenarioChoice): RainfallProfile {
@@ -73,6 +79,9 @@ export function useSimulation(): Simulation {
   const profileRef = useRef(profile)
   const demoRef = useRef(demoRunning)
   const selectedRef = useRef(selectedZoneId)
+  // full state per tick so the timeline can be scrubbed
+  const framesRef = useRef<SimState[]>([state])
+  const [maxTick, setMaxTick] = useState(0)
   useEffect(() => {
     stateRef.current = state
     paramsRef.current = params
@@ -94,6 +103,8 @@ export function useSimulation(): Simulation {
     const newAlerts = diffAlerts(prev, next, nextFc)
     stateRef.current = next
     setState(next)
+    framesRef.current = [...framesRef.current.slice(0, prev.tick + 1), next]
+    setMaxTick(next.tick)
     if (newAlerts.length) {
       setAlerts((a) => [...newAlerts, ...a].slice(0, 60))
       // during the demo, auto-focus the first zone that escalates so the detail
@@ -126,6 +137,8 @@ export function useSimulation(): Simulation {
     const fresh = createInitialState(CITY)
     stateRef.current = fresh
     setState(fresh)
+    framesRef.current = [fresh]
+    setMaxTick(0)
     setAlerts([])
   }, [])
 
@@ -184,6 +197,7 @@ export function useSimulation(): Simulation {
     whatIfIsFallback: whatIfTarget?.fallback ?? false,
     demoRunning,
     finished,
+    maxTick,
     play: () => setPlaying(true),
     pause: () => setPlaying(false),
     toggle: () => setPlaying((p) => !p),
@@ -199,5 +213,21 @@ export function useSimulation(): Simulation {
     setWhatIfDrainage,
     selectZone: setSelectedZoneId,
     runDemo,
+    toggleBlocked: (id) =>
+      setParams((p) => ({
+        ...p,
+        blockedZones: p.blockedZones.includes(id) ? p.blockedZones.filter((z) => z !== id) : [...p.blockedZones, id],
+      })),
+    scrubTo: (tick) => {
+      const frames = framesRef.current
+      const t = Math.max(0, Math.min(frames.length - 1, Math.round(tick)))
+      const target = frames[t]
+      if (!target) return
+      setPlaying(false)
+      stateRef.current = target
+      setState(target)
+      // drop alerts raised after this point so replaying does not duplicate them
+      setAlerts((a) => a.filter((al) => al.minutes <= target.minutes))
+    },
   }
 }

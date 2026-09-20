@@ -56,6 +56,28 @@ export function Timeline({ history, zonesTotal }: { history: SimSnapshot[]; zone
   )
 }
 
+/** Interactive time slider: rewind the simulation to any recorded tick. */
+export function TimeScrubber({ tick, maxTick, onScrub, minutesPerTick = 5 }: { tick: number; maxTick: number; onScrub: (t: number) => void; minutesPerTick?: number }) {
+  return (
+    <div className="flex items-center gap-2">
+      <span className="label text-[9px]">Time</span>
+      <input
+        type="range"
+        min={0}
+        max={Math.max(maxTick, 1)}
+        step={1}
+        value={tick}
+        disabled={maxTick === 0}
+        onChange={(e) => onScrub(Number(e.target.value))}
+        className="w-40"
+        title="Drag to rewind / replay the recorded simulation"
+      />
+      <span className="mono w-14 text-[10px] text-water">{formatSimTime(tick * minutesPerTick)}</span>
+      {tick < maxTick && <span className="mono text-[9px] text-warning">rewound · play resumes here</span>}
+    </div>
+  )
+}
+
 export function TimelineLegend() {
   return (
     <div className="mono flex items-center gap-3 text-[10px] text-muted">

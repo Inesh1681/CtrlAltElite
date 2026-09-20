@@ -1,9 +1,11 @@
+import { CAN, useAuth } from '../auth/auth'
 import type { Simulation } from '../hooks/useSimulation'
 import { RISK_BG, RISK_COLOR } from '../lib/format'
 import { formatDuration } from '../simulation/engine'
 import { computeRisk, inflowLabel } from '../simulation/risk'
 
 export function ZoneDetail({ sim }: { sim: Simulation }) {
+  const { role } = useAuth()
   const z = sim.state.zones.find((q) => q.id === sim.selectedZoneId)
   if (!z) {
     return (
@@ -52,13 +54,25 @@ export function ZoneDetail({ sim }: { sim: Simulation }) {
       </div>
 
       <div className="grid grid-cols-2 gap-x-3 gap-y-2 p-3">
-        <Stat label="Elevation" value={`${z.elevation.toFixed(1)} m`} />
+        <Stat label="Elevation" value={`${z.elevation.toFixed(1)} m`} sub={`${z.population.toLocaleString('en-IN')} residents`} />
         <Stat label="Rainfall" value={`${Math.round(z.rainfallIntensity)} mm/h`} />
-        <Stat label="Drainage" value={`${Math.round(z.drainageUtilization * 100)}%`} sub={`of ${Math.round(z.drainageCapacity * sim.params.drainageMultiplier)} mm/h`} color={z.drainageUtilization >= 1 ? '#ff4d4d' : undefined} />
+        <Stat label="Drainage" value={sim.params.blockedZones.includes(z.id) ? 'BLOCKED' : `${Math.round(z.drainageUtilization * 100)}%`} sub={sim.params.blockedZones.includes(z.id) ? 'channel blocked · 0 mm/h' : `of ${Math.round(z.drainageCapacity * sim.params.drainageMultiplier)} mm/h`} color={sim.params.blockedZones.includes(z.id) || z.drainageUtilization >= 1 ? '#ff4d4d' : undefined} />
         <Stat label="Upstream inflow" value={inflow} sub={`${(z.inflow * 1000).toFixed(1)} mm / tick`} color={inflow === 'HIGH' ? '#f2913d' : undefined} />
         <Stat label="Incoming flow" value={`+${(z.inflow * 100).toFixed(1)} cm`} sub="per 5 min" />
         <Stat label="Outgoing flow" value={`−${((z.outflow + z.seaDischarge) * 100).toFixed(1)} cm`} sub={outflowTo ? `→ ${outflowTo.name}` : z.isOutlet ? '→ sea' : 'none'} />
       </div>
+
+      {CAN.changeParams(role) && (
+        <div className="flex items-center justify-between border-t border-line px-3 py-2">
+          <div className="text-[10.5px] text-muted">Scenario: simulate a blocked drainage channel here</div>
+          <button
+            className={`btn h-6 px-2 text-[10px] ${sim.params.blockedZones.includes(z.id) ? 'border-critical text-critical' : ''}`}
+            onClick={() => sim.toggleBlocked(z.id)}
+          >
+            {sim.params.blockedZones.includes(z.id) ? '⊘ Unblock drain' : '⊘ Block drain'}
+          </button>
+        </div>
+      )}
 
       <div className="border-t border-line p-3">
         <div className="label mb-2">Why this zone is {r.level === 'SAFE' ? 'safe' : 'at risk'}</div>

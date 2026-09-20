@@ -149,10 +149,18 @@ export function generateCity(): ZoneStatic[] {
         // the river enters from the west edge: the col-0 cell(s) nearest the river line
         isInlet: col === 0 && Math.abs(row - riverRow(0)) < 1,
         landUse,
+        population: populationFor(landUse, hash01(col, row, 13)),
       })
     }
   }
   return zones
+}
+
+/** synthetic residents per district by land use (dense Indian urban wards) */
+function populationFor(landUse: ZoneStatic['landUse'], h: number): number {
+  const base =
+    landUse === 'residential' ? 14000 : landUse === 'commercial' ? 6000 : landUse === 'industrial' ? 3000 : landUse === 'waterfront' ? 9000 : 600
+  return Math.round((base * (0.8 + h * 0.5)) / 100) * 100
 }
 
 export function zoneId(idx: number): string {

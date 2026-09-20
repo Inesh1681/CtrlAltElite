@@ -200,3 +200,30 @@ describe('forecast, what-if and alerts', () => {
     expect(raised).toBeGreaterThan(0)
   })
 })
+
+describe('bonus features', () => {
+  it('a blocked drainage channel holds more water than an open one', () => {
+    const target = city.find((z) => z.landUse === 'residential' && z.elevation > 12)!
+    let open = createInitialState(city)
+    let blocked = createInitialState(city)
+    for (let i = 0; i < 12; i++) {
+      open = step(open, DEFAULT_PARAMS, HEAVY_MONSOON)
+      blocked = step(blocked, { ...DEFAULT_PARAMS, blockedZones: [target.id] }, HEAVY_MONSOON)
+    }
+    const wOpen = open.zones.find((z) => z.id === target.id)!.waterLevel
+    const wBlocked = blocked.zones.find((z) => z.id === target.id)!.waterLevel
+    expect(wBlocked).toBeGreaterThan(wOpen)
+    // other districts are unaffected at the moment of blocking (same tick-0 inputs)
+    expect(blocked.zones.filter((z) => z.id !== target.id).every((z) => z.population > 0)).toBe(true)
+  })
+
+  it('population at risk is the sum of residents in WARNING+ districts', () => {
+    let s = createInitialState(city)
+    for (let i = 0; i < 24; i++) s = step(s, DEFAULT_PARAMS, HEAVY_MONSOON)
+    const snap = s.history[s.history.length - 1]
+    const expected = s.zones.filter((z) => ['WARNING', 'CRITICAL', 'FLOODED'].includes(computeRisk(z).level)).reduce((a, z) => a + z.population, 0)
+    expect(snap.populationAtRisk).toBe(expected)
+    expect(snap.populationAtRisk).toBeGreaterThan(0)
+    expect(snap.populationFlooded).toBeLessThanOrEqual(snap.populationAtRisk)
+  })
+})

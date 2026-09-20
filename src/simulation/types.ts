@@ -32,6 +32,8 @@ export interface ZoneStatic {
   /** true for the cells where the river enters the city (receive upstream surge) */
   isInlet: boolean
   landUse: 'residential' | 'commercial' | 'industrial' | 'park' | 'waterfront'
+  /** resident population (synthetic, used for affected-population estimates) */
+  population: number
 }
 
 export interface ZoneDynamic {
@@ -68,6 +70,8 @@ export interface SimParams {
   maxOutflowFraction: number
   /** fraction of an outlet zone's water discharged to the sea each tick */
   outletFraction: number
+  /** ids of zones whose drainage channel is blocked (capacity → 0) */
+  blockedZones: string[]
 }
 
 export interface RainfallProfile {
@@ -95,6 +99,10 @@ export interface SimSnapshot {
   avgDrainageUtil: number
   highRiskCount: number
   floodedCount: number
+  /** residents in WARNING / CRITICAL / FLOODED districts */
+  populationAtRisk: number
+  /** residents in FLOODED districts */
+  populationFlooded: number
 }
 
 export interface SimState {

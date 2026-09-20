@@ -7,7 +7,7 @@ import { AlertsFeed } from './AlertsFeed'
 import { CityMap, RiskLegend } from './CityMap'
 import { TransportControls } from './Controls'
 import { Kpis } from './Kpis'
-import { Timeline, TimelineLegend } from './Timeline'
+import { Timeline, TimelineLegend, TimeScrubber } from './Timeline'
 import { systemStatus } from './TopBar'
 import { WhatIfStrip } from './WhatIfPanel'
 
@@ -66,12 +66,15 @@ export function CommandCenter({ sim }: { sim: Simulation }) {
             <RiskLegend />
           </div>
           <div className="min-h-0 flex-1 p-1">
-            <CityMap state={sim.state} selectedZoneId={sim.selectedZoneId} onSelect={sim.selectZone} />
+            <CityMap state={sim.state} blocked={sim.params.blockedZones} selectedZoneId={sim.selectedZoneId} onSelect={sim.selectZone} />
           </div>
         </section>
         <section className="panel flex h-[18vh] max-h-[160px] min-h-[110px] shrink-0 flex-col">
           <div className="panel-head py-1.5">
-            <span className="label">Simulation timeline</span>
+            <div className="flex items-center gap-4">
+              <span className="label">Simulation timeline</span>
+              <TimeScrubber tick={sim.state.tick} maxTick={sim.maxTick} onScrub={sim.scrubTo} />
+            </div>
             <TimelineLegend />
           </div>
           <div className="min-h-0 flex-1">

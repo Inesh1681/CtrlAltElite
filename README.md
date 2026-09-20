@@ -10,6 +10,55 @@ drainage intervention delays flooding.
 
 > RAIN → WATER ACCUMULATION → FLOW THROUGH CITY → RISK PREDICTION → EARLY WARNING → INTERVENTION → FLOOD DELAY
 
+**Live app:** https://flowshield-jade.vercel.app · **Repo:** https://github.com/Inesh1681/CtrlAltElite · **Demo video:** `FLOWSHIELD-demo.mp4` (submitted with the form)
+
+## AI component (what it is, and what it is not)
+
+FLOWSHIELD has one AI component: the **Analyst** panel.
+
+- **Model:** Anthropic Claude (`claude-opus-5`) via the official `@anthropic-ai/sdk`, called from the
+  Vercel serverless function [`api/explain.ts`](api/explain.ts). The API key lives only on the server
+  (`ANTHROPIC_API_KEY`); it is never shipped to the browser.
+- **Input:** a structured JSON snapshot of the *current simulation state* (per-district water level,
+  risk level and score, drainage load, upstream inflow, time-to-critical, population at risk, the
+  what-if comparison). Built in [`src/ai/explain.ts`](src/ai/explain.ts) → `buildStructuredState()`.
+- **Task:** explain *why* the focus district is at risk, which factors dominate, what intervention
+  helps (quoting the what-if delay), and which districts to monitor next. The system prompt forbids
+  inventing numbers — every figure it quotes comes from the engine.
+- **The simulation engine is not AI.** Water balance, flow, risk scoring and forecasting are
+  deterministic numerical code in `src/simulation/` (unit-tested). The AI interprets that state; it
+  does not produce it.
+- **Fallback (disclosed, not hidden):** if the API key is missing, the network fails, or the rate
+  limit is hit, a deterministic rule-based explainer produces the same four sections from the same
+  snapshot, and the panel badge reads **RULE ENGINE** instead of **CLAUDE OPUS 5**. This keeps the
+  demo from breaking offline; it is labelled as a fallback in the UI and in this README.
+- **Cost guards:** identical snapshots are served from a cache, 40 calls / IP / hour, 900-token cap.
+
+Other AI use: the team used an AI coding assistant (Claude Code) during the hackathon for writing
+code, as permitted by the rules; the model, simulation design, calibration and integration decisions
+are the team's own.
+
+## Requirements coverage
+
+| Brochure requirement | Where |
+|---|---|
+| Configure rainfall intensity | Rainfall slider, custom mm/h, presets, live Open-Meteo |
+| City as a connected grid of regions | 48-district grid, 4-neighbour connectivity (`src/simulation/city.ts`) |
+| Water accumulation and movement between regions | Water balance + gradient flow (`engine.ts`, `flow.ts`) |
+| Drainage capacity and terrain / elevation | Per-district capacity, pit-filled elevation, sea outlet |
+| Water levels over time | 5-minute timesteps, timeline chart, per-district depth |
+| Classify Safe / Warning / Critical | SAFE · WATCH · WARNING · CRITICAL · FLOODED (`risk.ts`) |
+| Time-based flood progression visualisation | Animated map (water gauge, flow arrows), timeline |
+| Identify regions reaching critical | High-risk list, map frames, alerts |
+| Estimated time to critical | 5-hour forward projection per district (`forecast.ts`), shown in KPI, zone panel, alerts |
+| **Bonus** normal + heavy rainfall | NORMAL RAIN, HEAVY MONSOON, EXTREME STORM presets |
+| **Bonus** drainage failure | City-wide drainage slider (down to 40 %) |
+| **Bonus** blocked drainage channel | Per-district **⊘ Block drain** toggle in the zone panel (capacity → 0, marked on the map) |
+| **Bonus** compare scenarios | What-if: baseline vs scenario drainage, delay in minutes, peak critical zones |
+| **Bonus** estimated affected population | **People at risk** KPI (residents in WARNING+ / FLOODED districts), per-district residents |
+| **Bonus** interactive time slider | **Time** scrubber under the timeline — rewinds the real state; play resumes from there |
+| Extra | Upstream surge (Nepal → Gandak) scenario, live weather, AI analyst, roles + Google sign-in, mobile layout |
+
 ## Run
 
 ```bash
@@ -148,9 +197,20 @@ load; no randomness anywhere in the simulation.
 Risk = 0.45·water/threshold + 0.15·rain + 0.15·drainage load + 0.10·low elevation + 0.15·upstream
 inflow, with hard overrides at 25 / 50 / 75 / 100 % of the flood threshold.
 
+## Disclosures (libraries, templates, data)
+
+- Scaffolded with the standard `npm create vite@latest` React + TypeScript template during the
+  hackathon; all application code was written during the event.
+- Open-source libraries: React, Vite, Tailwind CSS v4, Recharts, Vitest, Firebase JS SDK (auth
+  only), `@anthropic-ai/sdk` (server-side only). No pre-built flood or simulation code was used.
+- Data: the city, terrain and population figures are **synthetic** and labelled as such in the UI.
+  Rainfall presets are annotated with IMD categories and reference events; live rainfall comes from
+  Open-Meteo; the Nepal surge hydrograph is illustrative (sources linked above).
+
 ## Known limitations
 
 - Synthetic city and terrain (Indian-style district names, not a real city); no real DEM or GIS layers. Open-Meteo provides real rainfall only; the surge hydrograph is illustrative.
 - Simplified routing (no Manning/St-Venant), 4-neighbour connectivity, single water column per zone.
-- "Drainage capacity" is a single city-wide multiplier in the what-if; no per-district interventions.
+- The what-if compares city-wide drainage multipliers; the only per-district intervention is blocking / unblocking a drain.
+- Population figures are synthetic per-district estimates, not census data.
 - Auth is a shared access code checked client-side (no backend) — a gate for the demo, not security.
