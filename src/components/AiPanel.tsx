@@ -77,7 +77,7 @@ export function AiPanel({ sim, auto }: { sim: Simulation; auto?: boolean }) {
         ) : (
           <div className="text-[11px] text-muted">
             The analyst reads the structured simulation state — never the map — and explains why zones are at risk, which factors dominate, and what to do about it.
-            {!aiOn && <div className="mt-2 text-dim">Set ANTHROPIC_API_KEY on the server (Vercel env / .env) to enable Claude; the deterministic rule engine is active.</div>}
+            {!aiOn && <div className="mt-2 text-dim">This deployment runs the deterministic rule engine (no LLM key configured). The same panel switches to Claude when ANTHROPIC_API_KEY is set on the server.</div>}
           </div>
         )}
       </div>

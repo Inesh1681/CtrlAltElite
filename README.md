@@ -14,11 +14,20 @@ drainage intervention delays flooding.
 
 ## AI component (what it is, and what it is not)
 
-FLOWSHIELD has one AI component: the **Analyst** panel.
+FLOWSHIELD has one AI component: the **Analyst** panel. It has two interchangeable back-ends that
+read the *same* structured simulation state and produce the *same* four sections; the panel badge
+always shows which one answered.
 
-- **Model:** Anthropic Claude (`claude-opus-5`) via the official `@anthropic-ai/sdk`, called from the
-  Vercel serverless function [`api/explain.ts`](api/explain.ts). The API key lives only on the server
-  (`ANTHROPIC_API_KEY`); it is never shipped to the browser.
+- **LLM back-end — Anthropic Claude (`claude-opus-5`)** via the official `@anthropic-ai/sdk`, called
+  from the Vercel serverless function [`api/explain.ts`](api/explain.ts). The API key lives only on
+  the server (`ANTHROPIC_API_KEY`); it is never shipped to the browser. Enabled by setting that one
+  variable. **The public demo at flowshield-jade.vercel.app runs without an API key** (no paid
+  account was used for the hackathon), so it answers with the rule engine below; the Claude path is
+  fully implemented and tested locally with a key.
+- **Rule-engine back-end (what the public demo uses)** — a deterministic explainer in
+  [`src/ai/explain.ts`](src/ai/explain.ts) → `fallbackExplanation()` that turns the risk factors,
+  time-to-critical forecast and what-if comparison into plain-English situation / why / interventions
+  / monitor sections. It is generated from the engine's numbers at run time — nothing is hard-coded.
 - **Input:** a structured JSON snapshot of the *current simulation state* (per-district water level,
   risk level and score, drainage load, upstream inflow, time-to-critical, population at risk, the
   what-if comparison). Built in [`src/ai/explain.ts`](src/ai/explain.ts) → `buildStructuredState()`.
@@ -28,10 +37,9 @@ FLOWSHIELD has one AI component: the **Analyst** panel.
 - **The simulation engine is not AI.** Water balance, flow, risk scoring and forecasting are
   deterministic numerical code in `src/simulation/` (unit-tested). The AI interprets that state; it
   does not produce it.
-- **Fallback (disclosed, not hidden):** if the API key is missing, the network fails, or the rate
-  limit is hit, a deterministic rule-based explainer produces the same four sections from the same
-  snapshot, and the panel badge reads **RULE ENGINE** instead of **CLAUDE OPUS 5**. This keeps the
-  demo from breaking offline; it is labelled as a fallback in the UI and in this README.
+- **Which one is live:** the panel badge reads **CLAUDE OPUS 5** when the LLM answered and
+  **RULE ENGINE** otherwise (no key, network failure, or rate limit). Nothing is faked: the badge is
+  set from the actual response source.
 - **Cost guards:** identical snapshots are served from a cache, 40 calls / IP / hour, 900-token cap.
 
 Other AI use: the team used an AI coding assistant (Claude Code) during the hackathon for writing
