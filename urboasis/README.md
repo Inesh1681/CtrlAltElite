@@ -14,6 +14,10 @@ when to follow up, when to escalate and when to file an RTI, with each document 
   *Not filed → Waiting → Follow up → Escalate → RTI → Fixed*.
 - **Writes the documents:** follow-up, escalation letter addressed to the right officer, X post, and
   an RTI application under Section 6(1) with the five questions that get a written answer.
+- **Community board:** a public list of issues ranked by resident votes (one vote per Google account,
+  enforced by Firestore rules), with a map, filters by department and city corporation, and a printable
+  top-issues list for the ward office. Letters quote the vote count. Needs a Firebase project, see
+  [FIREBASE-SETUP.md](FIREBASE-SETUP.md). Until then it shows a labelled preview.
 - **Neighbour co-signing:** a share link (WhatsApp, native share with photo, or copy) opens the same
   complaint pre-filled so neighbours can file their own.
 - **Private by design:** no account and no server. Data lives in `localStorage`, photos in IndexedDB,
@@ -21,14 +25,16 @@ when to follow up, when to escalate and when to file an RTI, with each document 
 
 ## Run locally
 
-It's one static file. Serve the folder with any static server, for example:
+It's two static files: `index.html` (the app) and `pitch.html` (for judges and investors). From the repo folder, serve it with any static server, for example:
 
 ```bash
-npx serve urboasis
+npx serve .
 ```
 
-Deploy by uploading `index.html` to Vercel, Netlify, GitHub Pages or Cloudflare Pages. It needs
+Deploy by uploading the folder to Vercel, Netlify, GitHub Pages or Cloudflare Pages. It needs
 HTTPS for "Use my location".
+
+Everything that still needs checking against official sources is listed in [TODO-VERIFY.md](TODO-VERIFY.md).
 
 ## Before going public
 

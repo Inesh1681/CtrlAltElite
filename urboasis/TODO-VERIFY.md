@@ -25,3 +25,8 @@ Open `index.html?verify` or `pitch.html?verify` to see every spot outlined on th
 - [ ] `PROOF.complaints`, `PROOF.fixed`, `PROOF.societies` in **both** index.html and pitch.html
 - [ ] `PROOF.caseStudy` in index.html: title, place, dates, before/after photo URLs, quote
 - [ ] Pricing (₹999/month) and running-cost estimates are hypotheses. Keep the "may change" wording until validated
+
+## Community board
+- [ ] Create the Firebase project and paste its config into `const FIREBASE` (see FIREBASE-SETUP.md)
+- [ ] Publish `firestore.rules` and add `inesh1681.github.io` to Firebase authorized domains
+- [ ] Decide who moderates posts, and check the Firestore console regularly

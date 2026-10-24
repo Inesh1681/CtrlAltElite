@@ -1,0 +1,67 @@
+rules_version = '2';
+// UrbOasis community board.
+// - Anyone can read issues (the board is public, including for officials).
+// - Signed-in users can post an issue, which counts as their first vote.
+// - Each user can vote once per issue: the vote document's ID is their user ID, and the
+//   issue's vote count may only move by exactly one in the same write as that document.
+// - Only the person who posted an issue can mark it fixed or reopen it.
+// - No names, emails or phone numbers are stored, only the anonymous user ID.
+service cloud.firestore {
+  match /databases/{db}/documents {
+
+    function issuePath(id) { return /databases/$(db)/documents/issues/$(id); }
+    function votePath(id) { return /databases/$(db)/documents/issues/$(id)/votes/$(request.auth.uid); }
+    function onlyChanged(keys) { return request.resource.data.diff(resource.data).affectedKeys().hasOnly(keys); }
+
+    match /issues/{id} {
+      allow read: if true;
+
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(['cat','ag','title','area','landmark','lat','lng','corp','status','votes','createdBy','createdAt'])
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.votes == 1
+        && request.resource.data.status == 'open'
+        && request.resource.data.title is string && request.resource.data.title.size() > 0 && request.resource.data.title.size() <= 90
+        && request.resource.data.area is string && request.resource.data.area.size() <= 120
+        && request.resource.data.landmark is string && request.resource.data.landmark.size() <= 120
+        && request.resource.data.lat is number && request.resource.data.lat > 12.4 && request.resource.data.lat < 13.5
+        && request.resource.data.lng is number && request.resource.data.lng > 77.0 && request.resource.data.lng < 78.2
+        && request.resource.data.createdAt == request.time
+        && existsAfter(votePath(id));
+
+      allow update: if request.auth != null && (
+        // add a vote: +1 together with creating your vote document
+        (onlyChanged(['votes'])
+          && request.resource.data.votes == resource.data.votes + 1
+          && !exists(votePath(id)) && existsAfter(votePath(id)))
+        ||
+        // remove your vote: -1 together with deleting your vote document
+        (onlyChanged(['votes'])
+          && request.resource.data.votes == resource.data.votes - 1
+          && exists(votePath(id)) && !existsAfter(votePath(id)))
+        ||
+        // the poster marks it fixed or reopens it
+        (onlyChanged(['status'])
+          && resource.data.createdBy == request.auth.uid
+          && request.resource.data.status in ['open', 'fixed'])
+      );
+
+      allow delete: if false;
+
+      match /votes/{uid} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow create: if request.auth != null && request.auth.uid == uid
+          && request.resource.data.keys().hasOnly(['at'])
+          && (
+            // voting on an existing issue: its count goes up by one in the same write
+            (exists(issuePath(id)) && getAfter(issuePath(id)).data.votes == get(issuePath(id)).data.votes + 1)
+            ||
+            // posting a new issue: it is created with exactly one vote
+            (!exists(issuePath(id)) && getAfter(issuePath(id)).data.votes == 1)
+          );
+        allow delete: if request.auth != null && request.auth.uid == uid
+          && getAfter(issuePath(id)).data.votes == get(issuePath(id)).data.votes - 1;
+      }
+    }
+  }
+}

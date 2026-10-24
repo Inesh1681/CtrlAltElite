@@ -77,7 +77,8 @@ button{font:inherit;color:inherit}
 /* ---------- nav ---------- */
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:40;background:var(--surface)}
 .nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:30;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
-.nav .wrap{display:flex;align-items:center;gap:var(--s3);height:var(--nav-h)}
+.nav .wrap{display:flex;align-items:center;gap:var(--s3);height:var(--nav-h);max-width:1240px}
+.links .nl{padding:0 10px}
 .brand{display:flex;gap:10px;align-items:center;text-decoration:none;flex:none;min-height:44px}
 .mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--accent);color:var(--on-accent);font-size:15px;flex:none}
 .brand b{display:block;font:800 18px/1 var(--f-body);letter-spacing:-.01em}
@@ -394,14 +395,38 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
 [data-verify]{} /* TODO-VERIFY marker; add ?verify to the URL to highlight */
 .show-verify [data-verify]{outline:2px dashed #e0a100;outline-offset:2px}
 
+/* ---------- community board ---------- */
+.icard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--s3);align-items:center;padding:var(--s3) var(--s3) var(--s3) var(--s4);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);transition:box-shadow .15s,border-color .15s}
+.icard:hover,.icard.hl{box-shadow:var(--sh-1);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
+.icard .rank{font-size:var(--fs-sm);font-weight:600;color:var(--muted);min-width:30px}
+.icard-main{appearance:none;border:0;background:none;padding:0;text-align:left;cursor:pointer;display:grid;gap:3px;min-width:0;min-height:44px;align-content:center;color:inherit}
+.icard-main b{font-size:16px;font-weight:650;line-height:1.35}
+.icard-main small{font-size:var(--fs-sm);color:var(--muted)}
+.vote{appearance:none;display:grid;justify-items:center;align-content:center;min-width:64px;min-height:64px;padding:6px 8px;border:1.5px solid var(--line);border-radius:var(--r-md);background:var(--surface);cursor:pointer;color:var(--ink);font:inherit;transition:background .15s,border-color .15s,transform .12s ease-out}
+.vote:hover{border-color:var(--accent)}
+.vote:active{transform:scale(.95)}
+.vote i{font-size:13px;color:var(--accent-ink)}
+.vote .vn{font:800 19px/1.15 var(--f-body);font-variant-numeric:tabular-nums}
+.vote .vl{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.05em}
+.vote.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.vote.on i,.vote.on .vl{color:var(--on-accent)}
+.vote:disabled{cursor:default;background:color-mix(in srgb,var(--st-fixed) 10%,var(--surface));border-color:color-mix(in srgb,var(--st-fixed) 35%,var(--line))}
+.vote:disabled i{color:var(--st-fixed)}
+.vote.big{min-width:96px;min-height:88px;border-radius:var(--r-lg)}
+.vote.big .vn{font-size:30px}
+.mk .mono{font-size:11.5px;font-weight:700}
+@media (max-width:640px){.icard{padding-left:var(--s3)}.icard .rank{min-width:24px}.vote{min-width:56px}}
+
 /* ---------- responsive ---------- */
-@media (max-width:960px){
+@media (max-width:1180px){
   .links,.nav-cta{display:none}
   .menu-btn{display:grid}
   #theme{margin-left:auto}
   .bottombar.on{display:block}
   body.has-bar{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
   body.has-bar .toasts{bottom:calc(92px + env(safe-area-inset-bottom,0px))}
+}
+@media (max-width:960px){
   .hero{grid-template-columns:1fr;padding-block:var(--s6) var(--s6);gap:var(--s6)}
   .steps{grid-template-columns:1fr 1fr}
   .pain,.prices{grid-template-columns:1fr}
@@ -445,6 +470,7 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
     <nav class="links" aria-label="Main">
       <a class="nl" href="#how" data-go="home" data-anchor="how">How it works</a>
       <a class="nl" href="#guide" data-go="guide">Who to contact</a>
+      <a class="nl" href="#board" data-go="board">Community board</a>
       <a class="nl" href="#societies" data-go="societies">For societies</a>
       <a class="nl" href="#complaints" data-go="complaints">My complaints<span class="badge" data-badge hidden></span></a>
     </nav>
@@ -456,6 +482,7 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
     <nav class="wrap" aria-label="Main">
       <a class="nl" href="#how" data-go="home" data-anchor="how">How it works</a>
       <a class="nl" href="#guide" data-go="guide">Who to contact</a>
+      <a class="nl" href="#board" data-go="board">Community board</a>
       <a class="nl" href="#societies" data-go="societies">For societies</a>
       <a class="nl" href="#complaints" data-go="complaints">My complaints<span class="badge" data-badge hidden></span></a>
       <a class="nl" href="pitch.html">About the project</a>
@@ -490,6 +517,10 @@ const PROOF={
   societies:null,    // TODO: societies in the pilot
   caseStudy:null,    // TODO: {title:'', where:'', filed:'2026-..-..', fixed:'2026-..-..', before:'img url', after:'img url', quote:''}
 };
+
+/* Community board (shared voting) runs on Firebase. Paste your project's web config here to switch it on; see FIREBASE-SETUP.md.
+   These values identify the project and are safe to publish. Firestore security rules control who can write. */
+const FIREBASE=null;   // e.g. {apiKey:'...',authDomain:'your-project.firebaseapp.com',projectId:'your-project',appId:'...'}
 
 const EMERGENCY='112';   // National emergency number. Never used as a department helpline.
 
@@ -655,7 +686,7 @@ let S=migrate(LS.get('uo2',null));
 if(S.showEx&&!S.list.length)S.list=examples();
 function save(){if(!LS.set('uo2',{v:SCHEMA,list:S.list.filter(c=>!c.sample),profile:S.profile,showEx:S.showEx}))toast('This browser is blocking storage, so changes will be lost when you close the tab','fa-triangle-exclamation')}
 const mine=()=>S.list.filter(c=>!c.sample);
-const blankDraft=()=>({step:0,cat:'',title:'',desc:'',sev:'hazard',lat:null,lng:null,area:'',landmark:'',areaAuto:true,corp:'',corpAuto:true,hasPhoto:false,exif:null,text:'',textEdited:false,ref:'',filed:false,cosign:false});
+const blankDraft=()=>({step:0,cat:'',title:'',desc:'',sev:'hazard',lat:null,lng:null,area:'',landmark:'',areaAuto:true,corp:'',corpAuto:true,hasPhoto:false,exif:null,text:'',textEdited:false,ref:'',filed:false,cosign:false,post:true,publicId:null});
 let D=Object.assign(blankDraft(),LS.get('uo2-draft',{}));
 const saveDraft=()=>LS.set('uo2-draft',D);
 let openBox=new Set(), lastQ='', draftPhoto=null, view='home', detail=null, filter='all', docTab={}, pendingDel=null, results=null, leadSent=false, fieldErr=null;
@@ -762,7 +793,7 @@ Issue: ${c.title}
 Location: ${loc}
 Map: ${map}
 
-This was reported ${plural(n,'day')} ago and is still not fixed. Please tell me the current status and the date by which it will be resolved.
+This was reported ${plural(n,'day')} ago and is still not fixed. Please tell me the current status and the date by which it will be resolved.${supportLine(c)}
 
 ${sig()}`,
     escalate:`To: The ${a.escTitle}
@@ -778,7 +809,7 @@ Map: ${map}
 
 It is still unresolved after ${plural(n,'day')}${fu?`, and my follow-up on ${fmtD(fu)} did not get it fixed`:''}.${c.sev!=='low'?` This is a ${SEV[c.sev].toLowerCase()}.`:''}
 
-I request you to direct the concerned staff to inspect and fix it, and to let me know the action taken.
+I request you to direct the concerned staff to inspect and fix it, and to let me know the action taken.${supportLine(c)}
 
 Thank you,
 ${sig()}`,
@@ -825,6 +856,222 @@ function icsFor(c){
   return['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//UrbOasis//EN','BEGIN:VEVENT',`UID:${c.id}-${d(due)}@urboasis`,`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,'').slice(0,15)}Z`,
     `DTSTART;VALUE=DATE:${d(due)}`,`DTEND;VALUE=DATE:${d(end)}`,`SUMMARY:Check: ${c.title.replace(/[,;]/g,' ')}`,
     `DESCRIPTION:If it isn't fixed\\, open UrbOasis. It has your follow-up message ready.`,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+}
+
+/* ============ Community board ============ */
+/* One interface, three backends:
+   live    – Firebase (Firestore + Google sign-in), when FIREBASE is set
+   preview – no config yet: read-only example issues, clearly labelled
+   mock    – add ?mockboard to the URL: a local, single-browser stand-in for testing the UI */
+const FB_VER='10.12.2';
+function previewIssues(){const t=now();return[
+  {id:'ex-1',cat:'pothole',ag:'gba',title:'Crater-sized pothole on the service road',area:'Outer Ring Road, Marathahalli',landmark:'near the bridge',lat:12.9569,lng:77.7011,corp:'east',status:'open',votes:12,createdAt:t-6*DAY,example:true},
+  {id:'ex-2',cat:'garbage',ag:'gba',title:'Garbage black spot next to the school gate',area:'4th Cross, Jayanagar 9th Block',landmark:'opposite the school',lat:12.9204,lng:77.5937,corp:'south',status:'open',votes:7,createdAt:t-3*DAY,example:true},
+  {id:'ex-3',cat:'sewage',ag:'bwssb',title:'Manhole overflowing onto the street',area:'27th Main, HSR Layout',landmark:'near the bus stop',lat:12.9116,lng:77.6389,corp:'',status:'open',votes:4,createdAt:t-11*DAY,example:true},
+  {id:'ex-4',cat:'streetlight',ag:'gba',title:'Whole stretch of streetlights off',area:'Hennur Main Road',landmark:'after the flyover',lat:13.0359,lng:77.6413,corp:'north',status:'fixed',votes:9,createdAt:t-20*DAY,example:true},
+]}
+const Board={
+  mode:FIREBASE?'live':new URLSearchParams(location.search).has('mockboard')?'mock':'preview',
+  user:null,items:[],mine:new Set(),state:'idle',err:'',_f:null,_p:null,
+  get canVote(){return this.mode!=='preview'},
+  init(){
+    if(this.state==='loading'||this.state==='ready')return this._p;
+    this.state='loading';
+    return this._p=(async()=>{
+      try{
+        if(this.mode==='preview')this.items=previewIssues();
+        else if(this.mode==='mock'){const m=LS.get('uo2-mockboard',null);this.items=m?m.items:previewIssues().map(x=>({...x,example:false,createdBy:'someone'}));this.mine=new Set(m?m.mine:[]);this.user=LS.get('uo2-mockuser',null)}
+        else{
+          const[app,auth,fs]=await Promise.all(['app','auth','firestore'].map(m=>import(`https://www.gstatic.com/firebasejs/${FB_VER}/firebase-${m}.js`)));
+          const a=app.initializeApp(FIREBASE);this._f={auth,fs,au:auth.getAuth(a),db:fs.getFirestore(a)};
+          auth.getRedirectResult(this._f.au).catch(()=>{});
+          await new Promise(res=>{let first=true;auth.onAuthStateChanged(this._f.au,async u=>{this.user=u;if(first){first=false;res();return}await this.loadMine();boardChanged()})});
+          await this.load();
+        }
+        this.state='ready';
+      }catch(e){this.state='error';this.err='The community board couldn’t load. Check your connection and try again.'}
+      boardChanged();
+    })();
+  },
+  async load(){
+    if(this.mode!=='live')return;
+    const{fs,db}=this._f;
+    const snap=await fs.getDocs(fs.query(fs.collection(db,'issues'),fs.orderBy('votes','desc'),fs.limit(200)));
+    this.items=snap.docs.map(d=>{const x=d.data();return{...x,id:d.id,createdAt:x.createdAt&&x.createdAt.toMillis?x.createdAt.toMillis():now()}});
+    await this.loadMine();
+  },
+  async loadMine(){
+    if(this.mode!=='live')return;
+    this.mine=new Set();if(!this.user)return;
+    const{fs,db}=this._f,uid=this.user.uid;
+    await Promise.all(this.items.slice(0,120).map(async it=>{try{if((await fs.getDoc(fs.doc(db,'issues',it.id,'votes',uid))).exists())this.mine.add(it.id)}catch{}}));
+  },
+  persistMock(){LS.set('uo2-mockboard',{items:this.items,mine:[...this.mine]});LS.set('uo2-mockuser',this.user)},
+  async signIn(){
+    if(this.mode==='mock'){this.user={uid:'mock-user',displayName:'Test user'};this.persistMock();return true}
+    if(this.mode!=='live')return false;
+    const{auth,au}=this._f,p=new auth.GoogleAuthProvider();
+    try{await auth.signInWithPopup(au,p);this.user=au.currentUser;await this.loadMine();return true}
+    catch(e){
+      if(['auth/popup-blocked','auth/operation-not-supported-in-environment'].includes(e.code)){await auth.signInWithRedirect(au,p);return false}
+      if(!['auth/popup-closed-by-user','auth/cancelled-popup-request'].includes(e.code))toast('Sign-in didn’t work. Try again in a moment.','fa-circle-info');
+      return false;
+    }
+  },
+  async signOut(){
+    if(this.mode==='mock'){this.user=null;this.mine=new Set();this.persistMock()}
+    else if(this.mode==='live'){await this._f.auth.signOut(this._f.au);this.user=null;this.mine=new Set()}
+  },
+  async vote(id,on){
+    const it=this.get(id);if(!it)return;
+    if(this.mode==='live'){
+      const{fs,db}=this._f,uid=this.user.uid,b=fs.writeBatch(db),vr=fs.doc(db,'issues',id,'votes',uid),ir=fs.doc(db,'issues',id);
+      if(on){b.set(vr,{at:fs.serverTimestamp()});b.update(ir,{votes:fs.increment(1)})}else{b.delete(vr);b.update(ir,{votes:fs.increment(-1)})}
+      await b.commit();
+    }
+    it.votes+=on?1:-1;on?this.mine.add(id):this.mine.delete(id);
+    if(this.mode==='mock')this.persistMock();
+  },
+  async create(c){
+    const data={cat:c.cat,ag:CATS[c.cat].ag,title:String(c.title).slice(0,90),area:String(c.area).slice(0,120),landmark:String(c.landmark||'').slice(0,120),
+      lat:+(+c.lat).toFixed(5),lng:+(+c.lng).toFixed(5),corp:c.corp||'',status:'open',votes:1,createdBy:this.user.uid};
+    let id;
+    if(this.mode==='live'){
+      const{fs,db}=this._f,ir=fs.doc(fs.collection(db,'issues')),b=fs.writeBatch(db);
+      b.set(ir,{...data,createdAt:fs.serverTimestamp()});b.set(fs.doc(db,'issues',ir.id,'votes',this.user.uid),{at:fs.serverTimestamp()});
+      await b.commit();id=ir.id;
+    }else id='mock-'+Math.random().toString(36).slice(2,8);
+    this.items.push({...data,id,createdAt:now()});this.mine.add(id);
+    if(this.mode==='mock')this.persistMock();
+    return id;
+  },
+  async setStatus(id,status){
+    const it=this.get(id);if(!it)return;
+    if(this.mode==='live'){const{fs,db}=this._f;await fs.updateDoc(fs.doc(db,'issues',id),{status})}
+    it.status=status;if(this.mode==='mock')this.persistMock();
+  },
+  get(id){return this.items.find(x=>x.id===id)},
+  near(cat,lat,lng){return lat==null?[]:this.items.filter(x=>x.cat===cat&&x.status==='open'&&dist(x,{lat,lng})<150)},
+};
+function boardChanged(){
+  const a=document.activeElement;if(a&&panel.contains(a)&&a.matches('input,textarea,select'))return;
+  if(['board','issue','home'].includes(view)||(view==='report'&&D.step>=1)||(view==='complaints'&&detail)||view==='done'){render();frameMap()}
+}
+const ranked=l=>[...l].sort((a,b)=>b.votes-a.votes||b.createdAt-a.createdAt);
+const issueDept=x=>x.ag==='gba'&&CORPS[x.corp]?CORPS[x.corp].replace('Bengaluru ',''):CONTACTS[x.ag].short;
+const ago=t=>{const d=days(t);return d===0?'today':d===1?'1 day ago':`${d} days ago`};
+const issueLink=id=>`${location.origin}${location.pathname}#i-${id}`;
+const pub=c=>c&&c.publicId?Board.get(c.publicId):null;
+function supportLine(c){const x=pub(c);return x&&x.votes>1?`\n\nThis issue is supported by ${x.votes} residents on the UrbOasis community board: ${issueLink(x.id)}`:''}
+let bfilter={ag:'all',corp:'',status:'open'};
+function voteBtn(x,big){
+  const on=Board.mine.has(x.id),fixed=x.status==='fixed';
+  return `<button class="vote${on?' on':''}${big?' big':''}" data-act="vote" data-id="${esc(x.id)}" aria-pressed="${on}" ${fixed?'disabled':''}
+    aria-label="${fixed?'Fixed':on?'Remove your vote':'Vote for this'}: ${esc(x.title)}, ${plural(x.votes,'vote')}"><i class="fa-solid ${fixed?'fa-check':'fa-arrow-up'}" aria-hidden="true"></i><span class="vn">${x.votes}</span><span class="vl">${fixed?'fixed':on?'voted':'vote'}</span></button>`;
+}
+function issueCard(x,rank){
+  const cat=CATS[x.cat];
+  return `<div class="icard${x.status==='fixed'?' t-fixed':''}" data-iid="${esc(x.id)}">
+    <span class="rank mono" aria-label="Rank ${rank}">#${rank}</span>
+    <button class="icard-main" data-act="issue" data-id="${esc(x.id)}"><b>${esc(x.title)}</b><small><i class="fa-solid ${cat.ic}" aria-hidden="true"></i> ${esc(x.area)} · ${esc(issueDept(x))} · ${ago(x.createdAt)}${x.example?' · example':''}</small></button>
+    ${voteBtn(x)}</div>`;
+}
+function boardNote(){
+  return Board.mode==='preview'?'<div class="exnote"><span><b>Preview.</b> These are example issues with example vote counts. Voting goes live once the site’s database is connected.</span></div>'
+    :Board.mode==='mock'?'<div class="exnote"><span><b>Test mode.</b> Votes are stored only in this browser.</span></div>':'';
+}
+function signInCard(){
+  if(!Board.canVote)return'';
+  const u=Board.user;
+  return u?`<div class="row" style="justify-content:space-between"><span class="small muted"><i class="fa-solid fa-circle-user" aria-hidden="true"></i> Signed in${u.displayName?` as ${esc(u.displayName)}`:''}. One vote per person.</span><button class="btn quiet" data-act="board-signout">Sign out</button></div>`
+    :`<div class="card stack" style="gap:var(--s3)"><h3>Sign in to vote</h3><p class="hint">One vote per person keeps the ranking fair. We store only an anonymous ID, never your name or email.</p><div><button class="btn primary" data-act="board-signin"><i class="fa-brands fa-google" aria-hidden="true"></i>Sign in with Google</button></div></div>`;
+}
+const boardList=()=>ranked(Board.items.filter(x=>(bfilter.ag==='all'||x.ag===bfilter.ag)&&(!bfilter.corp||x.corp===bfilter.corp)&&(bfilter.status==='all'||x.status===bfilter.status)));
+function boardHTML(){
+  const B=Board,list=boardList();
+  const chip=(f,v,l)=>`<button class="chip" data-act="bfilter" data-f="${f}" data-v="${v}" aria-pressed="${bfilter[f]===v}">${l}</button>`;
+  return `<div class="wrap narrow">
+  <div class="phead"><p class="eyebrow">Community board</p><h1>What Bengaluru wants fixed first</h1><p>Problems residents have posted, ranked by how many people want them fixed. Anyone can see this list, including officials. Vote for the ones that affect you.</p></div>
+  <div class="pbody stack" style="gap:var(--s5)">
+    ${boardNote()}
+    ${B.state==='loading'?'<p class="hint" role="status"><i class="fa-solid fa-spinner fa-spin" aria-hidden="true"></i> Loading the board…</p>':''}
+    ${B.state==='error'?`<div class="alert t-over" role="alert"><b>Couldn’t load the board</b><span>${esc(B.err)}</span><div><button class="btn" data-act="board-retry">Try again</button></div></div>`:''}
+    ${signInCard()}
+    <div class="mapslot short" data-mapslot></div>
+    <div class="stack" style="gap:var(--s3)">
+      <div class="chips" role="group" aria-label="Department">${chip('ag','all','All')}${Object.entries(CONTACTS).map(([k,a])=>chip('ag',k,a.short)).join('')}</div>
+      <div class="row">
+        ${bfilter.ag==='all'||bfilter.ag==='gba'?`<label class="sr" for="b-corp">City corporation</label><select id="b-corp" style="max-width:280px"><option value="">All city corporations</option>${Object.entries(CORPS).map(([k,n])=>`<option value="${k}" ${bfilter.corp===k?'selected':''}>${n.replace('Bengaluru ','')}</option>`).join('')}</select>`:''}
+        <div class="chips" role="group" aria-label="Status">${chip('status','open','Open')}${chip('status','fixed','Fixed')}${chip('status','all','All')}</div>
+      </div>
+    </div>
+    <div class="clist" id="ilist">${list.map((x,i)=>issueCard(x,i+1)).join('')||(B.state==='ready'?'<div class="empty"><i class="fa-regular fa-comments" aria-hidden="true"></i><h3>Nothing here yet</h3><p>Be the first: report a problem and post it to the board.</p><a class="btn primary" href="#report" data-go="report">Report a problem</a></div>':'')}</div>
+    <div class="card stack" style="gap:var(--s3)"><h3>Taking this to officials</h3><p class="hint">UrbOasis doesn’t send this list to any department. Print it for your ward office or corporator, and quote an issue’s link and vote count in your follow-up or escalation letter. UrbOasis adds them for you when your complaint is on the board.</p><div><button class="btn" data-act="board-print"><i class="fa-solid fa-print"></i>Print the top issues</button></div></div>
+  </div></div>`;
+}
+function issueHTML(x){
+  if(!x)return`<div class="wrap narrow"><div class="pbody stack">${Board.state==='loading'||Board.state==='idle'?'<p class="hint" role="status"><i class="fa-solid fa-spinner fa-spin"></i> Loading…</p>':'<div class="empty"><h3>This issue isn’t on the board</h3><p>It may have been removed, or the link is incomplete.</p><a class="btn primary" href="#board" data-go="board">See the community board</a></div>'}</div></div>`;
+  const cat=CATS[x.cat],open=ranked(Board.items.filter(i=>i.status==='open')),rank=open.findIndex(i=>i.id===x.id)+1;
+  const mineC=mine().find(c=>c.publicId===x.id),owner=Board.user&&x.createdBy===Board.user.uid;
+  const shareText=`Vote to get this fixed: ${x.title} at ${x.area}. ${issueLink(x.id)}`;
+  return `<div class="wrap narrow">
+  <div class="phead" style="gap:var(--s3)">
+    <a class="link muted" href="#board" data-go="board"><i class="fa-solid fa-arrow-left"></i>Community board</a>
+    <div class="row" style="gap:var(--s2)"><span class="pill ${x.status==='fixed'?'t-fixed':'t-act'}">${x.status==='fixed'?'Fixed':'Open'}</span>${x.example?'<span class="ex">Example</span>':''}${rank?`<span class="small muted">#${rank} of ${open.length} open issues</span>`:''}</div>
+    <h1 style="font-size:var(--fs-2xl)">${esc(x.title)}</h1>
+    <p class="small muted"><i class="fa-solid ${cat.ic}" aria-hidden="true"></i> ${cat.n} · ${esc(x.area)}${x.landmark?`, ${esc(x.landmark)}`:''} · ${esc(issueDept(x))} · posted ${ago(x.createdAt)}</p>
+  </div>
+  <div class="pbody stack" style="gap:var(--s5)">
+    ${boardNote()}
+    <section class="next t-act votebox"><div class="row" style="gap:var(--s4);flex-wrap:nowrap">${voteBtn(x,true)}<div><h2 style="font-size:var(--fs-xl)">${plural(x.votes,'resident')} ${x.votes===1?'wants':'want'} this fixed</h2><p class="small muted">${x.status==='fixed'?'Marked fixed by the person who posted it.':Board.canVote?'Tap the arrow to add your vote. You can take it back any time.':'Voting goes live once the site’s database is connected.'}</p></div></div></section>
+    ${x.status==='open'?signInCard():''}
+    <div class="mapslot short" data-mapslot></div>
+    <div class="boxes">
+      ${box('more','Get more votes',`<p class="hint">Share it in your building or neighbourhood WhatsApp group. More votes push it up the list.</p>
+        <div class="row"><a class="btn" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(shareText)}"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a><button class="btn" data-act="copy-text-x" data-text="${esc(shareText)}"><i class="fa-solid fa-link"></i>Copy link</button></div>`)}
+      ${mineC?box('yours','Your complaint about this',`<p class="hint">You’re tracking this in My complaints. Your follow-up and escalation letters quote this vote count and link.</p><div><button class="btn" data-act="open" data-id="${esc(mineC.id)}">Open my complaint</button></div>`)
+        :box('file','Complain to the department too',`<p class="hint">Votes show support, but the department acts on complaints. File your own in a couple of minutes. It’s linked to this issue, so it won’t be posted twice.</p><div><button class="btn primary" data-act="issue-report" data-id="${esc(x.id)}"><i class="fa-solid fa-plus"></i>File my complaint</button></div>`)}
+    </div>
+    ${owner&&x.status==='open'?'<div class="row"><button class="btn quiet" data-act="issue-fixed" data-id="'+esc(x.id)+'"><i class="fa-solid fa-circle-check" style="color:var(--st-fixed)"></i>It’s been fixed</button></div>':''}
+  </div></div>`;
+}
+function boardTeaserHTML(){
+  const top=ranked(Board.items.filter(x=>x.status==='open')).slice(0,3);
+  if(!top.length)return'';
+  return `<section class="band alt"><div class="wrap narrow">
+    <div class="shead reveal"><p class="eyebrow">Community board</p><h2>Vote for what gets fixed first</h2><p>The more residents vote for an issue, the higher it ranks. The list is public, so officials can see it too.</p></div>
+    ${Board.mode==='preview'?'<p class="hint" style="margin-bottom:var(--s3)">Example issues shown until voting goes live.</p>':''}
+    <div class="clist reveal-kids">${top.map((x,i)=>issueCard(x,i+1)).join('')}</div>
+    <p style="margin-top:var(--s4)"><a class="link" href="#board" data-go="board">See the full board<i class="fa-solid fa-arrow-right"></i></a></p>
+  </div></section>`;
+}
+function printBoard(){
+  const list=boardList().slice(0,30),f=[bfilter.ag==='all'?'All departments':CONTACTS[bfilter.ag].short,bfilter.corp?CORPS[bfilter.corp]:'',bfilter.status==='all'?'':bfilter.status==='open'?'open issues':'fixed issues'].filter(Boolean).join(' · ');
+  $('#printdoc').innerHTML=`<article class="paper"><header class="rh"><div><h1>Top civic issues by resident votes</h1><p>${esc(f)} · ${fmtD(now())}</p></div></header>
+    <table><thead><tr><th>#</th><th>Problem</th><th>Location</th><th>Department</th><th class="n">Votes</th><th>Posted</th></tr></thead><tbody>
+    ${list.map((x,i)=>`<tr><td>${i+1}</td><td>${esc(x.title)}</td><td>${esc(x.area)}${x.landmark?`, ${esc(x.landmark)}`:''}</td><td>${esc(issueDept(x))}</td><td class="n">${x.votes}</td><td>${fmtD(x.createdAt)}</td></tr>`).join('')||'<tr><td colspan="6">No issues</td></tr>'}</tbody></table>
+    <p class="foot">From the UrbOasis community board (${esc(location.origin+location.pathname)}#board). One vote per signed-in resident.${Board.mode!=='live'?' Example data, not real votes.':''}</p></article>`;
+  window.print();
+}
+async function ensureSignedIn(){if(Board.user)return true;if(!Board.canVote){toast('Voting goes live once the site’s database is connected','fa-circle-info');return false}return Board.signIn()}
+async function doVote(id){
+  const x=Board.get(id);if(!x||x.status==='fixed')return;
+  if(!(await ensureSignedIn()))return;
+  const on=!Board.mine.has(id);
+  try{await Board.vote(id,on)}catch{toast('Your vote didn’t go through. Try again.','fa-circle-info');return}
+  render();
+  const b=panel.querySelector(`.vote[data-id="${CSS.escape(id)}"]`);
+  if(b){b.focus({preventScroll:true});A(b,{scale:[.85,1]},SPRING);A(b.querySelector('.vn'),{y:[on?8:-8,0],opacity:[0,1]},{duration:.25})}
+  toast(on?'Voted. Share it to get more votes':'Vote removed',on?'fa-arrow-up':'fa-rotate-left');
+}
+async function postToBoard(c){
+  if(!(await ensureSignedIn()))return false;
+  const near=Board.near(c.cat,c.lat,c.lng)[0];
+  try{
+    if(near){if(!Board.mine.has(near.id))await Board.vote(near.id,true);c.publicId=near.id;c.events.push({t:now(),k:'board',x:`Linked to an existing community board issue and voted for it`})}
+    else{c.publicId=await Board.create(c);c.events.push({t:now(),k:'board',x:'Posted on the community board'})}
+    save();return true;
+  }catch{toast('Couldn’t post to the community board. Try again from the complaint page.','fa-circle-info');return false}
 }
 
 /* ============ Views ============ */
@@ -898,6 +1145,8 @@ function homeHTML(){
       <p class="small muted">Handles: ${Object.values(CATS).filter(c=>c.ag===k).map(c=>c.n.toLowerCase()).join('; ')}</p></div>`).join('')}</div>
     <p style="margin-top:var(--s4)"><a class="link" href="#guide" data-go="guide">Full guide to who fixes what<i class="fa-solid fa-arrow-right"></i></a></p>
   </div></section>
+
+  ${boardTeaserHTML()}
 
   <section class="band"><div class="wrap"><div class="cta dark reveal"><div class="stack" style="gap:6px"><p class="eyebrow">For housing societies and RWAs</p><h2>Run a residents’ association?</h2><p>Track every civic problem around your society in one place, and get a monthly report for the ward office.</p></div><a class="btn lg" href="#societies" data-go="societies">See the society plan</a></div></div></section>
 
@@ -989,6 +1238,7 @@ function detailHTML(c){
     <div class="photo" data-photobox hidden><img data-photo="${esc(c.id)}" alt="Photo of the problem"></div>
     <div class="boxes">
       ${box('docs','Messages and letters',docsInner)}
+      ${!c.sample&&(pub(c)||Board.canVote)?box('community','Community board',pub(c)?`<p><b>${plural(pub(c).votes,'resident')}</b> ${pub(c).votes===1?'wants':'want'} this fixed. Your follow-up and escalation letters quote this, with a link.</p><div class="row"><button class="btn" data-act="issue" data-id="${esc(c.publicId)}"><i class="fa-solid fa-arrow-up"></i>Open on the board</button></div>`:`<p class="hint">Post it so neighbours can vote. More votes rank it higher on a public list officials can see. Only the problem and location are shared, never your name or number.</p><div><button class="btn" data-act="post-board"><i class="fa-solid fa-arrow-up"></i>Post to the community board</button></div>`,pub(c)?plural(pub(c).votes,'vote'):''):''}
       ${box('map','Map and directions',`<div class="mapslot short" data-mapslot></div><a class="btn" target="_blank" rel="noopener" href="${gmaps(c.lat,c.lng)}"><i class="fa-solid fa-diamond-turn-right"></i>Directions</a>`)}
       ${box('info','Complaint details',`<dl class="facts">
         <dt>Department</dt><dd>${esc(orgFor(c))}${a.phone?` · <span class="mono">${a.phone}</span>`:''}</dd>
@@ -1030,6 +1280,7 @@ function doneHTML(c){
     <section class="card stack"><h2 style="font-size:var(--fs-xl)">What happens next</h2>
       <ol class="whatnext" id="whatnext">${items.map(([d,tone,x])=>`<li class="t-${tone}" style="--tone:var(--st-${tone})"><time>${d}</time><span class="dot" aria-hidden="true"></span><span>${x}</span></li>`).join('')}</ol>
       <p class="hint">UrbOasis doesn’t send notifications. Add a calendar reminder so you remember to check.</p>
+      ${c.publicId?`<p class="small"><i class="fa-solid fa-arrow-up" style="color:var(--accent-ink)" aria-hidden="true"></i> It’s on the <a class="link" style="min-height:0" href="#i-${esc(c.publicId)}" data-act="issue" data-id="${esc(c.publicId)}">community board</a>. Share it so neighbours can vote.</p>`:''}
     </section>
     <div class="stack">
       <a class="btn primary xl block" href="#c-${esc(c.id)}" data-act="open" data-id="${esc(c.id)}">${c.filedAt?'Open my complaint':`Send it to ${deptLabel(c)} now`}</a>
@@ -1070,6 +1321,7 @@ function reportHTML(){
     <div class="pinread ${D.lat!=null?'ok':''}"><i class="fa-solid ${D.lat!=null?'fa-circle-check':'fa-location-dot'}" aria-hidden="true"></i>${D.lat!=null?'<span>Pin placed. Drag it if it’s not quite right.</span>':'<span class="muted">No pin yet. Tap the map, use your location, or search.</span>'}</div>
     ${D.lat!=null&&!inBLR(D.lat,D.lng)?'<div class="alert t-wait"><b>This pin is outside Bengaluru</b><span>These departments only cover Bengaluru. Move the pin if that’s a mistake.</span></div>':''}
     ${exifOff?`<div class="alert t-fixed"><b><i class="fa-solid fa-camera"></i> Your photo has a location</b><span>Use it to place the pin?</span><div><button class="btn" data-act="use-exif">Use the photo’s location</button></div></div>`:''}
+    ${Board.canVote&&!D.publicId&&Board.near(D.cat,D.lat,D.lng).length?(x=>`<div class="alert t-act"><b>Already on the community board</b><span>${esc(x.title)} · ${plural(x.votes,'vote')}. If you post yours, it’s linked to this one and counts as your vote, so it isn’t posted twice.</span><div><button class="btn" data-act="issue" data-id="${esc(x.id)}">See it</button></div></div>`)(Board.near(D.cat,D.lat,D.lng)[0]):''}
     ${dup.length?`<div class="alert t-wait"><b>You already reported this</b><span>${dup.map(c=>esc(c.title)).join('<br>')}</span><div><button class="btn" data-act="open" data-id="${esc(dup[0].id)}">Open that complaint instead</button></div></div>`:''}
     <label class="fl" for="f-area">Area and street <span class="opt">Filled in from the pin. Correct it if it’s wrong.</span></label>
     <div class="fieldwrap" id="areaWrap"><input id="f-area" data-f="area" value="${esc(D.area)}" placeholder="e.g. 100 Feet Road, Indiranagar" ${inv('f-area')}></div>${fe('f-area')}
@@ -1100,6 +1352,8 @@ function reportHTML(){
     ${sendTools(draftC,false)}
     <label class="fl" for="f-ref">Complaint number they gave you <span class="opt">It arrives by SMS, in their app, or on the call. You can add it later.</span></label><input id="f-ref" data-f="ref" value="${esc(D.ref)}" placeholder="e.g. 10/2026/123456">
     <label class="check"><input type="checkbox" id="f-filed" data-f="filed" ${D.filed||D.ref?'checked':''}><span>I’ve sent it to ${ag.short}. Start counting the ${cat.days}-day fix time.</span></label>
+    ${Board.canVote&&!D.publicId?`<label class="check"><input type="checkbox" id="f-post" data-f="post" ${D.post?'checked':''}><span>Post it on the community board so neighbours can vote. Only the problem and location are shared, never your name or number.${Board.user?'':' You’ll be asked to sign in with Google.'}</span></label>`:''}
+    ${D.publicId?`<p class="hint"><i class="fa-solid fa-link" aria-hidden="true"></i> Linked to a community board issue${(x=>x?` with ${plural(x.votes,'vote')}`:'')(Board.get(D.publicId))}.</p>`:''}
     <div class="wnav"><button class="btn lg" data-act="back-step"><i class="fa-solid fa-arrow-left"></i>Back</button><button class="btn primary lg" data-act="save"><i class="fa-solid fa-check"></i>Save and track</button></div>`;
   }
   const pct=(D.step+1)/4;
@@ -1317,9 +1571,9 @@ function afterView(changed){
 let mapShown=false;
 const cur=()=>S.list.find(x=>x.id===detail);
 const draftC=()=>({...D,id:'',createdAt:now(),filedAt:null,events:[],hasPhoto:!!draftPhoto||D.hasPhoto});
-const hashFor=()=>view==='complaints'&&detail?`#c-${detail}`:view==='done'&&detail?`#done-${detail}`:`#${view}`;
+const hashFor=()=>view==='issue'&&detail?`#i-${detail}`:view==='complaints'&&detail?`#c-${detail}`:view==='done'&&detail?`#done-${detail}`:`#${view}`;
 function go(v,id,anchor){
-  const nd=['complaints','done'].includes(v)?(id||null):null;if(nd!==detail)openBox=new Set();
+  const nd=['complaints','done','issue'].includes(v)?(id||null):null;if(nd!==detail)openBox=new Set();
   const changed=v!==view||nd!==detail;
   view=v;detail=nd;pendingDel=null;results=null;fieldErr=null;indPrev=null;closeMenu();
   render();
@@ -1332,7 +1586,7 @@ function render(){
   const holder=$('#mapholder');$('#park').appendChild(holder);
   let c=detail&&S.list.find(x=>x.id===detail);
   if(['complaints','done'].includes(view)&&detail&&!c){detail=null;if(view==='done')view='complaints'}
-  panel.innerHTML=view==='report'?reportHTML():view==='guide'?guideHTML():view==='societies'?societiesHTML():view==='monthly'?monthlyHTML()
+  panel.innerHTML=view==='report'?reportHTML():view==='guide'?guideHTML():view==='board'?boardHTML():view==='issue'?issueHTML(Board.get(detail)):view==='societies'?societiesHTML():view==='monthly'?monthlyHTML()
     :view==='done'?doneHTML(c):view==='complaints'?(c?detailHTML(c):trackerHTML()):homeHTML();
   $$('.nl[data-go]').forEach(t=>{if(t.dataset.go===view&&!t.dataset.anchor)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current')});
   const act=mine().filter(needsYou).length;
@@ -1450,6 +1704,19 @@ async function act(a,el){
       download('urboasis-complaints.csv','text/csv',rows.map(r=>r.map(q).join(',')).join('\n'));break}
     case'print-monthly':$('#printdoc').innerHTML=$('#paper').outerHTML;window.print();break;
     case'lead-again':leadSent=false;render();break;
+    case'issue':go('issue',el.dataset.id);break;
+    case'vote':await doVote(el.dataset.id);break;
+    case'board-signin':if(await Board.signIn())toast('Signed in. You can vote now');render();break;
+    case'board-signout':await Board.signOut();render();toast('Signed out');break;
+    case'board-retry':Board.state='idle';Board.init();render();break;
+    case'bfilter':bfilter[el.dataset.f]=el.dataset.v;if(el.dataset.f==='ag'&&!['all','gba'].includes(el.dataset.v))bfilter.corp='';render();frameMap();break;
+    case'board-print':printBoard();break;
+    case'copy-text-x':copy(el.dataset.text,'Link copied');break;
+    case'issue-report':{const x=Board.get(el.dataset.id);if(!x)break;
+      D=Object.assign(blankDraft(),{cat:x.cat,title:x.title,area:x.area,landmark:x.landmark||'',lat:x.lat,lng:x.lng,corp:x.corp||'',areaAuto:false,corpAuto:false,cosign:true,publicId:x.example?null:x.id,post:false,step:2});
+      saveDraft();go('report');break}
+    case'issue-fixed':await Board.setStatus(el.dataset.id,'fixed');render();confetti(panel.querySelector('.votebox'));toast('Marked fixed. Thanks for closing the loop');break;
+    case'post-board':if(c&&await postToBoard(c)){render();toast('Posted. Neighbours can vote for it now','fa-arrow-up')}break;
     case'startcat':if(D.cat!==el.dataset.k){D.cat=el.dataset.k;D.title=''}D.step=0;saveDraft();go('report');break;
   }
 }
@@ -1492,6 +1759,8 @@ async function onPhoto(file){
   if(D.exif&&D.lat==null){setPin(D.exif.lat,D.exif.lng);map&&map.flyTo({center:[D.exif.lng,D.exif.lat],zoom:17.5});toast('Pinned at the photo’s location','fa-camera')}
 }
 async function saveComplaint(){
+  const wantPost=!D.publicId&&D.post&&Board.canVote&&Board.state==='ready';
+  if(wantPost&&!Board.user)await Board.signIn();   // first, while the tap still counts as a user gesture for the sign-in pop-up
   const t=now(),filed=!!(D.filed||D.ref.trim());
   const c={id:newId(),cat:D.cat,title:D.title.trim(),desc:D.desc.trim(),sev:D.sev,lat:D.lat,lng:D.lng,area:D.area.trim(),landmark:D.landmark.trim(),corp:D.corp||'',
     hasPhoto:!!draftPhoto,createdAt:t,filedAt:filed?t:null,ref:D.ref.trim(),status:filed?'filed':'draft',text:D.textEdited?D.text:'',
@@ -1499,7 +1768,10 @@ async function saveComplaint(){
   if(filed)c.events.push({t,k:'filed',x:`Sent to ${deptLabel(c)}${c.ref?` · ${c.ref}`:''}`});
   if(draftPhoto){try{await idb.set(c.id,draftPhoto)}catch{c.hasPhoto=false;toast('The photo couldn’t be stored on this device','fa-circle-info')}}
   if(S.list.some(x=>x.sample)){S.list=S.list.filter(x=>!x.sample);S.showEx=false}
+  c.publicId=D.publicId||null;
   S.list.unshift(c);save();
+  if(c.publicId&&Board.user&&!Board.mine.has(c.publicId))await Board.vote(c.publicId,true).catch(()=>{});
+  if(wantPost){if(Board.user)await postToBoard(c);else toast('Saved without posting to the board. You can post it from the complaint page.','fa-circle-info')}
   D=blankDraft();draftPhoto=null;idb.del('draft');saveDraft();
   go('done',c.id);
 }
@@ -1526,6 +1798,7 @@ panel.addEventListener('change',e=>{
   if(e.target.id==='f-photo')onPhoto(e.target.files[0]);
   if(e.target.id==='f-import')importJSON(e.target.files[0]);
   if(e.target.id==='f-corp'){if(!D.textEdited)D.text='';render();$('#f-corp')?.focus()}
+  if(e.target.id==='b-corp'){bfilter.corp=e.target.value;render();frameMap();$('#b-corp')?.focus()}
 });
 panel.addEventListener('submit',e=>{
   e.preventDefault();const f=e.target.dataset.form,c=cur();
@@ -1544,8 +1817,8 @@ panel.addEventListener('submit',e=>{
     leadSent=true;fieldErr=null;render();document.getElementById('join')?.scrollIntoView()}
 });
 panel.addEventListener('toggle',e=>{const d=e.target.dataset?.box;if(!d)return;e.target.open?openBox.add(d):openBox.delete(d);if(d==='map'&&e.target.open){placeMap();frameMap()}if(d==='docs'&&e.target.open)moveInd(false)},true);
-panel.addEventListener('mouseover',e=>{const c=e.target.closest('.ccard');if(c)markerEls[c.dataset.id]?.classList.add('hl')});
-panel.addEventListener('mouseout',e=>{const c=e.target.closest('.ccard');if(c&&!c.contains(e.relatedTarget))markerEls[c.dataset.id]?.classList.remove('hl')});
+panel.addEventListener('mouseover',e=>{const c=e.target.closest('.ccard,.icard');if(c)markerEls[c.dataset.id||c.dataset.iid]?.classList.add('hl')});
+panel.addEventListener('mouseout',e=>{const c=e.target.closest('.ccard,.icard');if(c&&!c.contains(e.relatedTarget))markerEls[c.dataset.id||c.dataset.iid]?.classList.remove('hl')});
 async function importJSON(file){
   if(!file)return;
   try{const j=migrate(JSON.parse(await file.text()));
@@ -1558,7 +1831,7 @@ async function importJSON(file){
 /* menu */
 function closeMenu(focusBtn){const m=$('#menu');if(m.hidden)return;m.hidden=true;$('#menuBtn').setAttribute('aria-expanded','false');$('#menuBtn').innerHTML='<i class="fa-solid fa-bars"></i>';if(focusBtn)$('#menuBtn').focus()}
 $('#menuBtn').addEventListener('click',()=>{const m=$('#menu');if(!m.hidden)return closeMenu();m.hidden=false;$('#menuBtn').setAttribute('aria-expanded','true');$('#menuBtn').innerHTML='<i class="fa-solid fa-xmark"></i>';A(m,{opacity:[0,1],y:[-6,0]},{duration:.2});m.querySelector('.nl')?.focus()});
-addEventListener('resize',()=>{if(innerWidth>960)closeMenu()});
+addEventListener('resize',()=>{if(innerWidth>1180)closeMenu()});
 
 /* ============ Map ============ */
 let map,markers=[],markerEls={},pinMk=null,pinDrop=false;
@@ -1576,12 +1849,24 @@ function initMap(){
 function frameMap(){
   if(!map||!mapShown)return;
   if(view==='report'){map.jumpTo(D.lat!=null?{center:[D.lng,D.lat],zoom:16.5}:{center:[77.5946,12.9716],zoom:11.5});return}
+  if(view==='issue'){const x=Board.get(detail);if(x)map.jumpTo({center:[x.lng,x.lat],zoom:16});return}
+  if(view==='board'){const L=boardList();if(!L.length){map.jumpTo({center:[77.5946,12.9716],zoom:11});return}const b=new maplibregl.LngLatBounds();L.forEach(x=>b.extend([x.lng,x.lat]));map.fitBounds(b,{padding:50,maxZoom:15,duration:0});return}
   const c=detail&&cur();if(c){map.jumpTo({center:[c.lng,c.lat],zoom:16});return}
   const L=S.list;if(!L.length){map.jumpTo({center:[77.5946,12.9716],zoom:11});return}
   const b=new maplibregl.LngLatBounds();L.forEach(x=>b.extend([x.lng,x.lat]));map.fitBounds(b,{padding:50,maxZoom:15,duration:0});
 }
 function renderMarkers(){
   if(!map)return;markers.forEach(m=>m.remove());markers=[];markerEls={};
+  if(view==='board'||view==='issue'){
+    (view==='issue'?[Board.get(detail)].filter(Boolean):boardList()).forEach(x=>{
+      const el=document.createElement('button');el.type='button';el.className=`mk ${x.status==='fixed'?'t-fixed':'t-act'}${detail===x.id?' sel':''}`;
+      el.setAttribute('aria-label',`${x.title}, ${plural(x.votes,'vote')}`);el.title=`${x.title} · ${plural(x.votes,'vote')}`;el.innerHTML=`<span class="mono">${x.votes}</span>`;markerEls[x.id]=el;
+      el.addEventListener('mouseenter',()=>panel.querySelector(`.icard[data-iid="${x.id}"]`)?.classList.add('hl'));
+      el.addEventListener('mouseleave',()=>panel.querySelector(`.icard[data-iid="${x.id}"]`)?.classList.remove('hl'));
+      el.addEventListener('click',ev=>{ev.stopPropagation();go('issue',x.id)});
+      markers.push(new maplibregl.Marker({element:el}).setLngLat([x.lng,x.lat]).addTo(map));
+    });return;
+  }
   S.list.forEach(c=>{
     const el=document.createElement('button');const s=status(c);
     el.className=`mk t-${s.tone}${detail===c.id?' sel':''}`;el.type='button';
@@ -1622,9 +1907,10 @@ function route(){
     }catch{view='home';toast('That shared link is damaged. Ask for it again.','fa-circle-info')}
   }else if(h.startsWith('c-')){view='complaints';detail=h.slice(2)}
   else if(h.startsWith('done-')){view='done';detail=h.slice(5)}
+  else if(h.startsWith('i-')){view='issue';detail=h.slice(2)}
   else if(h==='how'){view='home';routeAnchor='how'}
   else if(h==='join'||h==='sample'){view='societies';routeAnchor=h}
-  else if(['home','report','complaints','guide','societies','monthly'].includes(h))view=h;
+  else if(['home','report','complaints','guide','societies','monthly','board'].includes(h))view=h;
   else view='home';
 }
 addEventListener('hashchange',()=>{route();go(view,detail,routeAnchor)});
@@ -1634,6 +1920,7 @@ addEventListener('hashchange',()=>{route();go(view,detail,routeAnchor)});
   if(D.hasPhoto)draftPhoto=await idb.get('draft');if(D.hasPhoto&&!draftPhoto)D.hasPhoto=false;
   await Promise.race([motionReady,new Promise(r=>setTimeout(r,700))]);
   const v=view;view='';go(v,detail,routeAnchor);
+  Board.init();
 })();
 </script>
 </body>
