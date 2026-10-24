@@ -395,6 +395,42 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
 [data-verify]{} /* TODO-VERIFY marker; add ?verify to the URL to highlight */
 .show-verify [data-verify]{outline:2px dashed #e0a100;outline-offset:2px}
 
+/* ---------- departments page ---------- */
+.dpage h1{font-size:clamp(28px,3.6vw,40px);max-width:22ch}
+.dpage p{max-width:58ch}
+.dh{font-size:var(--fs-xl)}
+.dgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4)}
+.dcard{display:grid;gap:var(--s4);align-content:start;padding:var(--s5);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface)}
+.dhead{display:flex;gap:var(--s3);align-items:center}
+.dic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-ink);flex:none;font-size:18px}
+.dhead h3{font-size:var(--fs-lg);line-height:1.2}
+.dhead p{font-size:var(--fs-sm);color:var(--muted);line-height:1.35}
+.dhandles{font-size:15.5px;line-height:1.55}
+.dmeta{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin:0;padding-top:var(--s4);border-top:1px solid var(--line)}
+.dmeta dt{font-size:12px;color:var(--muted);font-weight:650;text-transform:uppercase;letter-spacing:.05em}
+.dmeta dd{margin:4px 0 0;font-weight:650;font-size:15px}
+.dmore{margin-top:calc(-1 * var(--s2))}
+.dmore summary{cursor:pointer;list-style:none;color:var(--accent-ink);font-weight:650;font-size:var(--fs-sm);min-height:44px;display:inline-flex;align-items:center;gap:8px}
+.dmore summary::-webkit-details-marker{display:none}
+.dmore summary::after{content:"\f078";font:900 10px "Font Awesome 6 Free";transition:transform .2s}
+.dmore[open] summary::after{transform:rotate(180deg)}
+.dmore>div{display:grid;gap:var(--s3);padding-bottom:var(--s1)}
+.dmore ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:var(--fs-sm)}
+.dmore li{display:flex;justify-content:space-between;gap:var(--s3)}
+.dmore li i{width:20px;color:var(--muted)}
+.dmore li span:last-child{color:var(--muted);white-space:nowrap}
+.chase{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4);counter-reset:c}
+.chase li{counter-increment:c;display:grid;gap:6px;align-content:start;padding:var(--s5);border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--line)}
+.chase li::before{content:counter(c);width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font:800 13px var(--f-body);margin-bottom:4px}
+.chase b{font-size:16px}
+.chase p{font-size:var(--fs-sm);color:var(--muted)}
+.corpgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--s3)}
+.corpitem{display:flex;gap:10px;align-items:center;padding:14px var(--s4);border-radius:var(--r-md);background:var(--surface);border:1px solid var(--line);font-weight:650;font-size:15.5px}
+.corpitem i{color:var(--accent-ink)}
+.corpitem small{display:block;font-weight:400;font-size:var(--fs-xs);color:var(--muted)}
+@media (max-width:960px){.corpgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.chase{grid-template-columns:1fr}}
+@media (max-width:640px){.dgrid{grid-template-columns:1fr}.corpgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
 /* ---------- where it goes ---------- */
 .strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .stripitem{display:flex;gap:var(--s3);align-items:center;min-height:64px;padding:14px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg);text-decoration:none;color:inherit}
@@ -1432,32 +1468,48 @@ function reportHTML(){
   <div class="pbody stack" style="gap:var(--s5);padding-top:var(--s5)">${body}</div></div></div>`;
 }
 function departmentsHTML(){
-  const short={gba:'Roads, garbage, streetlights, footpaths, trees, stagnant water, stray dogs',bwssb:'Water supply, leaks and sewage',bescom:'Power cuts and loose or hanging wires',btp:'Traffic signals and road safety'};
+  const handles={gba:'Roads, garbage, streetlights, footpaths, trees, stagnant water and stray dogs',bwssb:'Water supply, leaks and sewage',bescom:'Power cuts and loose or hanging wires',btp:'Traffic signals and road safety'};
+  const how=a=>{const l=channelsFor(a).map(k=>({whatsapp:'WhatsApp',email:'Email',x:'X',form:'Online form'})[k]);return l.length?l.join(', '):`Call ${a.phone||'their helpline'} for now`};
   return `<div class="wrap">
-  <div class="phead"><p class="eyebrow">Where your complaint goes</p><h1>You don’t need to know who fixes what. UrbOasis routes it for you.</h1><p>Pick the problem and drop a pin. We work out the department and the city corporation, write the complaint, send it in one tap, and chase it until it’s fixed.</p></div>
-  <div class="pbody stack" style="gap:var(--s7)">
-  <div class="agrid">${Object.entries(CONTACTS).map(([k,a])=>{const cats=Object.values(CATS).filter(c=>c.ag===k),lo=Math.min(...cats.map(c=>c.days)),hi=Math.max(...cats.map(c=>c.days));
-    return`<div class="acard">
-    <div class="ah"><i class="fa-solid ${a.ic}" aria-hidden="true"></i><div><h3>${a.name}</h3><span class="small muted">${a.short} · ${short[k]}</span></div></div>
-    <ul>${cats.map(c=>`<li><span><i class="fa-solid ${c.ic} muted" style="width:18px" aria-hidden="true"></i> ${c.n}</span><span>~${plural(c.days,'day')}</span></li>`).join('')}</ul>
-    <div class="stack" style="gap:var(--s2)"><p class="eyebrow">If it isn’t fixed</p>
-      <ol class="pathsteps" data-verify><li>Not fixed in ${lo===hi?plural(lo,'day'):`its usual time (${lo} to ${hi} days, depending on the problem)`}? We send a follow-up quoting your complaint number.</li><li>A week later, we escalate to ${a.escHint}.</li><li>Three weeks after that, we prepare an RTI application.</li></ol></div>
-    <p class="small muted"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> ${sendSummary(a)}</p></div>`}).join('')}</div>
-  <div class="stack"><h2>GBA and the five city corporations</h2><div class="prose" data-verify>
-    <p>Since 2025, the Greater Bengaluru Authority oversees five city corporations. UrbOasis detects which one your pin falls under and addresses your complaint to it. If we get it wrong, you can change it.</p></div>
-    <div class="chips">${Object.values(CORPS).map(n=>`<span class="chip" style="cursor:default">${n.replace('Bengaluru ','')}</span>`).join('')}</div></div>
-  <div class="stack"><h2>What makes a complaint get fixed</h2><ol class="tips">
-    <li><b>The complaint number.</b> UrbOasis asks for it and quotes it in every follow-up, so nobody can say they never got it.</li>
-    <li><b>A landmark, not just a road.</b> “Opposite the bakery, next to pole 14” gets a crew to the spot. “Hosur Road” doesn’t.</li>
-    <li><b>A photo</b> with something for scale. It makes a complaint harder to close as “not found”.</li>
-    <li><b>One follow-up, then an escalation.</b> UrbOasis times both for you. That works better than calling every day.</li>
-    <li><b>Neighbours complaining too.</b> Several complaints about one spot get noticed. Share yours, or vote on the community board.</li>
-  </ol></div>
-  <details class="box" data-box="callself" ${openBox.has('callself')?'open':''} style="border-top:1px solid var(--line)"><summary>Prefer to call yourself?</summary><div>
-    <p class="hint">Only numbers published on each department’s own website are listed.</p>
-    <dl class="facts">${Object.values(CONTACTS).map(a=>`<dt>${a.short}</dt><dd>${a.phone?`<a class="link" style="min-height:0" href="tel:${a.phone}">${a.phone}</a>`:'<span class="muted">No confirmed helpline</span>'}${a.app?` <span class="muted">· ${a.app} app</span>`:''}</dd>`).join('')}</dl>
-    <p class="hint">For emergencies such as live wires, open manholes or accidents, call ${EMERGENCY}. It is not a complaint line.</p></div></details>
-  <div class="prose"><p>UrbOasis is independent and not connected to any of these departments. Fix times are our guide to a reasonable wait, not official deadlines.</p></div>
+  <div class="phead dpage"><p class="eyebrow">Where your complaint goes</p><h1>You don’t need to know who fixes what.</h1><p>Pick the problem and drop a pin. UrbOasis works out the department and city corporation, sends your complaint in one tap, and chases it until it’s fixed.</p></div>
+  <div class="pbody stack" style="gap:var(--s8)">
+
+  <section class="stack" style="gap:var(--s4)" aria-labelledby="dh-1">
+    <h2 class="dh" id="dh-1">The four departments</h2>
+    <div class="dgrid">${Object.entries(CONTACTS).map(([k,a])=>{const cats=Object.values(CATS).filter(c=>c.ag===k),lo=Math.min(...cats.map(c=>c.days)),hi=Math.max(...cats.map(c=>c.days));
+      return`<article class="dcard">
+      <div class="dhead"><span class="dic"><i class="fa-solid ${a.ic}" aria-hidden="true"></i></span><div><h3>${a.short}</h3><p>${a.name}</p></div></div>
+      <p class="dhandles">${handles[k]}</p>
+      <dl class="dmeta"><div><dt>Usual fix time</dt><dd>${lo===hi?plural(lo,'day'):`${lo}–${hi} days`}</dd></div><div><dt>How we send it</dt><dd>${how(a)}</dd></div></dl>
+      <details class="dmore"><summary>Problem types and escalation</summary><div>
+        <ul>${cats.map(c=>`<li><span><i class="fa-solid ${c.ic}" aria-hidden="true"></i>${c.n}</span><span>~${plural(c.days,'day')}</span></li>`).join('')}</ul>
+        <p class="hint" data-verify>If it isn’t fixed, we escalate to ${a.escHint}.</p>
+      </div></details>
+    </article>`}).join('')}</div>
+  </section>
+
+  <section class="stack" style="gap:var(--s4)" aria-labelledby="dh-2">
+    <h2 class="dh" id="dh-2">If it isn’t fixed, we chase it</h2>
+    <ol class="chase">
+      <li><b>Follow-up</b><p>Once the usual fix time passes, we send a follow-up quoting your complaint number.</p></li>
+      <li><b>Escalation</b><p>A week later, a letter to the department’s senior engineer or inspector.</p></li>
+      <li><b>RTI application</b><p>Three weeks after that. The department must reply in writing within 30 days.</p></li>
+    </ol>
+  </section>
+
+  <section class="stack" style="gap:var(--s4)" aria-labelledby="dh-3">
+    <div class="stack" style="gap:var(--s2)"><h2 class="dh" id="dh-3">GBA and the five city corporations</h2>
+    <p class="muted" style="max-width:62ch" data-verify>GBA oversees five city corporations. We detect which one your pin falls under and address your complaint to it. You can change it if we get it wrong.</p></div>
+    <div class="corpgrid">${Object.values(CORPS).map(n=>{const w=n.replace('Bengaluru ','').replace(' City Corporation','');return`<div class="corpitem"><i class="fa-solid fa-location-dot" aria-hidden="true"></i><span>${w}<small>City Corporation</small></span></div>`}).join('')}</div>
+  </section>
+
+  <div class="boxes">
+    <details class="box" data-box="callself" ${openBox.has('callself')?'open':''}><summary>Prefer to call yourself?</summary><div>
+      <p class="hint">Only numbers published on each department’s own website are listed.</p>
+      <dl class="facts">${Object.values(CONTACTS).map(a=>`<dt>${a.short}</dt><dd>${a.phone?`<a class="link" style="min-height:0" href="tel:${a.phone}">${a.phone}</a>`:'<span class="muted">No confirmed helpline</span>'}${a.app?` <span class="muted">· ${a.app} app</span>`:''}</dd>`).join('')}</dl>
+      <p class="hint">For emergencies such as live wires, open manholes or accidents, call ${EMERGENCY}. It is not a complaint line.</p></div></details>
+  </div>
+  <p class="hint">UrbOasis is independent and not connected to any of these departments. Fix times are our guide to a reasonable wait, not official deadlines.</p>
   </div></div>`;
 }
 function reportDoc(list,org,compact){
