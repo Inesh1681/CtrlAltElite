@@ -2101,7 +2101,7 @@ async function act(a,el){
     case'del':pendingDel=c.id;render();panel.querySelector('.confirm .btn')?.focus();break;
     case'del-no':pendingDel=null;render();break;
     case'del-yes':S.list=S.list.filter(x=>x.id!==c.id);idb.del(c.id);save();toast('Deleted');go('complaints');break;
-    case'export-json':download(`urboasis-backup-${new Date().toISOString().slice(0,10)}.json`,'application/json',JSON.stringify({app:'urboasis',v:SCHEMA,exportedAt:new Date().toISOString(),list:mine(),profile:S.profile},null,2));break;
+    case'export-json':download(`urboasis-backup-${isoDate(now())}.json`,'application/json',JSON.stringify({app:'urboasis',v:SCHEMA,exportedAt:new Date().toISOString(),list:mine(),profile:S.profile},null,2));break;
     case'export-csv':{const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
       const rows=[['id','title','category','department','area','landmark','lat','lng','severity','status','due','complaint_no','created','sent','fixed']]
         .concat(mine().map(x=>[x.id,x.title,CATS[x.cat].n,deptLabel(x),x.area,x.landmark,x.lat,x.lng,SEV[x.sev],status(x).l,dueText(x),x.ref,fmtD(x.createdAt),x.filedAt?fmtD(x.filedAt):'',x.fixedAt?fmtD(x.fixedAt):'']));
@@ -2241,10 +2241,10 @@ panel.addEventListener('mouseout',e=>{const c=e.target.closest('.ccard,.icard,.q
 async function importJSON(file){
   if(!file)return;
   try{const j=migrate(JSON.parse(await file.text()));
-    const have=new Set(S.list.map(x=>x.id)),add=j.list.filter(x=>!have.has(x.id)).map(x=>({...x,hasPhoto:false}));
+    const have=new Set(S.list.map(x=>x.id)),add=j.list.filter(x=>!have.has(x.id)).map(x=>({...x,hasPhoto:false,issueId:null}));
     S.list=mine().concat(add);S.showEx=false;
     if(!S.profile.name)S.profile=Object.assign(S.profile,j.profile);
-    save();render();toast(`Restored ${plural(add.length,'complaint')}`);
+    save();linkMine();render();toast(`Restored ${plural(add.length,'complaint')}`);
   }catch{toast('That file isn’t an UrbOasis backup','fa-circle-info')}
 }
 /* menu */
