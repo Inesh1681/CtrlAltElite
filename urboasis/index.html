@@ -399,26 +399,24 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
 .dpage h1{font-size:clamp(28px,3.6vw,40px);max-width:22ch}
 .dpage p{max-width:58ch}
 .dh{font-size:var(--fs-xl)}
-.dgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s4)}
+.dgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4)}
+.dcard.wide{grid-column:1/-1}
+.dcard.wide .sol{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:var(--s6)}
+.dcard.wide .sol li:nth-child(2){border-top:0;padding-top:0}
 .dcard{display:grid;gap:var(--s4);align-content:start;padding:var(--s5);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface)}
 .dhead{display:flex;gap:var(--s3);align-items:center}
 .dic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-ink);flex:none;font-size:18px}
 .dhead h3{font-size:var(--fs-lg);line-height:1.2}
 .dhead p{font-size:var(--fs-sm);color:var(--muted);line-height:1.35}
-.dhandles{font-size:15.5px;line-height:1.55}
-.dmeta{display:grid;grid-template-columns:1fr 1fr;gap:var(--s4);margin:0;padding-top:var(--s4);border-top:1px solid var(--line)}
-.dmeta dt{font-size:12px;color:var(--muted);font-weight:650;text-transform:uppercase;letter-spacing:.05em}
-.dmeta dd{margin:4px 0 0;font-weight:650;font-size:15px}
-.dmore{margin-top:calc(-1 * var(--s2))}
-.dmore summary{cursor:pointer;list-style:none;color:var(--accent-ink);font-weight:650;font-size:var(--fs-sm);min-height:44px;display:inline-flex;align-items:center;gap:8px}
-.dmore summary::-webkit-details-marker{display:none}
-.dmore summary::after{content:"\f078";font:900 10px "Font Awesome 6 Free";transition:transform .2s}
-.dmore[open] summary::after{transform:rotate(180deg)}
-.dmore>div{display:grid;gap:var(--s3);padding-bottom:var(--s1)}
-.dmore ul{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:var(--fs-sm)}
-.dmore li{display:flex;justify-content:space-between;gap:var(--s3)}
-.dmore li i{width:20px;color:var(--muted)}
-.dmore li span:last-child{color:var(--muted);white-space:nowrap}
+.sol{list-style:none;margin:0;padding:0;display:grid;gap:0}
+.sol li{display:grid;gap:4px;padding:var(--s3) 0;border-top:1px solid var(--line)}
+.sol li:first-child{border-top:0;padding-top:0}
+.solh{display:flex;justify-content:space-between;gap:var(--s3);align-items:baseline;font-weight:650;font-size:15.5px}
+.solh i{width:22px;color:var(--accent-ink)}
+.solh .days{font-size:var(--fs-xs);font-weight:600;color:var(--muted);white-space:nowrap}
+.sol p{font-size:var(--fs-sm);color:var(--muted);line-height:1.5;padding-left:22px}
+.dcard .esc{font-size:var(--fs-xs);color:var(--muted);padding-top:var(--s3);border-top:1px solid var(--line)}
+.dcard .esc i{color:var(--accent-ink);margin-right:4px}
 .chase{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s4);counter-reset:c}
 .chase li{counter-increment:c;display:grid;gap:6px;align-content:start;padding:var(--s5);border-radius:var(--r-lg);background:var(--surface);border:1px solid var(--line)}
 .chase li::before{content:counter(c);width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent-ink);display:grid;place-items:center;font:800 13px var(--f-body);margin-bottom:4px}
@@ -429,6 +427,7 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
 .corpitem i{color:var(--accent-ink)}
 .corpitem small{display:block;font-weight:400;font-size:var(--fs-xs);color:var(--muted)}
 @media (max-width:960px){.corpgrid{grid-template-columns:repeat(3,minmax(0,1fr))}.chase{grid-template-columns:1fr}}
+@media (max-width:960px){.dgrid{grid-template-columns:1fr 1fr}.dcard.wide .sol{grid-template-columns:1fr}.dcard.wide .sol li:nth-child(2){border-top:1px solid var(--line);padding-top:var(--s3)}}
 @media (max-width:640px){.dgrid{grid-template-columns:1fr}.corpgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 
 /* ---------- where it goes ---------- */
@@ -640,6 +639,20 @@ const CORP_LOOKUP={
 };
 const ZONE_MAP_URL='';   // TODO-VERIFY: official GBA corporation / zone map URL. The link is hidden until set.
 
+/* How UrbOasis handles each problem type, shown on the "Where it goes" page. */
+const SOLVE={
+  pothole:'We mark the exact spot, lane and size with a photo, so it can be found and filled first time.',
+  garbage:'We pin the black spot with a photo and reopen it if the dumping comes back.',
+  streetlight:'We pin the dark stretch and the nearest pole, so the right lights get repaired.',
+  footpath:'We record the broken or blocked section with a photo, so it can be repaired or cleared.',
+  tree:'Marked urgent when it blocks a road or wires, and followed up after just one day.',
+  mosquito:'We report the stagnant water before it becomes a mosquito breeding spot.',
+  dogs:'We describe the animal and the exact place, so it can be found and helped.',
+  water:'We pin the leak or the street without supply, and ask for a repair date.',
+  sewage:'We report it as a health hazard and follow up after two days.',
+  power:'For a loose or hanging wire, we tell you to call 112 first, then report it so it’s made safe.',
+  traffic:'We pin the junction and what’s wrong, so the signal is fixed or the hazard removed.',
+};
 const CATS={
   pothole:{n:'Pothole or damaged road',kn:'ರಸ್ತೆ ಗುಂಡಿ',ic:'fa-road-circle-exclamation',ag:'gba',days:7,ph:'Deep pothole in the left lane before the signal'},
   garbage:{n:'Garbage or black spot',kn:'ಕಸ',ic:'fa-trash-can',ag:'gba',days:2,ph:'Garbage dumped on the corner for a week'},
@@ -1468,23 +1481,18 @@ function reportHTML(){
   <div class="pbody stack" style="gap:var(--s5);padding-top:var(--s5)">${body}</div></div></div>`;
 }
 function departmentsHTML(){
-  const handles={gba:'Roads, garbage, streetlights, footpaths, trees, stagnant water and stray dogs',bwssb:'Water supply, leaks and sewage',bescom:'Power cuts and loose or hanging wires',btp:'Traffic signals and road safety'};
-  const how=a=>{const l=channelsFor(a).map(k=>({whatsapp:'WhatsApp',email:'Email',x:'X',form:'Online form'})[k]);return l.length?l.join(', '):`Call ${a.phone||'their helpline'} for now`};
   return `<div class="wrap">
   <div class="phead dpage"><p class="eyebrow">Where your complaint goes</p><h1>You don’t need to know who fixes what.</h1><p>Pick the problem and drop a pin. UrbOasis works out the department and city corporation, sends your complaint in one tap, and chases it until it’s fixed.</p></div>
   <div class="pbody stack" style="gap:var(--s8)">
 
   <section class="stack" style="gap:var(--s4)" aria-labelledby="dh-1">
-    <h2 class="dh" id="dh-1">The four departments</h2>
-    <div class="dgrid">${Object.entries(CONTACTS).map(([k,a])=>{const cats=Object.values(CATS).filter(c=>c.ag===k),lo=Math.min(...cats.map(c=>c.days)),hi=Math.max(...cats.map(c=>c.days));
-      return`<article class="dcard">
+    <div class="stack" style="gap:var(--s2)"><h2 class="dh" id="dh-1">How we get each problem fixed</h2>
+    <p class="hint"><i class="fa-solid fa-circle-info" aria-hidden="true"></i> Every complaint goes through the department’s official channel. You just tap send.</p></div>
+    <div class="dgrid">${Object.entries(CONTACTS).map(([k,a])=>{const cats=Object.entries(CATS).filter(([,c])=>c.ag===k);
+      return`<article class="dcard${cats.length>3?' wide':''}">
       <div class="dhead"><span class="dic"><i class="fa-solid ${a.ic}" aria-hidden="true"></i></span><div><h3>${a.short}</h3><p>${a.name}</p></div></div>
-      <p class="dhandles">${handles[k]}</p>
-      <dl class="dmeta"><div><dt>Usual fix time</dt><dd>${lo===hi?plural(lo,'day'):`${lo}–${hi} days`}</dd></div><div><dt>How we send it</dt><dd>${how(a)}</dd></div></dl>
-      <details class="dmore"><summary>Problem types and escalation</summary><div>
-        <ul>${cats.map(c=>`<li><span><i class="fa-solid ${c.ic}" aria-hidden="true"></i>${c.n}</span><span>~${plural(c.days,'day')}</span></li>`).join('')}</ul>
-        <p class="hint" data-verify>If it isn’t fixed, we escalate to ${a.escHint}.</p>
-      </div></details>
+      <ul class="sol">${cats.map(([ck,c])=>`<li><div class="solh"><span><i class="fa-solid ${c.ic}" aria-hidden="true"></i>${c.n}</span><span class="days">~${plural(c.days,'day')}</span></div><p>${SOLVE[ck]}</p></li>`).join('')}</ul>
+      <p class="esc" data-verify><i class="fa-solid fa-arrow-trend-up" aria-hidden="true"></i> Not fixed in time? We escalate to ${a.escHint}.</p>
     </article>`}).join('')}</div>
   </section>
 
