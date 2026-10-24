@@ -1,0 +1,544 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UrbOasis Pitch</title>
+<meta name="description" content="UrbOasis: the follow-through layer for civic complaints in Bengaluru. SDG alignment, problem analysis, innovation, feasibility and pitch.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23167a5b'/%3E%3Cpath d='M16 7a6 6 0 0 0-6 6c0 4.5 6 12 6 12s6-7.5 6-12a6 6 0 0 0-6-6zm0 8.2a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* Layout: a long-form pitch read top to bottom. Sticky section bar with scroll tracking, centred 1080px column,
+   alternating bands. Each section has one interactive piece that proves the claim next to it. */
+:root{
+  --bg:#f5f6f4; --surface:#ffffff; --ink:#1d2421; --muted:#5f6964; --line:#e3e7e4; --hover:#eef1ee;
+  --accent:#167a5b; --accent-ink:#0f5c44; --accent-soft:#e6f3ee; --on-accent:#ffffff;
+  --go:#1a7a4c; --wait:#a5670f; --stop:#c0402a; --idle:#78817c;
+  --pitch-hi:#7fd9b7; --sdg3:#4c9f38; --sdg6:#26bde2; --sdg11:#fd9d24; --sdg16:#00689d; --on-sdg:#ffffff;
+  --shadow:0 1px 2px rgba(20,30,25,.05),0 10px 30px rgba(20,30,25,.08);
+  --f-body:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1312; --surface:#161b19; --ink:#e4e9e6; --muted:#9aa49f; --line:#262d2a; --hover:#1d2321;
+  --accent:#4fc69b; --accent-ink:#7fd9b7; --accent-soft:#163029; --on-accent:#0c1210;
+  --go:#55c38e; --wait:#e0a74e; --stop:#f0846c; --idle:#8d9691; --pitch-hi:#0f5c44;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1312; --surface:#161b19; --ink:#e4e9e6; --muted:#9aa49f; --line:#262d2a; --hover:#1d2321;
+  --accent:#4fc69b; --accent-ink:#7fd9b7; --accent-soft:#163029; --on-accent:#0c1210;
+  --go:#55c38e; --wait:#e0a74e; --stop:#f0846c; --idle:#8d9691; --pitch-hi:#0f5c44;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.35); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:120px}
+body{margin:0;font:16.5px/1.6 var(--f-body);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;line-height:1.15;text-wrap:balance;letter-spacing:-.018em}
+h1{font-size:clamp(34px,5.4vw,60px);font-weight:800}
+h2{font-size:clamp(26px,3.4vw,38px);font-weight:800}
+h3{font-size:18px;font-weight:700}
+p{margin:0}
+a{color:inherit}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.eyebrow{font:700 13px var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--accent-ink)}
+.wrap{max-width:1100px;margin-inline:auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.stack{display:grid;gap:16px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:9px;font:650 15.5px var(--f-body);padding:13px 20px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);text-decoration:none;cursor:pointer;transition:transform .1s,box-shadow .15s}
+.btn:hover{box-shadow:var(--shadow)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+
+/* top bar + section nav */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:16px;height:60px}
+.brand{display:flex;gap:10px;align-items:center;text-decoration:none;font:800 18px var(--f-body)}
+.mark{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--accent);color:var(--on-accent);font-size:14px}
+.top .row{margin-left:auto;gap:8px}
+.top .btn{padding:8px 14px;font-size:14px;border-radius:10px}
+.iconbtn{appearance:none;border:0;background:transparent;width:38px;height:38px;border-radius:10px;display:grid;place-items:center;cursor:pointer;color:var(--muted)}
+.iconbtn:hover{background:var(--hover);color:var(--ink)}
+.secnav{border-top:1px solid var(--line)}
+.secnav .wrap{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none;height:46px;align-items:center}
+.secnav a{flex:none;text-decoration:none;font:600 14px var(--f-body);color:var(--muted);padding:6px 12px;border-radius:999px;transition:background .15s,color .15s}
+.secnav a:hover{color:var(--ink)}
+.secnav a.on{background:var(--ink);color:var(--surface)}
+.progress{position:absolute;left:0;bottom:-1px;height:2px;background:var(--accent);width:0}
+
+/* sections */
+section{padding-block:80px}
+section.alt{background:var(--surface);border-block:1px solid var(--line)}
+.shead{display:grid;gap:12px;max-width:720px;margin-bottom:40px}
+.shead p{font-size:18.5px;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:24px}
+section.alt .card{background:var(--bg)}
+
+/* hero */
+.hero{padding-block:72px 64px}
+.hero .grid{display:grid;grid-template-columns:1.15fr .85fr;gap:56px;align-items:center}
+.lede{font-size:20px;color:var(--muted);max-width:56ch}
+.oneliner{font:600 15px/1.5 var(--f-mono);padding:14px 16px;border-radius:12px;background:var(--accent-soft);color:var(--accent-ink);max-width:60ch}
+.facts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fact{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;display:grid;gap:4px}
+.fact b{font:800 34px/1 var(--f-body);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.fact span{font-size:14px;color:var(--muted)}
+.chain{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font:600 14px var(--f-body);color:var(--muted)}
+.chain span{padding:6px 11px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+.chain i{font-size:10px}
+
+/* SDG */
+.sdgs{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.sdg{appearance:none;text-align:left;border:0;border-radius:18px;padding:0;overflow:hidden;cursor:pointer;background:var(--surface);border:1px solid var(--line);display:grid;transition:transform .15s,box-shadow .15s}
+.sdg:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.sdg[aria-expanded="true"]{box-shadow:0 0 0 2px var(--c)}
+.sdg .head{background:var(--c);color:var(--on-sdg);padding:16px 18px;display:grid;gap:4px;min-height:118px;align-content:start}
+.sdg .num{font:800 34px/1 var(--f-body)}
+.sdg .name{font:700 15px/1.25 var(--f-body)}
+.sdg .body{padding:14px 18px;font-size:14.5px;color:var(--muted);display:flex;justify-content:space-between;gap:8px;align-items:center}
+.sdg.primary .head::after{content:"Primary goal";justify-self:start;margin-top:6px;font:700 11px var(--f-body);letter-spacing:.06em;text-transform:uppercase;background:rgba(0,0,0,.18);padding:3px 7px;border-radius:5px}
+.targets{margin-top:16px;display:grid;gap:10px}
+.target{display:grid;grid-template-columns:104px 1fr;gap:16px;padding:16px 18px;border-radius:14px;background:var(--surface);border:1px solid var(--line);animation:rise .25s ease both}
+.target .code{font:700 15px var(--f-mono);color:var(--c)}
+.target p{font-size:15px;color:var(--muted)}
+.target b{display:block;color:var(--ink);font-size:15.5px;margin-bottom:3px}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
+
+/* problem funnel */
+.funnel{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:start}
+.stages{display:grid;gap:8px}
+.stage{appearance:none;text-align:left;cursor:pointer;display:grid;grid-template-columns:36px 1fr auto;gap:14px;align-items:center;padding:14px 16px;border-radius:14px;border:1px solid var(--line);background:var(--surface);transition:all .15s;width:calc(100% - var(--cut))}
+.stage:hover{border-color:var(--muted)}
+.stage[aria-selected="true"]{border-color:var(--stop);box-shadow:0 0 0 1px var(--stop)}
+.stage .n{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font:700 13px var(--f-mono);background:var(--hover)}
+.stage[aria-selected="true"] .n{background:var(--stop);color:var(--on-accent)}
+.stage b{font-size:16px}
+.stage small{font-size:13px;color:var(--stop);font-weight:600;white-space:nowrap}
+.why{position:sticky;top:130px;display:grid;gap:16px}
+.why .cause{border-left:0;padding:22px;border-radius:18px;background:color-mix(in srgb,var(--stop) 8%,var(--surface));border:1px solid color-mix(in srgb,var(--stop) 25%,transparent)}
+.why .fix{padding:22px;border-radius:18px;background:var(--accent-soft);border:1px solid color-mix(in srgb,var(--accent) 30%,transparent)}
+.why .label{font:700 12.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;display:flex;gap:8px;align-items:center}
+.why .cause .label{color:var(--stop)}
+.why .fix .label{color:var(--accent-ink)}
+.why p{font-size:16px}
+.roots{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
+.roots .card{display:grid;gap:8px;align-content:start}
+.roots i{font-size:20px;color:var(--stop)}
+.roots p{font-size:15px;color:var(--muted)}
+
+/* innovation */
+.cmp{width:100%;border-collapse:collapse;font-size:15px;min-width:640px}
+.cmp th,.cmp td{padding:13px 14px;border-bottom:1px solid var(--line);text-align:center}
+.cmp th:first-child,.cmp td:first-child{text-align:left}
+.cmp thead th{font-size:13.5px;color:var(--muted);font-weight:650;vertical-align:bottom}
+.cmp thead th.us{color:var(--accent-ink)}
+.cmp td.us{background:var(--accent-soft);font-weight:650}
+.cmp .y{color:var(--go)} .cmp .n{color:var(--line)} .cmp .p{color:var(--wait)}
+.tscroll{overflow-x:auto;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.sim{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:28px;margin-top:48px;align-items:start}
+.sim .controls{display:grid;gap:20px}
+.fl{display:grid;gap:8px;font-weight:650;font-size:15px}
+select{font:500 16px var(--f-body);padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+input[type=range]{width:100%;accent-color:var(--accent);height:28px}
+.daylabel{display:flex;justify-content:space-between;align-items:baseline}
+.daylabel b{font:800 28px var(--f-body);font-variant-numeric:tabular-nums}
+.tline{position:relative;height:36px;margin-top:4px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13.5px}
+.legend>span{display:flex;gap:7px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:3px;flex:none}
+.tline .rail{position:absolute;left:0;right:0;top:22px;height:8px;border-radius:4px;background:var(--line);overflow:hidden}
+.tline .seg{position:absolute;top:0;bottom:0}
+.tline .tick{position:absolute;top:36px;font:600 11.5px var(--f-mono);color:var(--muted);transform:translateX(-50%);white-space:nowrap}
+.tline .now{position:absolute;top:14px;width:4px;height:24px;border-radius:2px;background:var(--ink);transform:translateX(-50%);transition:left .15s}
+.out{border-radius:18px;padding:22px;display:grid;gap:12px;background:color-mix(in srgb,var(--tone) 9%,var(--surface));border:1.5px solid color-mix(in srgb,var(--tone) 32%,transparent);transition:background .2s,border-color .2s}
+.out .pill{justify-self:start;display:inline-flex;gap:7px;align-items:center;font:700 13px var(--f-body);padding:6px 11px;border-radius:999px;color:var(--tone);background:color-mix(in srgb,var(--tone) 14%,transparent)}
+.out .pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.out pre{margin:0;white-space:pre-wrap;font:13.5px/1.6 var(--f-mono);background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px;max-height:260px;overflow:auto}
+.t-stop{--tone:var(--stop)} .t-wait{--tone:var(--wait)} .t-go{--tone:var(--go)} .t-idle{--tone:var(--idle)}
+.pillars{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:40px}
+.pillars .card{display:grid;gap:8px;align-content:start}
+.pillars i{font-size:20px;color:var(--accent)}
+.pillars p{font-size:15px;color:var(--muted)}
+
+/* feasibility */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:22px}
+.tab{appearance:none;border:1px solid var(--line);background:var(--surface);padding:10px 16px;border-radius:999px;font:650 15px var(--f-body);color:var(--muted);cursor:pointer;display:flex;gap:8px;align-items:center}
+.tab[aria-selected="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.panel{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;animation:rise .25s ease both}
+.panel[hidden]{display:none}
+.panel .card{display:grid;gap:8px;align-content:start}
+.panel .card p{font-size:15px;color:var(--muted)}
+.status{justify-self:start;font:700 11.5px var(--f-body);letter-spacing:.05em;text-transform:uppercase;padding:4px 8px;border-radius:6px}
+.status.done{color:var(--go);background:color-mix(in srgb,var(--go) 12%,transparent)}
+.status.next{color:var(--wait);background:color-mix(in srgb,var(--wait) 12%,transparent)}
+.calc{grid-column:1/-1;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center}
+.calc .controls{display:grid;gap:18px}
+.money{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.money div{padding:18px;border-radius:14px;background:var(--surface);border:1px solid var(--line);display:grid;gap:4px}
+section.alt .money div{background:var(--surface)}
+.money b{font:800 28px/1.1 var(--f-body);font-variant-numeric:tabular-nums;letter-spacing:-.01em}
+.money span{font-size:13.5px;color:var(--muted)}
+.money .big{grid-column:1/-1;background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.money .big span{color:inherit;opacity:.8}
+.money .big b{font-size:38px}
+.note{font-size:13.5px;color:var(--muted)}
+
+/* roadmap */
+.road{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;position:relative}
+.road li{display:grid;gap:10px;align-content:start;padding:22px;border-radius:18px;background:var(--surface);border:1px solid var(--line);position:relative}
+.road li.now{border:2px solid var(--accent)}
+.road .when{font:700 13px var(--f-mono);color:var(--accent-ink)}
+.road ul{margin:0;padding-left:18px;display:grid;gap:5px;font-size:14.5px;color:var(--muted)}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
+.kpis .card{display:grid;gap:6px}
+.kpis b{font-size:16px}
+.kpis p{font-size:14.5px;color:var(--muted)}
+
+/* pitch */
+.pitch{background:var(--ink);color:var(--surface);border:0}
+.pitch .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:start}
+.pitch .eyebrow{color:var(--pitch-hi)}
+.pitch .lede{color:color-mix(in srgb,var(--surface) 75%,transparent)}
+.canvas{display:grid;gap:2px;border-radius:16px;overflow:hidden;background:color-mix(in srgb,var(--surface) 15%,transparent)}
+.canvas div{background:var(--ink);padding:16px 18px;display:grid;grid-template-columns:130px 1fr;gap:14px;font-size:15px}
+.canvas dt{font:700 12.5px var(--f-body);letter-spacing:.07em;text-transform:uppercase;color:var(--pitch-hi);padding-top:2px}
+.canvas dd{margin:0;color:color-mix(in srgb,var(--surface) 85%,transparent)}
+.asks{display:grid;gap:10px}
+.ask{display:flex;gap:14px;padding:16px;border-radius:14px;background:color-mix(in srgb,var(--surface) 8%,transparent);border:1px solid color-mix(in srgb,var(--surface) 15%,transparent)}
+.ask i{color:var(--pitch-hi);font-size:18px;margin-top:3px}
+.ask p{font-size:14.5px;color:color-mix(in srgb,var(--surface) 70%,transparent)}
+.pitch .btn{border-color:transparent}
+.pitch .btn:not(.primary){background:color-mix(in srgb,var(--surface) 12%,transparent);color:var(--surface)}
+footer{padding-block:32px 48px;font-size:14px;color:var(--muted)}
+footer .wrap{display:grid;gap:8px}
+
+@media (max-width:960px){
+  .hero .grid,.funnel,.sim,.calc,.pitch .grid{grid-template-columns:1fr}
+  .sdgs,.pillars,.road,.kpis{grid-template-columns:1fr 1fr}
+  .roots{grid-template-columns:1fr}
+  .why{position:static}
+  .stage{width:100%!important}
+}
+@media (max-width:600px){
+  section{padding-block:56px}
+  .sdgs,.pillars,.road,.kpis,.panel,.money{grid-template-columns:1fr}
+  .facts{grid-template-columns:1fr 1fr}
+  .fact b{font-size:28px}
+  .top .hide-sm{display:none}
+  .canvas div{grid-template-columns:1fr;gap:4px}
+  .target{grid-template-columns:1fr;gap:6px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top"><span class="mark" aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span>UrbOasis</a>
+    <div class="row">
+      <a class="btn hide-sm" href="index.html#societies">For societies</a>
+      <a class="btn primary" href="index.html"><i class="fa-solid fa-arrow-up-right-from-square"></i>Open the app</a>
+      <button class="iconbtn" id="theme" type="button" aria-label="Switch light or dark theme"><i class="fa-solid fa-circle-half-stroke"></i></button>
+    </div>
+  </div>
+  <nav class="secnav" aria-label="Sections"><div class="wrap">
+    <a href="#top">Overview</a><a href="#sdg">SDG alignment</a><a href="#problem">Problem</a><a href="#innovation">Innovation</a><a href="#feasibility">Feasibility</a><a href="#roadmap">Roadmap</a><a href="#pitch">Pitch</a>
+  </div></nav>
+  <div class="progress" id="progress"></div>
+</header>
+
+<main>
+<!-- ============ HERO ============ -->
+<div class="hero wrap" id="top">
+  <div class="grid">
+    <div class="stack" style="gap:22px">
+      <p class="eyebrow">Civic tech · Bengaluru · SDG 11</p>
+      <h1>Getting a complaint filed is easy. Getting it fixed is the hard part.</h1>
+      <p class="lede">UrbOasis is the follow-through layer for civic complaints. It routes each problem to the right department, writes the complaint, and tells citizens and housing societies exactly when and how to follow up, escalate and file an RTI.</p>
+      <p class="oneliner">Report it to the right desk, then follow up on schedule until it’s fixed.</p>
+      <div class="row"><a class="btn primary" href="index.html#report"><i class="fa-solid fa-play"></i>Try a report (2 min)</a><a class="btn" href="#pitch">Jump to the pitch</a></div>
+    </div>
+    <div class="stack">
+      <div class="facts">
+        <div class="fact"><b>4</b><span>departments routed automatically (GBA, BWSSB, BESCOM, Traffic Police)</span></div>
+        <div class="fact"><b>11</b><span>problem types, labelled in English and Kannada</span></div>
+        <div class="fact"><b>5</b><span>stages from filing to RTI, each with a ready-made letter</span></div>
+        <div class="fact"><b>₹0</b><span>server cost today. Data stays on the user’s device</span></div>
+      </div>
+      <div class="chain" aria-label="Escalation path"><span>Report</span><i class="fa-solid fa-chevron-right"></i><span>File</span><i class="fa-solid fa-chevron-right"></i><span>Follow up</span><i class="fa-solid fa-chevron-right"></i><span>Escalate</span><i class="fa-solid fa-chevron-right"></i><span>RTI</span><i class="fa-solid fa-chevron-right"></i><span style="color:var(--go);border-color:var(--go)">Fixed</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SDG ============ -->
+<section class="alt" id="sdg"><div class="wrap">
+  <div class="shead"><p class="eyebrow">SDG alignment</p><h2>Built for SDG 11, with direct links to three more goals</h2><p>Tap a goal to see the specific UN targets UrbOasis contributes to, and how.</p></div>
+  <div class="sdgs" id="sdgs"></div>
+  <div class="targets" id="targets"></div>
+</div></section>
+
+<!-- ============ PROBLEM ============ -->
+<section id="problem"><div class="wrap">
+  <div class="shead"><p class="eyebrow">Problem analysis</p><h2>Civic complaints don’t fail at reporting. They fail after it.</h2><p>Follow a pothole from the moment someone notices it. Tap each stage to see where it breaks down, and what UrbOasis does about it.</p></div>
+  <div class="funnel">
+    <div class="stages" id="stages" role="tablist" aria-label="Stages of a civic complaint"></div>
+    <div class="why" id="why" aria-live="polite"></div>
+  </div>
+  <div class="roots">
+    <div class="card"><i class="fa-solid fa-sitemap"></i><h3>Fragmented ownership</h3><p>Roads, garbage and streetlights sit with GBA, water and sewage with BWSSB, power with BESCOM, signals with Traffic Police. BBMP’s 2025 split into GBA and five city corporations added more confusion.</p></div>
+    <div class="card"><i class="fa-solid fa-hourglass-half"></i><h3>No follow-through</h3><p>Helplines take complaints, but nobody tells the citizen when a complaint is overdue, who to escalate to, or what to write. Most people give up after one call.</p></div>
+    <div class="card"><i class="fa-solid fa-eye-slash"></i><h3>No shared evidence</h3><p>Every complaint lives alone. Nobody can show that a ward’s potholes take three weeks, so there’s no pressure to improve.</p></div>
+  </div>
+</div></section>
+
+<!-- ============ INNOVATION ============ -->
+<section class="alt" id="innovation"><div class="wrap">
+  <div class="shead"><p class="eyebrow">Innovation</p><h2>The first tool that manages what happens after you complain</h2><p>Existing channels are built to receive complaints. UrbOasis is built to get them resolved: a rules-based escalation engine that knows each department’s chain and the citizen’s legal tools.</p></div>
+  <div class="tscroll"><table class="cmp">
+    <thead><tr><th>Capability</th><th>Official helpline / app</th><th>Posting on social media</th><th>Civic reporting portals</th><th class="us">UrbOasis</th></tr></thead>
+    <tbody id="cmp"></tbody>
+  </table></div>
+  <p class="note" style="margin-top:10px"><i class="fa-solid fa-circle-check" style="color:var(--go)"></i> yes   <i class="fa-solid fa-circle-half-stroke" style="color:var(--wait)"></i> partly   <i class="fa-regular fa-circle" style="color:var(--muted)"></i> no. Based on how each channel typically works.</p>
+
+  <div class="sim">
+    <div class="controls card">
+      <div><p class="eyebrow">Live demo</p><h3 style="margin-top:6px">Try the escalation engine</h3><p class="muted" style="font-size:15px;margin-top:6px">Pick a problem and drag the slider to move through time. This is the same logic the app runs.</p></div>
+      <label class="fl">Problem<select id="s-cat"></select></label>
+      <div class="fl"><div class="daylabel"><span>Days since filing</span><b id="s-daynum">0</b></div><input type="range" id="s-day" min="0" max="45" value="0" aria-label="Days since filing"></div>
+      <div class="tline" id="s-tline" aria-hidden="true"></div>
+      <div class="legend" id="s-legend"></div>
+      <label class="fl" style="flex-direction:row;display:flex;gap:10px;align-items:center;font-weight:500"><input type="checkbox" id="s-fixed" style="width:20px;height:20px;accent-color:var(--accent)">The department fixed it</label>
+    </div>
+    <div class="out" id="s-out" aria-live="polite"></div>
+  </div>
+
+  <div class="pillars">
+    <div class="card"><i class="fa-solid fa-route"></i><h3>Smart routing</h3><p>Maps 11 problem types to the right department and its helpline, and handles BBMP’s handover to GBA.</p></div>
+    <div class="card"><i class="fa-solid fa-scale-balanced"></i><h3>Legal escalation</h3><p>Turns the RTI Act’s 30-day reply into a one-tap application with the five questions that get a written answer.</p></div>
+    <div class="card"><i class="fa-solid fa-users"></i><h3>Collective pressure</h3><p>Neighbour co-sign links and society-level reports turn one complaint into a pattern that’s hard to ignore.</p></div>
+    <div class="card"><i class="fa-solid fa-lock"></i><h3>Private by design</h3><p>No account and no server. Photos are re-saved without location metadata. Built with the DPDP Act 2023 in mind.</p></div>
+  </div>
+</div></section>
+
+<!-- ============ FEASIBILITY ============ -->
+<section id="feasibility"><div class="wrap">
+  <div class="shead"><p class="eyebrow">Feasibility</p><h2>Working today, cheap to run, clear path to revenue</h2><p>Check each dimension. Green items are already built and tested.</p></div>
+  <div class="tabs" role="tablist" id="ftabs">
+    <button class="tab" role="tab" aria-selected="true" data-p="tech"><i class="fa-solid fa-code"></i>Technical</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="ops"><i class="fa-solid fa-gears"></i>Operational</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="fin"><i class="fa-solid fa-indian-rupee-sign"></i>Financial</button>
+    <button class="tab" role="tab" aria-selected="false" data-p="legal"><i class="fa-solid fa-shield-halved"></i>Legal and ethical</button>
+  </div>
+  <div class="panel" data-panel="tech">
+    <div class="card"><span class="status done">Built</span><h3>Single-file web app</h3><p>One HTML file with no build step and no backend. It runs on any static host and works on any phone browser.</p></div>
+    <div class="card"><span class="status done">Built</span><h3>Open map and geocoding</h3><p>OpenStreetMap tiles via OpenFreeMap, with no API key or usage fees. Address lookup through Nominatim.</p></div>
+    <div class="card"><span class="status done">Built</span><h3>Escalation engine</h3><p>A deterministic rules engine: per-category fix windows, follow-up after the window, escalation 7 days later, RTI 21 days after that.</p></div>
+    <div class="card"><span class="status next">Next</span><h3>Shared society boards</h3><p>Accounts and a hosted database (Firebase or Supabase) so a whole society shares one list. A known, low-risk build.</p></div>
+  </div>
+  <div class="panel" data-panel="ops" hidden>
+    <div class="card"><span class="status done">Built</span><h3>Department directory</h3><p>Helplines, escalation officers and RTI offices for four departments, stored in one config block that takes minutes to update.</p></div>
+    <div class="card"><span class="status done">Built</span><h3>Self-serve onboarding</h3><p>Residents report a problem in about two minutes with no sign-up. Societies request a pilot from the site.</p></div>
+    <div class="card"><span class="status next">Next</span><h3>Pilot playbook</h3><p>Set up each society in one call, import its open complaints, and train one committee member.</p></div>
+    <div class="card"><span class="status next">Next</span><h3>Directory upkeep</h3><p>A monthly check of helplines as GBA restructures. One person-hour a month.</p></div>
+  </div>
+  <div class="panel" data-panel="fin" hidden>
+    <div class="calc card">
+      <div class="controls">
+        <div><h3>Revenue calculator</h3><p class="muted" style="font-size:15px;margin-top:4px">Housing societies and RWAs pay a monthly subscription. Drag to test the assumptions.</p></div>
+        <div class="fl"><div class="daylabel"><span>Paying societies</span><b id="c-socn">100</b></div><input type="range" id="c-soc" min="10" max="1000" step="10" value="100" aria-label="Paying societies"></div>
+        <div class="fl"><div class="daylabel"><span>Price per society per month</span><b id="c-pricen">₹999</b></div><input type="range" id="c-price" min="299" max="2999" step="100" value="999" aria-label="Price per month"></div>
+        <p class="note">Running costs are an estimate: hosting, database and messaging grow from about ₹2,000 to ₹15,000 a month across this range.</p>
+      </div>
+      <div class="money">
+        <div class="big"><span>Annual recurring revenue</span><b id="c-arr"></b></div>
+        <div><span>Monthly revenue</span><b id="c-mrr"></b></div>
+        <div><span>Est. running cost / month</span><b id="c-cost"></b></div>
+        <div><span>Gross margin</span><b id="c-margin"></b></div>
+        <div><span>Homes reached (≈150 each)</span><b id="c-homes"></b></div>
+      </div>
+    </div>
+  </div>
+  <div class="panel" data-panel="legal" hidden>
+    <div class="card"><span class="status done">Built</span><h3>Independent, not impersonating</h3><p>Clearly states that it is not a government site. Citizens file through official channels, so complaints stay on the official record.</p></div>
+    <div class="card"><span class="status done">Built</span><h3>Data minimisation</h3><p>No accounts, no tracking and no central database today. Personal details stay on the device and are used only to sign letters.</p></div>
+    <div class="card"><span class="status done">Built</span><h3>Grounded in existing law</h3><p>Escalation uses the Right to Information Act, 2005: Section 6(1) applications, a 30-day reply under Section 7(1), and the Rs 10 fee in Karnataka.</p></div>
+    <div class="card"><span class="status next">Next</span><h3>DPDP compliance for shared boards</h3><p>Consent screens, a privacy notice and deletion on request before any resident data is stored centrally.</p></div>
+  </div>
+</div></section>
+
+<!-- ============ ROADMAP ============ -->
+<section class="alt" id="roadmap"><div class="wrap">
+  <div class="shead"><p class="eyebrow">Roadmap and impact</p><h2>From a working tool to a ward-level accountability network</h2></div>
+  <ol class="road">
+    <li class="now"><span class="when">Now</span><h3>Working product</h3><ul><li>Citizen reporting and routing</li><li>Escalation engine and letters</li><li>Monthly society report</li><li>Pilot sign-ups live</li></ul></li>
+    <li><span class="when">Months 0–3</span><h3>Validate</h3><ul><li>10 RWA interviews</li><li>Free pilots with up to 20 societies</li><li>Measure time-to-fix</li></ul></li>
+    <li><span class="when">Months 3–6</span><h3>Shared boards</h3><ul><li>Accounts and society boards</li><li>WhatsApp reminders</li><li>First paid societies</li></ul></li>
+    <li><span class="when">Months 6–12</span><h3>Scorecards</h3><ul><li>Ward and department fix-time scorecards</li><li>Kannada interface</li><li>RWA federations</li></ul></li>
+  </ol>
+  <div class="kpis">
+    <div class="card"><b>Time to fix</b><p>Median days from filing to fixed, compared with each society’s past experience.</p></div>
+    <div class="card"><b>Escalation success</b><p>Share of overdue complaints fixed after a follow-up or escalation letter.</p></div>
+    <div class="card"><b>Societies active</b><p>Societies that log at least one complaint a month.</p></div>
+    <div class="card"><b>Homes covered</b><p>Residents whose surroundings are tracked through a society board.</p></div>
+  </div>
+</div></section>
+
+<!-- ============ PITCH ============ -->
+<section class="pitch" id="pitch"><div class="wrap">
+  <div class="grid">
+    <div class="stack" style="gap:24px">
+      <p class="eyebrow">The pitch</p>
+      <h2>Bengaluru doesn’t need another place to complain. It needs complaints that get fixed.</h2>
+      <p class="lede">UrbOasis gives every resident and housing society a clear path from “that’s broken” to “it’s fixed”, and turns their complaints into evidence that holds departments to account.</p>
+      <dl class="canvas">
+        <div><dt>Problem</dt><dd>Complaints reach the wrong department and nobody follows up, so they quietly die.</dd></div>
+        <div><dt>Solution</dt><dd>Automatic routing plus a follow-up, escalation and RTI engine with ready-made letters.</dd></div>
+        <div><dt>Customer</dt><dd>Free for residents. Paid by housing societies and RWAs that chase civic problems every month.</dd></div>
+        <div><dt>Model</dt><dd>₹999 per society per month. Federations and ward dashboards on custom pricing.</dd></div>
+        <div><dt>Edge</dt><dd>The only tool focused on follow-through, plus pooled fix-time data that nobody else collects.</dd></div>
+        <div><dt>Impact</dt><dd>SDG 11 and 16: safer streets, basic services that work, and more accountable local government.</dd></div>
+      </dl>
+    </div>
+    <div class="stack" style="gap:16px">
+      <h3 style="color:var(--surface)">What we’re looking for</h3>
+      <div class="asks">
+        <div class="ask"><i class="fa-solid fa-building"></i><div><b>Pilot societies</b><p>20 housing societies or RWAs to use UrbOasis free for three months.</p></div></div>
+        <div class="ask"><i class="fa-solid fa-handshake"></i><div><b>RWA federations and civic groups</b><p>Introductions to their member societies and help shaping the ward scorecard.</p></div></div>
+        <div class="ask"><i class="fa-solid fa-rocket"></i><div><b>Incubation and mentorship</b><p>Support to build shared boards and run the pilot properly.</p></div></div>
+      </div>
+      <div class="row" style="margin-top:8px"><a class="btn primary" href="index.html#societies"><i class="fa-solid fa-building"></i>Join the pilot</a><a class="btn" href="index.html"><i class="fa-solid fa-arrow-up-right-from-square"></i>Open the app</a></div>
+    </div>
+  </div>
+</div></section>
+</main>
+<footer><div class="wrap">
+  <p><b style="color:var(--ink)">UrbOasis</b> is an independent civic tool for Bengaluru. It is not a government website and is not connected to GBA, BWSSB, BESCOM or the police.</p>
+  <p>SDG colours and goal names are from the United Nations Sustainable Development Goals. Financial figures on this page are illustrative estimates.</p>
+</div></footer>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const inrShort=n=>n>=1e7?`₹${(n/1e7).toFixed(2)} Cr`:n>=1e5?`₹${(n/1e5).toFixed(1)} L`:inr(n);
+
+/* ---------- SDG ---------- */
+const SDG=[
+  {n:11,name:'Sustainable cities and communities',c:'var(--sdg11)',primary:true,t:[
+    ['11.1','Access to basic services','Routes broken water, power, sewage and waste services to the department responsible, and tracks them until restored.'],
+    ['11.2','Safe transport systems','Potholes, broken footpaths and faulty signals are logged with an exact location and escalated when overdue.'],
+    ['11.3','Participatory planning and management','Residents and RWAs take part in managing their neighbourhood, with a monthly report for ward-level meetings.'],
+    ['11.6','Municipal waste management','Garbage black spots and dumping are routed to GBA and followed up within a 2-day window.'],
+    ['11.7','Safe public spaces','Dark streets, unsafe trees and blocked footpaths are reported with photo evidence.']]},
+  {n:16,name:'Peace, justice and strong institutions',c:'var(--sdg16)',t:[
+    ['16.6','Effective, accountable institutions','Every complaint carries its number, dates and follow-ups, giving a paper trail officials can be held to.'],
+    ['16.7','Responsive, participatory decision-making','Escalation letters reach the officer named in each department’s chain, not a general inbox.'],
+    ['16.10','Public access to information','One-tap RTI applications under the RTI Act, 2005, which must be answered within 30 days.']]},
+  {n:6,name:'Clean water and sanitation',c:'var(--sdg6)',t:[
+    ['6.2','Sanitation for all','Sewage overflows and blocked drains go straight to BWSSB with a 2-day fix window.'],
+    ['6.4','Water-use efficiency','Leaking water mains are reported and followed up quickly, cutting water lost from the supply network.']]},
+  {n:3,name:'Good health and well-being',c:'var(--sdg3)',t:[
+    ['3.6','Fewer road traffic deaths and injuries','Potholes and broken signals are marked by severity, with a prompt to call 112 when life is at risk.'],
+    ['3.3','Communicable diseases','Stagnant water and mosquito breeding spots are reported for quick clearance.']]},
+];
+let sdgOpen=11;
+function drawSDG(){
+  $('#sdgs').innerHTML=SDG.map(g=>`<button class="sdg${g.primary?' primary':''}" style="--c:${g.c}" aria-expanded="${sdgOpen===g.n}" data-n="${g.n}">
+    <span class="head"><span class="num">${g.n}</span><span class="name">${g.name}</span></span>
+    <span class="body"><span>${g.t.length} target${g.t.length>1?'s':''}</span><i class="fa-solid fa-chevron-${sdgOpen===g.n?'up':'down'}"></i></span></button>`).join('');
+  const g=SDG.find(x=>x.n===sdgOpen);
+  $('#targets').innerHTML=g?g.t.map(([code,title,how])=>`<div class="target" style="--c:${g.c}"><span class="code">Target ${code}</span><p><b>${title}</b>${how}</p></div>`).join(''):'';
+}
+$('#sdgs').addEventListener('click',e=>{const b=e.target.closest('.sdg');if(!b)return;sdgOpen=+b.dataset.n===sdgOpen?null:+b.dataset.n;drawSDG()});
+drawSDG();
+
+/* ---------- Problem funnel ---------- */
+const STAGES=[
+  {t:'Problem noticed',l:'Starts here',cause:'A resident sees a pothole every day but doesn’t know who handles it, or assumes someone already complained.',fix:'One public page explains who fixes what. Reporting takes about two minutes with no sign-up.'},
+  {t:'Complaint reaches a department',l:'Wrong desk',cause:'With four departments and BBMP’s 2025 restructuring, many complaints go to the wrong office and are bounced or ignored.',fix:'UrbOasis picks the department from the problem type and gives the right helpline, app and handle.'},
+  {t:'Complaint is actionable',l:'Too vague',cause:'“Pothole on Hosur Road” gives a crew nothing to go on. Without a pin, landmark or photo, complaints get closed as “not found”.',fix:'An exact pin, a landmark prompt, a photo and a complaint strength check produce a complaint a crew can act on.'},
+  {t:'Someone follows up',l:'Drop-off',cause:'Nobody tells the citizen when a complaint is overdue, so it quietly expires. This is where most complaints die.',fix:'Each category has a fix window. Once it passes, UrbOasis says “follow up today” and gives the exact message, quoting the complaint number.'},
+  {t:'Escalated when ignored',l:'Rarely happens',cause:'Few people know who is above the helpline, or that RTI exists. Writing a formal letter feels like too much work.',fix:'Escalation letters to the named officer, then a ready RTI application under Section 6(1), with a 30-day reply required.'},
+  {t:'Fixed, and stays fixed',l:'The goal',cause:'Even when fixed, nobody records how long it took, so departments face no pressure to do better.',fix:'Days-to-fix is recorded for every complaint and rolls up into society reports and, soon, ward scorecards.'},
+];
+let stageSel=3;
+function drawStages(){
+  $('#stages').innerHTML=STAGES.map((s,i)=>`<button class="stage" role="tab" aria-selected="${i===stageSel}" data-i="${i}" style="--cut:${i*3.2}%"><span class="n">${i+1}</span><b>${s.t}</b><small>${s.l}</small></button>`).join('');
+  const s=STAGES[stageSel];
+  $('#why').innerHTML=`<div class="cause"><p class="label"><i class="fa-solid fa-triangle-exclamation"></i>Where it breaks: ${esc(s.t.toLowerCase())}</p><p>${esc(s.cause)}</p></div><div class="fix"><p class="label"><i class="fa-solid fa-wrench"></i>What UrbOasis does</p><p>${esc(s.fix)}</p></div>`;
+}
+$('#stages').addEventListener('click',e=>{const b=e.target.closest('.stage');if(b){stageSel=+b.dataset.i;drawStages()}});
+drawStages();
+
+/* ---------- Comparison ---------- */
+const CMP=[
+  ['Tells you which department handles it','p','n','p','y'],
+  ['Writes the complaint for you','n','n','p','y'],
+  ['Exact location, landmark and photo','p','p','y','y'],
+  ['Tells you when a complaint is overdue','n','n','n','y'],
+  ['Ready-made follow-up and escalation letters','n','n','n','y'],
+  ['One-tap RTI application','n','n','n','y'],
+  ['Reports for housing societies','n','n','p','y'],
+  ['Works without an account','n','n','n','y'],
+];
+const ic={y:'<i class="fa-solid fa-circle-check y" aria-label="Yes"></i>',p:'<i class="fa-solid fa-circle-half-stroke p" aria-label="Partly"></i>',n:'<i class="fa-regular fa-circle n" aria-label="No"></i>'};
+$('#cmp').innerHTML=CMP.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map((v,i)=>`<td class="${i===3?'us':''}">${ic[v]}</td>`).join('')}</tr>`).join('');
+
+/* ---------- Escalation simulator (same rules as the app) ---------- */
+const AG={gba:{s:'GBA',phone:'1533',esc:'the ward’s Assistant Executive Engineer'},bwssb:{s:'BWSSB',phone:'1916',esc:'the BWSSB service station’s Assistant Executive Engineer'},bescom:{s:'BESCOM',phone:'1912',esc:'the BESCOM sub-division’s Assistant Executive Engineer (O&M)'},btp:{s:'Traffic Police',phone:'112',esc:'the jurisdictional traffic Inspector'}};
+const CATS=[['Pothole or damaged road','gba',7],['Garbage or black spot','gba',2],['Streetlight not working','gba',3],['Broken or blocked footpath','gba',15],['Water leak or no supply','bwssb',2],['Sewage overflow','bwssb',2],['Power cut or loose wire','bescom',1],['Traffic signal or road safety','btp',2]];
+$('#s-cat').innerHTML=CATS.map((c,i)=>`<option value="${i}">${c[0]} (${c[2]}-day window)</option>`).join('');
+function simulate(){
+  const [name,ag,w]=CATS[+$('#s-cat').value],a=AG[ag],d=+$('#s-day').value,fixed=$('#s-fixed').checked;
+  const fu=w,es=w+7,rti=w+28,max=+$('#s-day').max,pct=x=>Math.min(100,x/max*100);
+  $('#s-daynum').textContent=d;
+  $('#s-legend').innerHTML=[['var(--wait)','Waiting',`day 0–${fu}`],['color-mix(in srgb,var(--stop) 55%,var(--wait))','Follow up',`day ${fu}–${es}`],['var(--stop)','Escalate',`day ${es}–${rti}`],['color-mix(in srgb,var(--stop) 70%,#000)','RTI',`day ${rti}+`]].map(([c,l,r])=>`<span><i style="background:${c}"></i>${l} <span class="mono muted">${r}</span></span>`).join('');
+  $('#s-tline').innerHTML=`<div class="rail"><span class="seg" style="left:0;width:${pct(fu)}%;background:var(--wait)"></span><span class="seg" style="left:${pct(fu)}%;width:${pct(es)-pct(fu)}%;background:color-mix(in srgb,var(--stop) 55%,var(--wait))"></span><span class="seg" style="left:${pct(es)}%;width:${pct(rti)-pct(es)}%;background:var(--stop)"></span><span class="seg" style="left:${pct(rti)}%;right:0;background:color-mix(in srgb,var(--stop) 70%,#000)"></span></div>
+    <span class="now" style="left:${pct(d)}%"></span>`;
+  let tone,pill,h,p,doc;
+  if(fixed){tone='go';pill='Fixed';h=`Fixed in ${d} day${d===1?'':'s'}`;p=d<=w?`Within the ${w}-day window. UrbOasis records this as an on-time fix for ${a.s}.`:`${d-w} days late. The delay is recorded and counts towards ${a.s}’s fix-time score for the ward.`;doc=null}
+  else if(d<fu){tone='wait';pill='Waiting for fix';h=`Day ${d} of ${w}. Nothing to do yet`;p=`Problems like this are usually fixed within ${w} day${w>1?'s':''}. UrbOasis will prompt a follow-up on day ${fu}.`;doc=null}
+  else if(d<es){tone='stop';pill='Time to follow up';h='Follow up today';p=`It’s past the ${w}-day window. Call ${a.phone} quoting the complaint number, or send this message:`;doc=`Follow-up on complaint no. 10/2026/123456\n\nIssue: ${name}\nThis was reported ${d} days ago and is still not fixed. Please tell me the current status and the date by which it will be resolved.`}
+  else if(d<rti){tone='stop';pill='Time to escalate';h='Escalate it';p=`A follow-up didn’t work. Write to ${a.esc}, and post publicly with the pre-written message.`;doc=`To: ${a.esc.replace(/^the /,'The ')}\nSubject: Unresolved complaint 10/2026/123456\n\nI filed this complaint ${d} days ago about: ${name}.\nIt is still unresolved, and my follow-up on day ${fu} did not get it fixed.\n\nI request you to direct the concerned staff to inspect and fix it, and to let me know the action taken.`}
+  else{tone='stop';pill='Time for an RTI';h='File an RTI application';p=`Three weeks after escalating, it’s still open. Under the RTI Act, ${a.s} must reply in writing within 30 days.`;doc=`Application under Section 6(1) of the RTI Act, 2005\n\nPlease provide:\n1. The current status of complaint no. 10/2026/123456 and the action taken, with dates.\n2. The name and designation of the officer it was assigned to.\n3. Copies of any inspection report or work order.\n4. The time limit prescribed for this category of complaint.\n5. Reasons recorded for any delay.\n\nFee: Rs 10`}
+  $('#s-out').className=`out t-${tone}`;
+  $('#s-out').innerHTML=`<span class="pill">${pill}</span><h3 style="font-size:22px">${h}</h3><p>${esc(p)}</p>${doc?`<pre>${esc(doc)}</pre>`:`<p class="note">Goes to <b style="color:var(--ink)">${a.s}</b> · helpline <span class="mono">${a.phone}</span></p>`}`;
+}
+['s-cat','s-day','s-fixed'].forEach(id=>$('#'+id).addEventListener('input',simulate));
+$('#s-day').value=9;simulate();
+
+/* ---------- Feasibility tabs + calculator ---------- */
+$('#ftabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)return;
+  document.querySelectorAll('#ftabs .tab').forEach(b=>b.setAttribute('aria-selected',b===t));
+  document.querySelectorAll('[data-panel]').forEach(p=>p.hidden=p.dataset.panel!==t.dataset.p)});
+function calc(){
+  const n=+$('#c-soc').value,price=+$('#c-price').value,mrr=n*price,cost=2000+n*13;
+  $('#c-socn').textContent=n.toLocaleString('en-IN');$('#c-pricen').textContent=inr(price);
+  $('#c-arr').textContent=inrShort(mrr*12);$('#c-mrr').textContent=inrShort(mrr);$('#c-cost').textContent=inrShort(cost);
+  $('#c-margin').textContent=Math.round((1-cost/mrr)*100)+'%';$('#c-homes').textContent=(n*150).toLocaleString('en-IN');
+}
+['c-soc','c-price'].forEach(id=>$('#'+id).addEventListener('input',calc));calc();
+
+/* ---------- Section nav: active section + reading progress ---------- */
+const links=[...document.querySelectorAll('.secnav a')],secs=links.map(a=>document.querySelector(a.getAttribute('href')));
+function onScroll(){
+  const y=scrollY+140;let cur=0;secs.forEach((s,i)=>{if(s&&s.offsetTop<=y)cur=i});
+  links.forEach((a,i)=>a.classList.toggle('on',i===cur));
+  const lk=links[cur];if(lk&&lk.parentElement.scrollWidth>lk.parentElement.clientWidth)lk.parentElement.scrollTo({left:lk.offsetLeft-20,behavior:'smooth'});
+  const h=document.documentElement;$('#progress').style.width=(scrollY/(h.scrollHeight-innerHeight)*100||0)+'%';
+}
+addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+/* ---------- Theme (shared with the app) ---------- */
+try{const t=JSON.parse(localStorage.getItem('uo2-theme'));if(t)document.documentElement.dataset.theme=t}catch{}
+$('#theme').addEventListener('click',()=>{const r=document.documentElement,dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme: dark)').matches,t=dark?'light':'dark';r.dataset.theme=t;try{localStorage.setItem('uo2-theme',JSON.stringify(t))}catch{}});
+</script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+# UrbOasis Bengaluru
+
+A civic complaint desk for Bengaluru residents. It routes a street-level problem to the agency that
+fixes it (GBA, BWSSB, BESCOM or Traffic Police), writes the complaint, and then tells the resident
+when to follow up, when to escalate and when to file an RTI, with each document ready to copy or print.
+
+## What it does
+
+- **Report in four steps:** category (English + Kannada), pin on the map (tap, GPS, place search, or
+  the GPS tag inside a photo), landmark and photo, then a generated complaint with a strength score.
+- **Files it with the right desk:** helpline number, call link, a pre-written X post tagging the
+  agency where one exists, and a field for the official complaint number.
+- **Tracks every complaint against a fix window** per category, and moves it through
+  *Not filed → Waiting → Follow up → Escalate → RTI → Fixed*.
+- **Writes the documents:** follow-up, escalation letter addressed to the right officer, X post, and
+  an RTI application under Section 6(1) with the five questions that get a written answer.
+- **Neighbour co-signing:** a share link (WhatsApp, native share with photo, or copy) opens the same
+  complaint pre-filled so neighbours can file their own.
+- **Private by design:** no account and no server. Data lives in `localStorage`, photos in IndexedDB,
+  re-encoded so their location metadata is removed. JSON backup/restore and CSV export.
+
+## Run locally
+
+It's one static file. Serve the folder with any static server, for example:
+
+```bash
+npx serve urboasis
+```
+
+Deploy by uploading `index.html` to Vercel, Netlify, GitHub Pages or Cloudflare Pages. It needs
+HTTPS for "Use my location".
+
+## Before going public
+
+- Check the helplines and X handles in the `AG` object at the top of the script against each agency's
+  official site. The GBA restructuring in 2025 may change channels.
+- Fix windows (`days` in `CATS`) are guidelines, not official service levels. The page says so.
+- Address search and lookup use the public Nominatim API (OpenStreetMap). Its usage policy allows
+  light use only, so put a geocoder you control behind it if traffic grows.
+- Map tiles come from OpenFreeMap (free, no key).

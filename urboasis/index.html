@@ -1,0 +1,1240 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UrbOasis Bengaluru</title>
+<meta name="description" content="Get potholes, garbage and broken streetlights fixed in Bengaluru. UrbOasis tells you who to contact, writes the complaint, and tells you what to do if nothing happens.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23167a5b'/%3E%3Cpath d='M16 7a6 6 0 0 0-6 6c0 4.5 6 12 6 12s6-7.5 6-12a6 6 0 0 0-6-6zm0 8.2a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+Kannada:wght@400;600&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.css">
+<script src="https://cdn.jsdelivr.net/npm/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+/* Layout: an ordinary scrolling website. Sticky top nav, centred content column (wide for the home page,
+   narrow for forms), and a single map that is moved into whichever page section needs it. */
+:root{
+  --bg:#f5f6f4; --surface:#ffffff; --field:#ffffff; --ink:#1d2421; --muted:#5f6964; --line:#e3e7e4; --hover:#f0f2f0;
+  --accent:#167a5b; --accent-ink:#0f5c44; --accent-soft:#e6f3ee; --on-accent:#ffffff;
+  --go:#1a7a4c; --wait:#a5670f; --stop:#c0402a; --idle:#78817c; --on-tone:#ffffff; --focus:#2f6fe0;
+  --shadow:0 1px 2px rgba(20,30,25,.05),0 8px 24px rgba(20,30,25,.08);
+  --f-body:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+  --f-kn:'Noto Sans Kannada','Tunga','Nirmala UI',sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0f1312; --surface:#161b19; --field:#121615; --ink:#e4e9e6; --muted:#9aa49f; --line:#262d2a; --hover:#1d2321;
+  --accent:#4fc69b; --accent-ink:#7fd9b7; --accent-soft:#163029; --on-accent:#0c1210;
+  --go:#55c38e; --wait:#e0a74e; --stop:#f0846c; --idle:#8d9691; --on-tone:#0f1312; --focus:#86a8ff;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1312; --surface:#161b19; --field:#121615; --ink:#e4e9e6; --muted:#9aa49f; --line:#262d2a; --hover:#1d2321;
+  --accent:#4fc69b; --accent-ink:#7fd9b7; --accent-soft:#163029; --on-accent:#0c1210;
+  --go:#55c38e; --wait:#e0a74e; --stop:#f0846c; --idle:#8d9691; --on-tone:#0f1312; --focus:#86a8ff;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{margin:0;font:16px/1.6 var(--f-body);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+h1,h2,h3{margin:0;line-height:1.2;text-wrap:balance;letter-spacing:-.015em}
+h1{font-size:clamp(30px,4.4vw,46px);font-weight:800}
+h2{font-size:clamp(22px,2.6vw,28px);font-weight:750}
+h3{font-size:17px;font-weight:700}
+p{margin:0}
+a{color:inherit}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:8px}
+[lang="kn"]{font-family:var(--f-kn)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.eyebrow{font:700 12.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink)}
+.stack{display:grid;gap:16px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.wrap{max-width:1080px;margin-inline:auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.narrow{max-width:700px}
+
+/* nav */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:64px}
+.brand{display:flex;gap:10px;align-items:center;text-decoration:none;flex:none}
+.mark{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--accent);color:var(--on-accent);font-size:15px}
+.brand b{display:block;font:800 18px/1 var(--f-body);letter-spacing:-.01em}
+.brand small{display:block;font-size:12px;color:var(--muted);margin-top:3px}
+.links{display:flex;gap:4px;margin-left:auto;align-items:center}
+.nl{appearance:none;border:0;background:none;padding:8px 12px;border-radius:9px;font:600 14.5px var(--f-body);color:var(--muted);cursor:pointer;white-space:nowrap;display:flex;gap:7px;align-items:center;text-decoration:none}
+.nl:hover{color:var(--ink);background:var(--hover)}
+.nl[aria-current="page"]{color:var(--accent-ink);background:var(--accent-soft)}
+.badge{min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--stop);color:var(--on-tone);font:700 11.5px/20px var(--f-body);text-align:center}
+.iconbtn{appearance:none;border:0;background:transparent;width:40px;height:40px;border-radius:10px;display:grid;place-items:center;cursor:pointer;flex:none;color:var(--muted)}
+.iconbtn:hover{color:var(--ink);background:var(--hover)}
+.show-sm{display:none}
+
+/* buttons & fields */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;white-space:nowrap;font:650 15px var(--f-body);padding:11px 18px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-decoration:none;line-height:1.2;transition:background .15s,transform .1s,box-shadow .15s}
+.btn:hover{background:var(--hover)}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{box-shadow:0 6px 18px color-mix(in srgb,var(--accent) 35%,transparent)}
+.btn.ink{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+.btn.ink:hover{opacity:.9}
+.btn.lg{padding:15px 24px;font-size:16.5px;border-radius:13px}
+.btn.sm{padding:7px 12px;font-size:14px;border-radius:9px}
+.btn.block{width:100%}
+.btn.danger{color:var(--stop)}
+.btn.quiet{border-color:transparent;background:transparent;color:var(--muted)}
+.btn.quiet:hover{background:var(--hover);color:var(--ink)}
+.link{appearance:none;border:0;background:none;padding:0;color:var(--accent-ink);font-weight:650;font-size:15px;cursor:pointer;display:inline-flex;gap:7px;align-items:center;justify-self:start;text-decoration:none}
+.link:hover{text-decoration:underline}
+.link.muted{color:var(--muted)}
+.fl{display:grid;gap:7px;font-weight:650;font-size:15px}
+.fl .opt{font-weight:400;color:var(--muted);font-size:14px}
+input[type="text"],input[type="search"],input[type="tel"],input:not([type]),textarea{font:400 16px var(--f-body);padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--field);color:var(--ink);width:100%;min-width:0;transition:border-color .15s,box-shadow .15s}
+textarea{resize:vertical}
+input:focus,textarea:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+textarea.doc{font:14px/1.6 var(--f-mono);background:var(--bg)}
+.check{display:flex;gap:12px;align-items:flex-start;font-weight:500;font-size:15.5px;cursor:pointer;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.check input{width:20px;height:20px;margin-top:2px;accent-color:var(--accent);flex:none}
+.err{color:var(--stop);font-weight:650;font-size:15px;display:flex;gap:8px;align-items:center}
+.hint{font-size:14.5px;color:var(--muted)}
+.enter{animation:rise .3s cubic-bezier(.2,.7,.3,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+
+/* home */
+.hero{padding-block:56px 48px;display:grid;grid-template-columns:1.1fr .9fr;gap:48px;align-items:center}
+.hero .stack{gap:20px}
+.lede{font-size:18.5px;color:var(--muted);max-width:52ch}
+.trust{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--muted)}
+.trust span{display:flex;gap:7px;align-items:center}
+.trust i{color:var(--accent)}
+.demo{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:22px;box-shadow:var(--shadow);display:grid;gap:16px}
+.demo .tl li{font-size:14.5px}
+.band{padding-block:56px;border-top:1px solid var(--line)}
+.band.alt{background:var(--surface)}
+.shead{display:grid;gap:8px;margin-bottom:28px;max-width:640px}
+.shead p{color:var(--muted);font-size:17px}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:16px;counter-reset:s}
+.steps li{counter-increment:s;display:grid;gap:10px;align-content:start;padding:22px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.band.alt .steps li{background:var(--bg)}
+.steps li::before{content:counter(s);width:34px;height:34px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:800 15px var(--f-body)}
+.steps p{font-size:15px;color:var(--muted)}
+.steps .note{font-size:13.5px;color:var(--ink);background:var(--accent-soft);padding:8px 10px;border-radius:9px}
+.cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(180px,100%),1fr));gap:10px}
+.catlink{appearance:none;display:flex;gap:12px;align-items:center;text-align:left;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer;font:600 15px/1.3 var(--f-body);transition:border-color .15s,transform .1s,box-shadow .15s}
+.catlink:hover{border-color:var(--accent);box-shadow:var(--shadow);transform:translateY(-1px)}
+.catlink i{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:11px;background:var(--accent-soft);color:var(--accent-ink)}
+.catlink small{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+.faq{display:grid;max-width:760px;border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;list-style:none;padding:18px 4px;font-weight:650;font-size:17px;display:flex;justify-content:space-between;gap:12px;align-items:center}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"\f067";font:900 13px "Font Awesome 6 Free";color:var(--muted);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details>div{padding:0 4px 20px;color:var(--muted);font-size:16px;display:grid;gap:10px;max-width:68ch}
+.cta{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;padding:32px;border-radius:20px;background:var(--accent);color:var(--on-accent)}
+.cta p{opacity:.85}
+.cta .btn{background:var(--surface);color:var(--ink);border-color:var(--surface)}
+footer{padding-block:32px 48px;border-top:1px solid var(--line);font-size:14px;color:var(--muted)}
+footer .wrap{display:grid;gap:10px}
+
+/* page header for inner pages */
+.phead{padding-block:36px 8px;display:grid;gap:10px}
+.phead p{color:var(--muted);font-size:17px;max-width:60ch}
+.pbody{padding-block:20px 64px}
+
+/* tones */
+.t-stop{--tone:var(--stop)} .t-wait{--tone:var(--wait)} .t-go{--tone:var(--go)} .t-idle{--tone:var(--idle)}
+.pill{display:inline-flex;align-items:center;gap:7px;font:650 13px/1 var(--f-body);padding:6px 11px;border-radius:999px;white-space:nowrap;color:var(--tone);background:color-mix(in srgb,var(--tone) 12%,transparent)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.ex{font:700 11px var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);padding:3px 7px;border-radius:5px}
+.exnote{font-size:14.5px;background:var(--accent-soft);border-radius:12px;padding:12px 14px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+
+/* complaint list */
+.clist{display:grid;gap:10px}
+.ccard{appearance:none;width:100%;text-align:left;display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.ccard:hover,.ccard.hl{border-color:color-mix(in srgb,var(--tone) 50%,var(--line));box-shadow:var(--shadow)}
+.cic{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;color:var(--tone);background:color-mix(in srgb,var(--tone) 12%,transparent);flex:none;font-size:17px}
+.cmain{display:grid;gap:3px;min-width:0}
+.cmain b{font-size:16px;font-weight:650;line-height:1.35}
+.cmain small{font-size:14px;color:var(--muted)}
+.cside{display:grid;justify-items:end;gap:5px}
+.cside small{font-size:13px;color:var(--muted);white-space:nowrap}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{appearance:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font:600 14px var(--f-body);cursor:pointer;color:var(--muted)}
+.chip:hover{color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.empty{display:grid;justify-items:center;gap:12px;text-align:center;padding:40px 20px;border:1.5px dashed var(--line);border-radius:16px;color:var(--muted)}
+.empty i{font-size:28px;color:var(--accent)}
+
+/* map slot */
+.mapslot{position:relative;height:300px;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:var(--hover)}
+.mapslot.tall{height:380px}
+.mapslot.short{height:220px}
+#mapholder{position:absolute;inset:0}
+#map{position:absolute;inset:0}
+.maphint{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:var(--surface);color:var(--ink);padding:9px 14px;border-radius:999px;font-weight:650;font-size:14px;box-shadow:var(--shadow);white-space:nowrap;z-index:2;display:flex;gap:8px;align-items:center;pointer-events:none}
+.maphint i{color:var(--accent)}
+.maplibregl-ctrl-attrib{font-size:10px}
+
+/* wizard */
+.progress{display:grid;gap:10px}
+.progress .bar{height:6px;border-radius:3px;background:var(--line);overflow:hidden}
+.progress .bar span{display:block;height:100%;background:var(--accent);border-radius:3px;transition:width .35s ease}
+.stepnames{display:flex;justify-content:space-between;gap:6px;list-style:none;margin:0;padding:0;font-size:13.5px;color:var(--muted)}
+.stepnames button{appearance:none;border:0;background:none;padding:0;font:inherit;color:inherit;cursor:default}
+.stepnames .done button{cursor:pointer;color:var(--accent-ink);font-weight:600}
+.stepnames .done button:hover{text-decoration:underline}
+.stepnames .on{color:var(--ink);font-weight:700}
+.q{display:grid;gap:6px}
+.q p{color:var(--muted);font-size:16px}
+.catgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cat{appearance:none;display:grid;justify-items:center;gap:7px;text-align:center;padding:14px 8px 12px;border:1.5px solid var(--line);border-radius:14px;background:var(--surface);cursor:pointer;font:600 14px/1.25 var(--f-body);transition:border-color .15s,background .15s,transform .1s}
+.cat:hover{border-color:var(--muted)}
+.cat:active{transform:scale(.97)}
+.cat i{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:var(--hover);font-size:16px;color:var(--muted)}
+.cat small{display:block;color:var(--muted);font-size:12px;font-weight:400;margin-top:2px}
+.cat[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.cat[aria-checked="true"] i{background:var(--accent);color:var(--on-accent)}
+.seg{display:grid;gap:8px;border:0;margin:0;padding:0}
+.seg legend{font-weight:650;font-size:15px;padding:0;margin-bottom:8px}
+.segrow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.segb{appearance:none;display:grid;gap:3px;text-align:left;padding:12px 14px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer;font:650 15px/1.25 var(--f-body)}
+.segb small{font-weight:400;font-size:13px;color:var(--muted)}
+.segb[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.alert{border-radius:14px;padding:14px 16px;display:grid;gap:6px;font-size:15px;background:color-mix(in srgb,var(--tone) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--tone) 30%,transparent)}
+.alert b{color:var(--tone)}
+.search{display:flex;gap:8px}
+.results{display:grid;gap:4px}
+.results button{appearance:none;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 12px;font-size:14.5px;cursor:pointer}
+.results button:hover{border-color:var(--accent)}
+.pinread{display:flex;gap:10px;align-items:center;font-size:14.5px;padding:12px 14px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.pinread.ok{border-color:color-mix(in srgb,var(--go) 40%,var(--line))}
+.pinread.ok i{color:var(--go)}
+.drop{display:flex;align-items:center;gap:14px;padding:16px;border:1.5px dashed var(--line);border-radius:14px;cursor:pointer;font-size:14.5px;color:var(--muted);background:var(--surface)}
+.drop:hover{border-color:var(--accent);background:var(--accent-soft)}
+.drop b{color:var(--ink);display:block;font-size:15.5px}
+.drop>i{font-size:22px;color:var(--accent)}
+.photo{position:relative;border-radius:14px;overflow:hidden;background:var(--hover)}
+.photo img{display:block;width:100%;max-height:300px;object-fit:cover}
+.photo .iconbtn{position:absolute;top:10px;right:10px;background:var(--surface)}
+.agency{display:flex;gap:14px;align-items:center;padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.agency>i{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;background:var(--accent);color:var(--on-accent);flex:none;font-size:18px}
+.meter{display:grid;gap:10px;padding:16px;border-radius:14px;background:var(--surface);border:1px solid var(--line)}
+.meter ul{list-style:none;margin:0;padding:0;display:grid;gap:6px;font-size:15px}
+.meter li{display:flex;gap:10px;align-items:center}
+.meter li.no{color:var(--muted)}
+.meter li i{width:18px;text-align:center}
+.important{border-radius:14px;padding:16px;background:color-mix(in srgb,var(--wait) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--wait) 30%,transparent);display:flex;gap:12px;font-size:15.5px}
+.important i{color:var(--wait);margin-top:4px}
+.todo{list-style:none;margin:0;padding:0;display:grid;gap:12px;counter-reset:td}
+.todo>li{counter-increment:td;display:grid;grid-template-columns:34px 1fr;gap:14px;padding:18px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}
+.todo>li::before{content:counter(td);width:32px;height:32px;border-radius:50%;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;font:800 14px var(--f-body)}
+.todo>li>div{display:grid;gap:10px;min-width:0}
+.todo p{font-size:15px;color:var(--muted)}
+.phone{font:700 22px var(--f-mono);letter-spacing:.02em;user-select:all}
+.wnav{display:flex;justify-content:space-between;gap:10px;padding-top:8px}
+
+/* detail */
+.track{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.track li{display:grid;gap:8px;font-size:13px;color:var(--muted);text-align:center}
+.track li::before{content:"";height:6px;border-radius:3px;background:var(--line)}
+.track li.done{color:var(--ink)}
+.track li.done::before{background:var(--accent)}
+.track li.now{color:var(--ink);font-weight:700}
+.track li.now::before{background:repeating-linear-gradient(90deg,var(--accent) 0 8px,color-mix(in srgb,var(--accent) 40%,transparent) 8px 14px)}
+.next{border-radius:16px;padding:20px;display:grid;gap:10px;background:color-mix(in srgb,var(--tone) 8%,var(--surface));border:1.5px solid color-mix(in srgb,var(--tone) 30%,transparent)}
+.next .eyebrow{color:var(--tone)}
+.next>p:not(.eyebrow){font-size:16px}
+.facts{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;margin:0;font-size:15px}
+.facts dt{color:var(--muted)}
+.facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.doctabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.doctabs button{appearance:none;border:1px solid var(--line);background:var(--surface);padding:7px 13px;font:600 14px var(--f-body);color:var(--muted);cursor:pointer;white-space:nowrap;border-radius:999px}
+.doctabs button[aria-selected="true"]{color:var(--surface);background:var(--ink);border-color:var(--ink)}
+.doctabs button .rec{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--stop);margin-left:7px;vertical-align:middle}
+.tl{list-style:none;margin:0;padding:0;display:grid}
+.tl li{display:grid;grid-template-columns:16px 1fr;gap:12px;font-size:15px;padding-bottom:14px;position:relative}
+.tl li::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--accent);margin-top:7px;z-index:1}
+.tl li::after{content:"";position:absolute;left:4.5px;top:14px;bottom:0;width:1px;background:var(--line)}
+.tl li:last-child::after{display:none}
+.tl time{display:block;font:13px var(--f-mono);color:var(--muted)}
+.confirm{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px;border-radius:12px;background:color-mix(in srgb,var(--stop) 9%,var(--surface));font-size:15px}
+.boxes{display:grid;border-top:1px solid var(--line)}
+details.box{border-bottom:1px solid var(--line)}
+details.box>summary{cursor:pointer;padding:18px 2px;font-weight:650;font-size:16.5px;list-style:none;display:flex;align-items:center;gap:10px}
+details.box>summary::-webkit-details-marker{display:none}
+details.box>summary .muted{font-weight:400;font-size:14px;margin-left:auto}
+details.box>summary::after{content:"\f078";font:900 11px "Font Awesome 6 Free";color:var(--muted);transition:transform .2s;margin-left:auto}
+details.box>summary .muted+*,details.box>summary .muted~::after{margin-left:0}
+details.box[open]>summary::after{transform:rotate(180deg)}
+details.box>div{padding:0 2px 20px;display:grid;gap:14px}
+
+/* guide */
+.agrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:14px}
+.acard{display:grid;gap:12px;align-content:start;padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--surface)}
+.acard .ah{display:flex;gap:12px;align-items:center}
+.acard .ah i{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-ink);flex:none}
+.acard ul{margin:0;padding:0;list-style:none;display:grid;gap:6px;font-size:15px}
+.acard li{display:flex;gap:8px;align-items:baseline;justify-content:space-between}
+.acard li span:last-child{font-size:13px;color:var(--muted);white-space:nowrap}
+.tips{margin:0;padding-left:22px;display:grid;gap:10px;font-size:16px;max-width:70ch}
+.prose{display:grid;gap:12px;font-size:16px;max-width:70ch;color:var(--muted)}
+
+/* markers */
+.mk{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-size:12px;cursor:pointer;background:var(--tone);color:var(--on-tone);border:2.5px solid var(--surface);box-shadow:0 2px 6px rgba(0,0,0,.25);transition:transform .18s cubic-bezier(.3,1.5,.5,1)}
+.mk:hover,.mk.hl,.mk.sel{transform:scale(1.3);z-index:5}
+.pinmk{width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--accent);border:3px solid var(--surface);box-shadow:0 3px 10px rgba(0,0,0,.35);cursor:grab}
+
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(24px + env(safe-area-inset-bottom,0px));z-index:50;display:grid;gap:8px;pointer-events:none}
+.toast{background:var(--ink);color:var(--surface);padding:12px 18px;border-radius:999px;font-weight:600;font-size:15px;box-shadow:var(--shadow);animation:rise .22s ease both}
+#printdoc,#park{display:none}
+
+/* societies */
+select{font:400 16px var(--f-body);padding:12px 14px;border:1px solid var(--line);border-radius:11px;background:var(--field);color:var(--ink);width:100%}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tag{justify-self:start;font:700 11.5px var(--f-body);letter-spacing:.04em;text-transform:uppercase;padding:4px 8px;border-radius:6px}
+.tag.now{color:var(--go);background:color-mix(in srgb,var(--go) 12%,transparent)}
+.tag.pilot{color:var(--wait);background:color-mix(in srgb,var(--wait) 12%,transparent)}
+.prices{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;align-items:start}
+.price{display:grid;gap:14px;padding:24px;border:1px solid var(--line);border-radius:18px;background:var(--surface)}
+.price.feat{border:2px solid var(--accent);box-shadow:var(--shadow)}
+.price .amt{font:800 32px/1 var(--f-body);letter-spacing:-.02em}
+.price .amt small{font-size:15px;font-weight:500;color:var(--muted);letter-spacing:0}
+.price ul{margin:0;padding:0;list-style:none;display:grid;gap:8px;font-size:15px}
+.price li::before{content:"\f00c";font:900 12px "Font Awesome 6 Free";color:var(--accent);margin-right:9px}
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-block:8px 4px}
+.kpis.sm{grid-template-columns:repeat(4,1fr)}
+.kpis>div{background:var(--surface);padding:12px;display:grid;gap:2px;font-size:12.5px;color:var(--muted)}
+.kpis b{font:800 24px/1.1 var(--f-body);color:var(--ink);font-variant-numeric:tabular-nums}
+.bars{list-style:none;margin:0;padding:0;display:grid;gap:8px;font-size:13.5px}
+.bars li{display:grid;grid-template-columns:64px 1fr 24px;gap:10px;align-items:center}
+.bars i{height:8px;border-radius:4px;background:linear-gradient(90deg,var(--accent) var(--w),var(--line) var(--w))}
+.paper{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:28px;display:grid;gap:14px;box-shadow:var(--shadow)}
+.paper .rh{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;padding-bottom:14px;border-bottom:2px solid var(--ink)}
+.paper h1{font-size:24px}
+.paper .rh p{color:var(--muted)}
+.paper h2{font-size:17px;margin-top:10px}
+.tscroll{overflow-x:auto}
+.paper table{width:100%;border-collapse:collapse;font-size:14px}
+.paper th{text-align:left;font-weight:650;color:var(--muted);font-size:12.5px;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.paper td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.paper .n{text-align:right;font-variant-numeric:tabular-nums}
+.paper .foot{font-size:12.5px;color:var(--muted);margin-top:6px}
+@media (max-width:820px){.prices{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr}.paper{padding:18px}}
+@media (max-width:900px){
+  .hero{grid-template-columns:1fr;padding-block:36px 32px;gap:32px}
+  .steps{grid-template-columns:1fr 1fr}
+}
+@media (max-width:920px){
+  .nav .wrap{height:auto;flex-wrap:wrap;padding-block:10px;gap:8px}
+  .links{order:3;width:100%;margin:0 -6px;overflow-x:auto;scrollbar-width:none}
+  .links .nl{padding:8px 10px;font-size:14px}
+  .links .btn{display:none}
+  .show-sm{display:inline-flex;margin-left:auto}
+  .brand small{display:none}
+}
+@media (max-width:720px){
+  .steps{grid-template-columns:1fr}
+  .catgrid{grid-template-columns:repeat(2,1fr)}
+  .segrow{grid-template-columns:1fr}
+  .track{grid-template-columns:repeat(4,1fr)}
+  .track li{font-size:11.5px}
+  .ccard{grid-template-columns:40px minmax(0,1fr);padding:14px}
+  .cic{width:40px;height:40px}
+  .cside{grid-column:2;justify-items:start;display:flex;gap:10px;align-items:center}
+  .cta{padding:24px}
+  .band{padding-block:40px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+@media print{
+  body{background:#fff;color:#000}
+  body>*:not(#printdoc){display:none!important}
+  #printdoc{display:block!important}
+  #printdoc h1{font:700 15pt Georgia,serif;margin:0 0 14pt}
+  #printdoc pre{white-space:pre-wrap;font:11.5pt/1.55 Georgia,serif;margin:0}
+  #printdoc .paper{border:0;box-shadow:none;padding:0}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="#home" data-go="home"><span class="mark" aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span><span><b>UrbOasis</b><small>Bengaluru · <span lang="kn">ನಮ್ಮ ಬೆಂಗಳೂರು</span></small></span></a>
+    <nav class="links" aria-label="Main">
+      <a class="nl" href="#how" data-go="home" data-anchor="how">How it works</a>
+      <a class="nl" href="#guide" data-go="guide">Who to contact</a>
+      <a class="nl" href="#societies" data-go="societies">For societies</a>
+      <a class="nl" href="#complaints" data-go="complaints">My complaints<span class="badge" id="badge" hidden></span></a>
+      <a class="btn primary sm" href="#report" data-go="report" style="margin-left:6px"><i class="fa-solid fa-plus"></i>Report a problem</a>
+    </nav>
+    <a class="btn primary sm show-sm" href="#report" data-go="report"><i class="fa-solid fa-plus"></i>Report</a>
+    <button class="iconbtn" id="theme" type="button" aria-label="Switch light or dark theme" title="Switch theme"><i class="fa-solid fa-circle-half-stroke"></i></button>
+  </div>
+</header>
+<main id="page"></main>
+<footer><div class="wrap">
+  <p><b style="color:var(--ink)">UrbOasis</b> is a free, independent tool for Bengaluru residents. It is not a government website and is not connected to GBA, BWSSB, BESCOM or the police.</p>
+  <p>Your complaints are saved only in this browser. Map data © OpenStreetMap contributors.</p>
+  <p><a class="link" href="pitch.html">About the project: SDG alignment, feasibility and pitch<i class="fa-solid fa-arrow-right"></i></a></p>
+</div></footer>
+<div id="park"><div id="mapholder"><div id="map" role="region" aria-label="Map of Bengaluru"></div><div class="maphint" id="maphint" hidden><i class="fa-solid fa-hand-pointer"></i>Tap the map where the problem is</div></div></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<div id="printdoc"></div>
+
+<script>
+/* Where pilot sign-ups go. Fill in one: a WhatsApp number with country code (e.g. '919800000000') or an email address. */
+const LEAD={whatsapp:'',email:'inesh1681@gmail.com'};
+let leadSent=false;
+
+/* ============ Reference data ============
+   Helplines and handles: verify against each agency's site before relying on them.
+   Fix windows are UrbOasis guidelines for "reasonable" turnaround, not official service levels. */
+const AG={
+  gba:{name:'Greater Bengaluru Authority',short:'GBA (ex-BBMP)',ic:'fa-building-columns',phone:'1533',x:'',
+    channel:'Call 1533 or file it in the Sahaaya app. GBA and its city corporations took over BBMP’s civic work in 2025.',
+    escTo:'The Assistant Executive Engineer (ward), Greater Bengaluru Authority',
+    escHint:'your ward’s Assistant Executive Engineer, then the Zonal Commissioner',
+    pio:'Office of the Assistant Executive Engineer (ward), Greater Bengaluru Authority'},
+  bwssb:{name:'Bangalore Water Supply and Sewerage Board',short:'BWSSB',ic:'fa-droplet',phone:'1916',x:'',
+    channel:'Call the BWSSB helpline 1916.',
+    escTo:'The Assistant Executive Engineer, BWSSB service station',
+    escHint:'the Assistant Executive Engineer of your BWSSB service station',
+    pio:'BWSSB service station / sub-division'},
+  bescom:{name:'Bangalore Electricity Supply Company',short:'BESCOM',ic:'fa-bolt',phone:'1912',x:'NammaBESCOM',
+    channel:'Call the BESCOM helpline 1912, or post to @NammaBESCOM on X.',
+    escTo:'The Assistant Executive Engineer (O&M), BESCOM sub-division',
+    escHint:'the Assistant Executive Engineer (O&M) of your BESCOM sub-division',
+    pio:'BESCOM O&M sub-division'},
+  btp:{name:'Bengaluru Traffic Police',short:'Traffic Police',ic:'fa-traffic-light',phone:'112',x:'blrcitytraffic',
+    channel:'Post to @blrcitytraffic on X. For an accident or emergency, call 112.',
+    escTo:'The Police Inspector, jurisdictional traffic police station',
+    escHint:'the Inspector of the jurisdictional traffic police station',
+    pio:'Jurisdictional traffic police station'},
+};
+const CATS={
+  pothole:{n:'Pothole or damaged road',kn:'ರಸ್ತೆ ಗುಂಡಿ',ic:'fa-road-circle-exclamation',ag:'gba',days:7,ph:'Deep pothole in the left lane before the signal'},
+  garbage:{n:'Garbage or black spot',kn:'ಕಸ',ic:'fa-trash-can',ag:'gba',days:2,ph:'Garbage dumped on the corner for a week'},
+  streetlight:{n:'Streetlight not working',kn:'ಬೀದಿ ದೀಪ',ic:'fa-lightbulb',ag:'gba',days:3,ph:'Three streetlights out near the bus stop'},
+  footpath:{n:'Broken or blocked footpath',kn:'ಪಾದಚಾರಿ ಮಾರ್ಗ',ic:'fa-person-walking',ag:'gba',days:15,ph:'Footpath slabs missing over the drain'},
+  tree:{n:'Fallen or unsafe tree',kn:'ಮರ',ic:'fa-tree',ag:'gba',days:1,ph:'Large branch hanging over the road'},
+  mosquito:{n:'Stagnant water or mosquitoes',kn:'ನಿಂತ ನೀರು',ic:'fa-mosquito',ag:'gba',days:3,ph:'Water stagnant in an empty plot for days'},
+  dogs:{n:'Stray dog concern',kn:'ಬೀದಿ ನಾಯಿ',ic:'fa-dog',ag:'gba',days:7,ph:'Injured stray dog near the park gate'},
+  water:{n:'Water leak or no supply',kn:'ನೀರು',ic:'fa-faucet-drip',ag:'bwssb',days:2,ph:'Water main leaking onto the road'},
+  sewage:{n:'Sewage overflow',kn:'ಒಳಚರಂಡಿ',ic:'fa-water',ag:'bwssb',days:2,ph:'Manhole overflowing onto the street'},
+  power:{n:'Power cut or loose wire',kn:'ವಿದ್ಯುತ್',ic:'fa-bolt',ag:'bescom',days:1,ph:'Electric wire hanging low over the footpath'},
+  traffic:{n:'Traffic signal or road safety',kn:'ಸಂಚಾರ',ic:'fa-traffic-light',ag:'btp',days:2,ph:'Signal stuck on red at the junction'},
+};
+const SEV={low:'Inconvenience',hazard:'Hazard to people or vehicles',danger:'Immediate danger to life'};
+const STAGE={
+  file:{l:'Not sent yet',tone:'idle',act:true},
+  wait:{l:'Waiting for fix',tone:'wait'},
+  followup:{l:'Time to follow up',tone:'stop',act:true},
+  escalate:{l:'Time to escalate',tone:'stop',act:true},
+  rti:{l:'Time for an RTI',tone:'stop',act:true},
+  fixed:{l:'Fixed',tone:'go'},
+};
+const DOCS=[['complaint','Complaint'],['followup','Follow-up'],['escalate','Escalation letter'],['x','Post on X'],['rti','RTI application']];
+const BLR={w:77.35,s:12.75,e:77.85,n:13.2};
+
+/* ============ Utilities ============ */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const DAY=864e5, now=()=>Date.now();
+const days=(a,b=now())=>Math.max(0,Math.floor((b-a)/DAY));
+const fmtD=t=>new Date(t).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+const fmtDT=t=>new Date(t).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});
+const gmaps=(la,ln)=>`https://maps.google.com/?q=${(+la).toFixed(6)},${(+ln).toFixed(6)}`;
+const inBLR=(la,ln)=>ln>BLR.w&&ln<BLR.e&&la>BLR.s&&la<BLR.n;
+const plural=(n,w)=>`${n} ${w}${n===1?'':'s'}`;
+function dist(a,b){const r=Math.PI/180,dLa=(b.lat-a.lat)*r,dLn=(b.lng-a.lng)*r;const h=Math.sin(dLa/2)**2+Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dLn/2)**2;return 12742e3*Math.asin(Math.sqrt(h))}
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch{return false}}};
+const idb=(()=>{let p;const open=()=>p||(p=new Promise((res,rej)=>{const r=indexedDB.open('urboasis',1);r.onupgradeneeded=()=>r.result.createObjectStore('photos');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}));
+  const tx=(mode,fn)=>open().then(db=>new Promise((res,rej)=>{const t=db.transaction('photos',mode);const q=fn(t.objectStore('photos'));t.oncomplete=()=>res(q.result);t.onerror=()=>rej(t.error)}));
+  return{get:k=>tx('readonly',s=>s.get(k)).catch(()=>null),set:(k,v)=>tx('readwrite',s=>s.put(v,k)),del:k=>tx('readwrite',s=>s.delete(k)).catch(()=>{})}})();
+const b64u={enc:s=>{let b='';new TextEncoder().encode(s).forEach(x=>b+=String.fromCharCode(x));return btoa(b).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'')},
+  dec:s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0)))};
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;$('#toasts').appendChild(t);setTimeout(()=>t.remove(),2800)}
+async function copy(text){
+  try{await navigator.clipboard.writeText(text);toast('Copied');return true}
+  catch{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();let ok=false;try{ok=document.execCommand('copy')}catch{}ta.remove();toast(ok?'Copied':'Select the text and copy it yourself');return ok}
+}
+function download(name,type,data){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([data],{type}));a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function printText(title,text){$('#printdoc').innerHTML=`<h1>${esc(title)}</h1><pre>${esc(text)}</pre>`;window.print()}
+const newId=()=>{const d=new Date();return 'UO-'+String(d.getFullYear()).slice(2)+String(d.getMonth()+1).padStart(2,'0')+String(d.getDate()).padStart(2,'0')+'-'+Math.random().toString(36).slice(2,6).toUpperCase()};
+
+/* EXIF GPS from a JPEG, so a photo taken on the spot can place the pin. */
+async function exifGPS(file){
+  const v=new DataView(await file.slice(0,262144).arrayBuffer());
+  if(v.byteLength<4||v.getUint16(0)!==0xFFD8)return null;
+  let o=2;
+  while(o<v.byteLength-10){
+    const m=v.getUint16(o);if((m&0xFF00)!==0xFF00)return null;
+    if(m===0xFFE1&&v.getUint32(o+4)===0x45786966){
+      const t=o+10,le=v.getUint16(t)===0x4949,u16=p=>v.getUint16(p,le),u32=p=>v.getUint32(p,le);
+      const ifd=t+u32(t+4);let gps=0;
+      for(let i=0,n=u16(ifd);i<n;i++){const e=ifd+2+i*12;if(u16(e)===0x8825)gps=u32(e+8)}
+      if(!gps)return null;
+      const g=t+gps,tags={};
+      for(let i=0,n=u16(g);i<n;i++){const e=g+2+i*12,tag=u16(e),type=u16(e+2);
+        if(type===2)tags[tag]=String.fromCharCode(v.getUint8(e+8));
+        else if(type===5){const p=t+u32(e+8);tags[tag]=[0,1,2].map(k=>u32(p+k*8)/(u32(p+k*8+4)||1))}}
+      if(!tags[2]||!tags[4])return null;
+      const dms=a=>a[0]+a[1]/60+a[2]/3600;
+      const lat=dms(tags[2])*(tags[1]==='S'?-1:1),lng=dms(tags[4])*(tags[3]==='W'?-1:1);
+      return isFinite(lat)&&isFinite(lng)&&(lat||lng)?{lat,lng}:null;
+    }
+    o+=2+v.getUint16(o+2);
+  }
+  return null;
+}
+/* Re-encode to a smaller JPEG. This also drops the photo's metadata before it is stored or shared. */
+async function shrink(file,max=1600,q=.8){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const s=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
+    c.width=Math.round(img.naturalWidth*s);c.height=Math.round(img.naturalHeight*s);
+    c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+    return await new Promise(r=>c.toBlob(b=>r(b||file),'image/jpeg',q));
+  }catch{return file}finally{URL.revokeObjectURL(url)}
+}
+
+/* ============ State ============ */
+function examples(){const t=now();return[
+  {id:'UO-EX-0001',sample:true,cat:'pothole',title:'Deep pothole in the left lane before the signal',desc:'About a metre wide and 15 cm deep. Two-wheelers swerve into the next lane to avoid it, and it fills with water after rain.',sev:'hazard',lat:12.9172,lng:77.6226,area:'Hosur Road, Silk Board Junction',landmark:'opposite the Silk Board metro station',hasPhoto:false,createdAt:t-13*DAY,filedAt:t-13*DAY,ref:'EX-482193',status:'filed',
+    events:[{t:t-13*DAY,k:'created',x:'Reported in UrbOasis'},{t:t-13*DAY,k:'filed',x:'Filed with GBA on 1533 · EX-482193'},{t:t-9*DAY,k:'followup',x:'Followed up on 1533, told “forwarded to engineer”'}]},
+  {id:'UO-EX-0002',sample:true,cat:'streetlight',title:'Three streetlights out on a dark stretch',desc:'Poles 14 to 16 near the bus stop have been off for a week. The footpath is pitch dark after 7 pm.',sev:'hazard',lat:12.9784,lng:77.6408,area:'100 Feet Road, Indiranagar',landmark:'bus stop near Indiranagar metro',hasPhoto:false,createdAt:t-1*DAY,filedAt:t-1*DAY,ref:'EX-488810',status:'filed',
+    events:[{t:t-1*DAY,k:'created',x:'Reported in UrbOasis'},{t:t-1*DAY,k:'filed',x:'Filed with GBA in Sahaaya · EX-488810'}]},
+  {id:'UO-EX-0003',sample:true,cat:'garbage',title:'Construction waste dumped on the lake service road',desc:'Debris and plastic bags piled along 30 m of the service road.',sev:'low',lat:12.9304,lng:77.6784,area:'Bellandur Lake service road',landmark:'near the Bellandur Kodi gate',hasPhoto:false,createdAt:t-20*DAY,filedAt:t-20*DAY,fixedAt:t-17*DAY,ref:'EX-470022',status:'fixed',
+    events:[{t:t-20*DAY,k:'created',x:'Reported in UrbOasis'},{t:t-20*DAY,k:'filed',x:'Filed with GBA · EX-470022'},{t:t-17*DAY,k:'fixed',x:'Marked fixed after 3 days'}]},
+  {id:'UO-EX-0004',sample:true,cat:'water',title:'Water main leaking onto the footpath',desc:'Clean water running from under the slab since this morning.',sev:'low',lat:12.925,lng:77.5938,area:'11th Main, Jayanagar 4th Block',landmark:'outside the Jayanagar shopping complex',hasPhoto:false,createdAt:t-3*36e5,filedAt:null,ref:'',status:'draft',
+    events:[{t:t-3*36e5,k:'created',x:'Reported in UrbOasis'}]},
+]}
+let S=LS.get('uo2',null)||{list:[],profile:{name:'',phone:'',address:''},showEx:true};
+S.profile=Object.assign({name:'',phone:'',address:'',org:''},S.profile);
+if(S.showEx!==false&&!S.list.length)S.list=examples();
+function save(){if(!LS.set('uo2',{list:S.list.filter(c=>!c.sample),profile:S.profile,showEx:S.showEx}))toast('This browser is blocking storage, so changes will be lost when you close the tab')}
+const blankDraft=()=>({step:0,cat:'',title:'',desc:'',sev:'hazard',lat:null,lng:null,area:'',landmark:'',areaAuto:true,hasPhoto:false,exif:null,text:'',textEdited:false,ref:'',filed:false,cosign:false});
+let D=Object.assign(blankDraft(),LS.get('uo2-draft',{}));
+const saveDraft=()=>LS.set('uo2-draft',D);
+let openBox=new Set(), lastQ='', draftPhoto=null, view='home', detail=null, filter='all', docTab={}, pendingDel=null, results=null;
+
+/* ============ Complaint logic ============ */
+function stage(c){
+  if(c.status==='fixed')return'fixed';
+  if(c.status==='draft')return'file';
+  const last=k=>{const e=[...c.events].reverse().find(e=>e.k===k);return e?e.t:null};
+  if(c.status==='escalated')return days(last('escalated')||c.filedAt)>=21?'rti':'wait';
+  if(days(c.filedAt||c.createdAt)<CATS[c.cat].days)return'wait';
+  const fu=last('followup');
+  if(!fu)return'followup';
+  return days(fu)>=7?'escalate':'wait';
+}
+function nextStep(c,st){
+  const cat=CATS[c.cat],a=AG[cat.ag],n=days(c.filedAt||c.createdAt);
+  const last=k=>{const e=[...c.events].reverse().find(e=>e.k===k);return e?e.t:null};
+  switch(st){
+    case'file':return{h:`Send it to ${a.short}`,p:`${a.channel} Then save the complaint number here so every follow-up can quote it.`,doc:'complaint'};
+    case'followup':return{h:'Follow up today',p:`It has been ${plural(n,'day')} since you filed it, past the ${cat.days}-day window. Call or message ${a.short} quoting your complaint number. The follow-up text is ready below.`,doc:'followup'};
+    case'escalate':return{h:'Escalate it',p:`You followed up on ${fmtD(last('followup'))} and it is still not fixed. Send the escalation letter to ${a.escHint}, and post it publicly on X.`,doc:'escalate'};
+    case'rti':return{h:'File an RTI application',p:`Three weeks after escalating, it is still open. An RTI application makes ${a.short} state in writing who was assigned and what was done, within 30 days.`,doc:'rti'};
+    case'fixed':return{h:`Fixed in ${plural(days(c.filedAt||c.createdAt,c.fixedAt),'day')}`,p:'Check that it stays fixed. If the problem comes back, reopen this complaint so your history and complaint number carry over.',doc:null};
+    default:{
+      if(c.status==='escalated'){const e=last('escalated');return{h:'Escalated. Give it time',p:`You escalated on ${fmtD(e)}. If nothing moves by ${fmtD(e+21*DAY)}, the next step is an RTI application.`,doc:null}}
+      const fu=last('followup');
+      if(fu)return{h:'Followed up. Give it a week',p:`If it is still open on ${fmtD(fu+7*DAY)}, escalate to ${a.escHint}.`,doc:null};
+      const due=(c.filedAt||c.createdAt)+cat.days*DAY;
+      return{h:`Day ${n} of ${cat.days}`,p:`Nothing to do yet. Problems like this are usually fixed within ${plural(cat.days,'day')}. If it isn’t by ${fmtD(due)}, come back and follow up.`,doc:null};
+    }
+  }
+}
+function sig(){const p=S.profile,org=p.org?`On behalf of ${p.org}`:'';return[p.name||(org?'':'A resident of Bengaluru'),org,p.phone].filter(Boolean).join('\n')}
+function complaintText(c){
+  const cat=CATS[c.cat];
+  return `${c.title}
+
+Category: ${cat.n}
+Location: ${c.area}${c.landmark?` (${c.landmark})`:''}
+Map: ${gmaps(c.lat,c.lng)}
+Seen on: ${fmtD(c.createdAt||now())}
+Severity: ${SEV[c.sev]}${c.desc?`\n\nDetails: ${c.desc}`:''}${c.hasPhoto?'\n\nA photo of the problem is attached.':''}
+
+Please inspect and fix this, and share the complaint number and the expected date of resolution.
+
+${sig()}`;
+}
+function tweet(c){
+  const a=AG[CATS[c.cat].ag],n=days(c.filedAt||c.createdAt);
+  const tail=`${c.ref?` Complaint ${c.ref}`:''}${c.filedAt&&n>0?`, open ${plural(n,'day')}`:''}.${a.x?` @${a.x}`:''} Please act. ${gmaps(c.lat,c.lng)} #NammaBengaluru`;
+  let head=`${c.title} at ${c.area}.`;
+  if(head.length+tail.length>270)head=head.slice(0,268-tail.length)+'…';
+  return head+tail;
+}
+function docs(c){
+  const cat=CATS[c.cat],a=AG[cat.ag],p=S.profile,map=gmaps(c.lat,c.lng);
+  const refT=c.ref?`complaint no. ${c.ref}`:'my complaint',fd=fmtD(c.filedAt||c.createdAt),n=days(c.filedAt||c.createdAt);
+  const fu=[...c.events].reverse().find(e=>e.k==='followup');
+  const loc=`${c.area}${c.landmark?` (${c.landmark})`:''}`;
+  return{
+    complaint:c.text||complaintText(c),
+    followup:`Follow-up on ${refT}, filed on ${fd}
+
+Issue: ${c.title}
+Location: ${loc}
+Map: ${map}
+
+This was reported ${plural(n,'day')} ago and is still not fixed. Please tell me the current status and the date by which it will be resolved.
+
+${sig()}`,
+    escalate:`To: ${a.escTo}
+Subject: Unresolved complaint${c.ref?` ${c.ref}`:''}: ${c.title}, ${c.area}
+
+Sir/Madam,
+
+I filed ${refT} on ${fd} about: ${c.title}.
+Location: ${loc}
+Map: ${map}
+
+It is still unresolved after ${plural(n,'day')}${fu?`, and my follow-up on ${fmtD(fu.t)} did not get it fixed`:''}.${c.sev!=='low'?` This is a ${SEV[c.sev].toLowerCase()}.`:''}
+
+I request you to direct the concerned staff to inspect and fix it, and to let me know the action taken.
+
+Thank you,
+${sig()}`,
+    x:tweet(c),
+    rti:`To,
+The Public Information Officer,
+${a.pio},
+${a.name}, Bengaluru
+
+Subject: Application for information under Section 6(1) of the Right to Information Act, 2005
+
+Sir/Madam,
+
+Please provide the following information about ${refT}, filed on ${fd}, regarding "${c.title}" at ${loc}:
+
+1. The current status of the complaint and every action taken on it, with dates.
+2. The name and designation of the officer to whom it was assigned.
+3. Copies of any inspection report, work order or closure note recorded against it.
+4. The time limit prescribed for resolving this category of complaint, and a copy of the citizen charter or order that sets it.
+5. If that time limit was exceeded, the reasons recorded for the delay.
+
+I am paying the application fee of Rs 10 by ________________ (IPO / DD / court fee stamp / cash receipt no.). Please provide the information within 30 days, as required by Section 7(1) of the Act.
+
+Name: ${p.name||'________________'}
+Address: ${p.address||'________________'}
+Phone: ${p.phone||'________________'}
+Date: ${fmtD(now())}
+
+Signature: ________________`,
+  };
+}
+function strength(d,photo){
+  return[['Category chosen',!!d.cat],['Pin on the map',d.lat!=null],['Nearest landmark',(d.landmark||'').trim().length>2],['Photo attached',!!photo],['Description of 30+ characters',(d.desc||'').trim().length>=30]];
+}
+function shareLink(c){
+  const s={c:c.cat,t:c.title,d:c.desc,a:c.area,l:c.landmark,la:+(+c.lat).toFixed(6),ln:+(+c.lng).toFixed(6),s:c.sev};
+  return `${location.origin}${location.pathname}#s=${b64u.enc(JSON.stringify(s))}`;
+}
+function neighbourText(c){return `I've reported this to ${AG[CATS[c.cat].ag].short}: ${c.title} at ${c.area}. Several complaints about the same spot are harder to ignore. File yours in a minute here: ${shareLink(c)}`}
+
+/* ============ Rendering ============ */
+const panel=$('#page');
+const ORDER={rti:0,escalate:1,followup:2,file:3,wait:4,fixed:5};
+let mapShown=false;
+function go(v,id,anchor){
+  const nd=v==='complaints'?(id||null):null;if(nd!==detail)openBox=new Set();
+  view=v;detail=nd;pendingDel=null;results=null;
+  render();panel.firstElementChild?.classList.add('enter');
+  history.replaceState(null,'',v==='complaints'&&detail?`#c-${detail}`:`#${v}`);
+  if(anchor)requestAnimationFrame(()=>document.getElementById(anchor)?.scrollIntoView({behavior:'smooth'}));
+  else window.scrollTo(0,0);
+  frameMap();
+}
+function render(){
+  const holder=$('#mapholder');$('#park').appendChild(holder);
+  const c=detail&&S.list.find(x=>x.id===detail);
+  if(view==='complaints'&&detail&&!c)detail=null;
+  panel.innerHTML=view==='report'?reportHTML():view==='guide'?guideHTML():view==='societies'?societiesHTML():view==='monthly'?monthlyHTML():view==='complaints'?(c?detailHTML(c):trackerHTML()):homeHTML();
+  document.querySelectorAll('.nl[data-go]').forEach(t=>{if(t.dataset.go===view&&!t.dataset.anchor)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current')});
+  const act=S.list.filter(x=>STAGE[stage(x)].act).length,b=$('#badge');b.hidden=!act;b.textContent=act;
+  $('#maphint').hidden=!(view==='report'&&D.step===1&&D.lat==null);
+  const slot=panel.querySelector('[data-mapslot]');
+  if(slot){slot.appendChild(holder);const was=mapShown;mapShown=true;if(!map)initMap();else{map.resize();if(!was)frameMap()}}
+  else mapShown=false;
+  panel.querySelectorAll('img[data-photo]').forEach(async img=>{
+    const blob=img.dataset.photo==='draft'?draftPhoto:await idb.get(img.dataset.photo);
+    if(blob){img.src=URL.createObjectURL(blob);img.closest('[data-photobox]')?.removeAttribute('hidden')}
+  });
+  renderMarkers();syncPin();
+}
+function card(c){
+  const st=stage(c),s=STAGE[st],cat=CATS[c.cat],n=days(c.filedAt||c.createdAt);
+  const note=st==='fixed'?`Fixed in ${plural(days(c.filedAt||c.createdAt,c.fixedAt),'day')}`:c.status==='draft'?'':`Day ${n} of ${cat.days}`;
+  return `<button class="ccard t-${s.tone}" data-act="open" data-id="${esc(c.id)}">
+    <span class="cic"><i class="fa-solid ${cat.ic}"></i></span>
+    <span class="cmain"><b>${esc(c.title)}</b><small>${esc(c.area)}${c.sample?' · example':''}</small></span>
+    <span class="cside"><span class="pill">${s.l}</span>${note?`<small>${note}</small>`:''}</span></button>`;
+}
+function exNote(){return S.list.some(c=>c.sample)?`<div class="exnote"><span>These are <b>examples</b> to show how tracking works. They disappear when you report your first problem.</span><button class="link" data-act="hideex">Hide examples</button></div>`:''}
+function homeHTML(){
+  const act=S.list.filter(c=>!c.sample&&STAGE[stage(c)].act);
+  const by={gba:['potholes','garbage','streetlights','footpaths','trees','stagnant water','stray dogs'],bwssb:['water leaks','no water supply','sewage overflow'],bescom:['power cuts','loose or hanging wires'],btp:['traffic signals','road safety']};
+  return `<div>
+  <section class="wrap hero">
+    <div class="stack">
+      <p class="eyebrow">Free for everyone in Bengaluru</p>
+      <h1>Get potholes, garbage and broken streetlights fixed.</h1>
+      <p class="lede">UrbOasis tells you which department to contact, writes the complaint for you, and tells you exactly what to do if nothing happens.</p>
+      <div class="row"><button class="btn primary lg" data-go="report"><i class="fa-solid fa-plus"></i>Report a problem</button><a class="btn lg" href="#how" data-go="home" data-anchor="how">How it works</a></div>
+      ${act.length?`<a class="link" href="#complaints" data-go="complaints"><i class="fa-solid fa-bell"></i>${plural(act.length,'complaint')} need${act.length===1?'s':''} your action</a>`:''}
+      <div class="trust"><span><i class="fa-solid fa-circle-check"></i>Takes about 2 minutes</span><span><i class="fa-solid fa-circle-check"></i>No sign-up</span><span><i class="fa-solid fa-circle-check"></i>Saved only on your device</span></div>
+    </div>
+    <div class="demo" aria-label="An example of a tracked complaint">
+      <div class="row" style="justify-content:space-between"><span class="ex">Example</span><span class="pill t-go">Fixed in 9 days</span></div>
+      <div class="row" style="gap:14px;flex-wrap:nowrap"><span class="cic t-stop"><i class="fa-solid fa-road-circle-exclamation"></i></span><div><b>Deep pothole before the signal</b><p class="small muted">Hosur Road, Silk Board Junction</p></div></div>
+      <ul class="tl">
+        <li><div><time>Day 0</time>Reported here and sent to GBA on helpline 1533</div></li>
+        <li><div><time>Day 7</time>UrbOasis: “This is overdue. Send this follow-up.”</div></li>
+        <li><div><time>Day 9</time>Crew visited and filled the pothole</div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band alt" id="how"><div class="wrap">
+    <div class="shead"><p class="eyebrow">How it works</p><h2>Four steps from “that’s broken” to “it’s fixed”</h2></div>
+    <ol class="steps">
+      <li><h3>Tell us what and where</h3><p>Pick the type of problem and drop a pin on the map. Add a photo if you can.</p></li>
+      <li><h3>We find the right department</h3><p>UrbOasis knows whether it’s GBA, BWSSB, BESCOM or Traffic Police, and writes the complaint for you.</p></li>
+      <li><h3>You send it to them</h3><p>Call their helpline or use their app, and note the complaint number they give you.</p><p class="note">You send it yourself so it goes on the department’s official record.</p></li>
+      <li><h3>We tell you what to do next</h3><p>If it isn’t fixed in time, we tell you when to follow up, when to escalate, and when to file an RTI.</p></li>
+    </ol>
+  </div></section>
+
+  <section class="band"><div class="wrap">
+    <div class="shead"><p class="eyebrow">What you can report</p><h2>Pick a problem to start</h2><p>Choose one and you’ll go straight to the report form.</p></div>
+    <div class="cats">${Object.entries(CATS).map(([k,c])=>`<button class="catlink" data-act="startcat" data-k="${k}"><i class="fa-solid ${c.ic}"></i><span>${c.n}<small lang="kn">${c.kn}</small></span></button>`).join('')}</div>
+  </div></section>
+
+  <section class="band alt"><div class="wrap">
+    <div class="shead"><p class="eyebrow">Who to contact</p><h2>Four departments fix almost everything</h2><p>Sending a complaint to the wrong one is the most common reason it goes nowhere. UrbOasis picks the right one for you.</p></div>
+    <div class="agrid">${Object.entries(AG).map(([k,a])=>`<div class="acard"><div class="ah"><i class="fa-solid ${a.ic}"></i><div><h3>${a.short}</h3><span class="small muted">${a.name}</span></div></div>
+      <div class="row" style="justify-content:space-between"><span class="phone">${a.phone}</span></div>
+      <p class="small muted">Handles: ${by[k].join(', ')}</p></div>`).join('')}</div>
+    <p style="margin-top:20px"><a class="link" href="#guide" data-go="guide">Full guide to who fixes what<i class="fa-solid fa-arrow-right"></i></a></p>
+  </div></section>
+
+  <section class="band"><div class="wrap"><div class="cta" style="background:var(--ink);color:var(--surface)"><div class="stack" style="gap:6px"><p class="eyebrow" style="color:inherit;opacity:.7">For housing societies and RWAs</p><h2>Run a residents’ association?</h2><p>Track every civic problem around your society in one place, and get a monthly report for the ward office.</p></div><a class="btn lg" href="#societies" data-go="societies">See how it works for societies</a></div></div></section>
+
+  <section class="band"><div class="wrap">
+    <div class="shead"><p class="eyebrow">Questions</p><h2>Common questions</h2></div>
+    <div class="faq">
+      <details><summary>Is this a government website?</summary><div><p>No. UrbOasis is a free, independent tool. It helps you send your complaint to the right government department and keep track of it, but it is not run by any department.</p></div></details>
+      <details><summary>Does UrbOasis send my complaint for me?</summary><div><p>No. UrbOasis writes the complaint and tells you exactly where to send it. You then call the helpline or use the department’s app. That way your complaint is on their official record and you get a complaint number.</p></div></details>
+      <details><summary>What is a complaint number and why does it matter?</summary><div><p>When you file a complaint, the department gives you a number by SMS, in their app, or on the call. Write it into UrbOasis. Every follow-up and escalation quotes that number, so nobody can say they never received your complaint.</p></div></details>
+      <details><summary>What if nothing gets fixed?</summary><div><p>Each type of problem has a reasonable time to fix it, for example a week for a pothole. If that time passes, UrbOasis tells you to follow up and gives you the message to send. If that doesn’t work, it gives you an escalation letter for a senior officer. As a last step, it prepares an RTI application, which the department must answer in writing within 30 days.</p></div></details>
+      <details><summary>Where is my information stored?</summary><div><p>Only in this browser on this device. There is no account and nothing is sent to us. To move your complaints to another phone, use <b>Backup</b> on the My complaints page.</p></div></details>
+      <details><summary>Is it an emergency?</summary><div><p>For a live electric wire, an open manhole, a fallen tree blocking a road or a gas smell, call <b>112</b> first. Report it here afterwards so there is a written record.</p></div></details>
+    </div>
+  </div></section>
+
+  <section class="wrap" style="padding-block:8px 64px"><div class="cta"><div class="stack" style="gap:6px"><h2>Seen something that needs fixing?</h2><p>It takes about two minutes.</p></div><button class="btn lg" data-go="report"><i class="fa-solid fa-plus"></i>Report a problem</button></div></section>
+  </div>`;
+}
+function reportDoc(list,org){
+  const month=new Date().toLocaleDateString('en-IN',{month:'long',year:'numeric'});
+  const isOver=c=>['followup','escalate','rti'].includes(stage(c));
+  const open=list.filter(c=>c.status!=='fixed'),over=list.filter(isOver),fixed=list.filter(c=>c.status==='fixed');
+  const avg=fixed.length?Math.round(fixed.reduce((s,c)=>s+days(c.filedAt||c.createdAt,c.fixedAt),0)/fixed.length):'–';
+  const byAg=Object.entries(AG).map(([k,a])=>{const l=list.filter(c=>CATS[c.cat].ag===k);return[a.short,l.filter(c=>c.status!=='fixed').length,l.filter(isOver).length,l.filter(c=>c.status==='fixed').length,l.length]}).filter(r=>r[4]);
+  const sorted=[...open].sort((a,b)=>ORDER[stage(a)]-ORDER[stage(b)]||(a.filedAt||a.createdAt)-(b.filedAt||b.createdAt));
+  return `<header class="rh"><div><h1>Civic complaints report</h1><p>${esc(org||'Your housing society')} · ${month}</p></div><span class="mark" aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span></header>
+  <div class="kpis"><div><b>${list.length}</b>Reported</div><div><b>${open.length}</b>Still open</div><div class="t-stop"><b style="color:var(--tone)">${over.length}</b>Overdue</div><div><b>${fixed.length}</b>Fixed</div><div><b>${avg}</b>Avg days to fix</div></div>
+  <h2>By department</h2>
+  <div class="tscroll"><table><thead><tr><th>Department</th><th class="n">Open</th><th class="n">Overdue</th><th class="n">Fixed</th></tr></thead><tbody>${byAg.map(r=>`<tr><td>${r[0]}</td><td class="n">${r[1]}</td><td class="n">${r[2]}</td><td class="n">${r[3]}</td></tr>`).join('')||'<tr><td colspan="4">No complaints yet</td></tr>'}</tbody></table></div>
+  <h2>Open complaints</h2>
+  <div class="tscroll"><table><thead><tr><th>Problem</th><th>Location</th><th>Department</th><th>Complaint no.</th><th class="n">Days open</th><th>Status</th></tr></thead><tbody>${sorted.map(c=>`<tr><td>${esc(c.title)}</td><td>${esc(c.area)}</td><td>${AG[CATS[c.cat].ag].short}</td><td class="mono">${esc(c.ref||'Not sent')}</td><td class="n">${c.filedAt?days(c.filedAt):'–'}</td><td><span class="pill t-${STAGE[stage(c)].tone}">${STAGE[stage(c)].l}</span></td></tr>`).join('')||'<tr><td colspan="6">Nothing open</td></tr>'}</tbody></table></div>
+  <h2>Fixed</h2>
+  <div class="tscroll"><table><thead><tr><th>Problem</th><th>Location</th><th>Department</th><th class="n">Days to fix</th></tr></thead><tbody>${fixed.map(c=>`<tr><td>${esc(c.title)}</td><td>${esc(c.area)}</td><td>${AG[CATS[c.cat].ag].short}</td><td class="n">${days(c.filedAt||c.createdAt,c.fixedAt)}</td></tr>`).join('')||'<tr><td colspan="4">Nothing fixed yet</td></tr>'}</tbody></table></div>
+  <p class="foot">Prepared with UrbOasis on ${fmtD(now())}. Fix times are UrbOasis guidelines, not official service levels.</p>`;
+}
+function monthlyHTML(){
+  const mine=S.list.filter(c=>!c.sample),sample=!mine.length;
+  return `<div class="wrap narrow">
+  <div class="phead" style="gap:14px">
+    <a class="link muted" href="#societies" data-go="societies"><i class="fa-solid fa-arrow-left"></i>For societies</a>
+    <h1 style="font-size:clamp(26px,3.4vw,34px)">Monthly report for your society</h1>
+    <p>Take this to your ward office or committee meeting. It lists every complaint, what’s overdue, and how long each department takes.</p>
+    ${sample?'<div class="exnote"><span>This is a <b>sample</b> made from example complaints. Report real problems and this becomes your society’s report.</span></div>':''}
+    ${S.profile.org?'':'<p class="hint">Add your society’s name under <a class="link" href="#complaints" data-go="complaints">My complaints › Your details</a> to put it on the report.</p>'}
+    <div class="row"><button class="btn primary" data-act="print-monthly"><i class="fa-solid fa-print"></i>Print or save as PDF</button></div>
+  </div>
+  <div class="pbody"><article class="paper" id="paper">${reportDoc(sample?examples():mine,S.profile.org||(sample?'Sample Residents’ Welfare Association':''))}</article></div></div>`;
+}
+function societiesHTML(){
+  return `<div>
+  <section class="wrap hero">
+    <div class="stack">
+      <p class="eyebrow">For apartment associations and RWAs</p>
+      <h1>Stop chasing the same pothole every month.</h1>
+      <p class="lede">UrbOasis gives your committee one place to report, track and escalate civic problems around your society, and a monthly report to take to the ward office.</p>
+      <div class="row"><a class="btn primary lg" href="#join" data-go="societies" data-anchor="join">Join the free pilot</a><a class="btn lg" href="#monthly" data-go="monthly"><i class="fa-solid fa-file-lines"></i>See a sample report</a></div>
+      <div class="trust"><span><i class="fa-solid fa-circle-check"></i>Free for the first 3 months</span><span><i class="fa-solid fa-circle-check"></i>Nothing to install</span><span><i class="fa-solid fa-circle-check"></i>Set up with you in one call</span></div>
+    </div>
+    <div class="demo" aria-label="Preview of a monthly report">
+      <div class="row" style="justify-content:space-between"><span class="ex">Sample report</span><span class="small muted">October 2026</span></div>
+      <h3>Sample Residents’ Welfare Association</h3>
+      <div class="kpis sm"><div><b>12</b>Reported</div><div class="t-stop"><b style="color:var(--tone)">3</b>Overdue</div><div><b>7</b>Fixed</div><div><b>6</b>Avg days</div></div>
+      <ul class="bars">
+        <li><span>GBA</span><i style="--w:70%"></i><span class="mono">7</span></li>
+        <li><span>BWSSB</span><i style="--w:30%"></i><span class="mono">3</span></li>
+        <li><span>BESCOM</span><i style="--w:20%"></i><span class="mono">2</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="band alt"><div class="wrap">
+    <div class="shead"><p class="eyebrow">What your committee gets</p><h2>One place for every civic problem around your society</h2><p>Some of this works today. The rest is what we’re building with pilot societies.</p></div>
+    <div class="agrid">${[
+      ['fa-file-signature','Letters from your association','now','Complaints, escalations and RTI applications signed on behalf of your RWA. They carry more weight than a single resident’s.'],
+      ['fa-file-lines','Monthly ward report','now','A printable summary of every open, overdue and fixed complaint by department, ready for the ward office or your AGM.'],
+      ['fa-bell','Follow-up on schedule','now','Each complaint tells the committee when to follow up, when to escalate and when to file an RTI.'],
+      ['fa-users','Shared board for all residents','pilot','Residents report into one society list. The committee sees everything in one place, with no duplicate complaints.'],
+      ['fa-chart-line','Department scorecard','pilot','How fast each department fixes problems in your ward, with a link you can share with your councillor or the press.'],
+      ['fa-headset','Set up with you','pilot','We add your society, import your open complaints and train one committee member. It takes one call.'],
+    ].map(([ic,t,s,d])=>`<div class="acard"><div class="ah"><i class="fa-solid ${ic}"></i><h3>${t}</h3></div><p class="small muted">${d}</p><span class="tag ${s}">${s==='now'?'Available now':'In the pilot'}</span></div>`).join('')}</div>
+  </div></section>
+
+  <section class="band"><div class="wrap">
+    <div class="shead"><p class="eyebrow">Pricing</p><h2>Simple pricing per society</h2><p>Early-access prices. They may change before launch.</p></div>
+    <div class="prices">
+      <div class="price feat"><span class="tag pilot">Limited to 20 societies</span><h3>Pilot</h3><p class="amt">Free<small> for 3 months</small></p><ul><li>Everything in Society</li><li>We set it up with you</li><li>Direct line to the founder for feedback</li></ul><a class="btn primary block" href="#join" data-go="societies" data-anchor="join">Join the pilot</a></div>
+      <div class="price"><h3>Society</h3><p class="amt">₹999<small> / month</small></p><ul><li>Up to 300 homes</li><li>Shared board for residents</li><li>Monthly ward report</li><li>Letters on behalf of your RWA</li></ul></div>
+      <div class="price"><h3>Federation</h3><p class="amt">Custom</p><ul><li>Several societies or a ward federation</li><li>Ward-level department scorecard</li><li>Quarterly briefing for your councillor</li></ul></div>
+    </div>
+  </div></section>
+
+  <section class="band alt" id="join"><div class="wrap narrow">
+    ${leadSent?`<div class="empty" style="border-style:solid"><i class="fa-solid fa-circle-check"></i><h2>Thanks! Request ready</h2><p>${LEAD.whatsapp||LEAD.email?'Your message has opened. Send it and we’ll get back to you within two working days.':'Your details are copied. Paste them into a message to the UrbOasis team.'}</p><button class="btn" data-act="lead-again">Send another request</button></div>`:`
+    <div class="shead"><p class="eyebrow">Join the pilot</p><h2>Get your society on UrbOasis</h2><p>Tell us a little about your society. We’ll call you to set it up. It’s free during the pilot.</p></div>
+    <form class="stack" data-form="lead">
+      <label class="fl">Society or RWA name<input id="l-soc" autocomplete="organization" required></label>
+      <div class="two"><label class="fl">Area<input id="l-area" placeholder="e.g. HSR Layout" required></label><label class="fl">Number of homes <span class="opt">approx.</span><input id="l-homes" inputmode="numeric"></label></div>
+      <div class="two"><label class="fl">Your name<input id="l-name" autocomplete="name" required></label>
+      <label class="fl">Your role<select id="l-role"><option>Secretary</option><option>President</option><option>Committee member</option><option>Resident</option></select></label></div>
+      <label class="fl">Phone or email<input id="l-contact" autocomplete="tel" required></label>
+      <button class="btn primary lg">Request a pilot spot</button>
+      <p class="hint">We only use these details to contact you about the pilot.</p>
+    </form>`}
+  </div></section>
+  </div>`;
+}
+function trackerHTML(){
+  const L=S.list,match=(c,f)=>{const s=stage(c);return f==='all'||(f==='action'&&STAGE[s].act)||(f==='waiting'&&s==='wait')||(f==='fixed'&&s==='fixed')};
+  const list=L.filter(c=>match(c,filter)).sort((a,b)=>ORDER[stage(a)]-ORDER[stage(b)]||b.createdAt-a.createdAt);
+  return `<div class="wrap narrow">
+  <div class="phead"><h1>My complaints</h1><p>Everything you’ve reported on this device. Open a complaint to see what to do next.</p></div>
+  <div class="pbody stack" style="gap:20px">
+    <div class="row"><button class="btn primary" data-go="report"><i class="fa-solid fa-plus"></i>Report a new problem</button></div>
+    ${exNote()}
+    ${L.length?`<div class="mapslot short" data-mapslot></div>
+    <div class="chips" role="group" aria-label="Show">${[['all','All'],['action','Needs your action'],['waiting','Waiting for a fix'],['fixed','Fixed']].map(([k,l])=>`<button class="chip" data-act="filter" data-k="${k}" aria-pressed="${filter===k}">${l} (${L.filter(c=>match(c,k)).length})</button>`).join('')}</div>
+    <div class="clist">${list.map(card).join('')||'<p class="hint">Nothing here right now.</p>'}</div>`
+    :'<div class="empty"><i class="fa-regular fa-folder-open"></i><p>You haven’t reported anything yet.</p><button class="btn primary" data-go="report">Report your first problem</button></div>'}
+    <div class="boxes" style="margin-top:12px">
+    <details class="box"><summary>Your details for letters</summary><div>
+      <p class="hint">Optional. Used to sign complaints, letters and RTI applications. Saved only in this browser.</p>
+      <label class="fl">Name<input id="p-name" data-p="name" value="${esc(S.profile.name)}" autocomplete="name"></label>
+      <label class="fl">Housing society or RWA <span class="opt">Letters will be signed on its behalf</span><input id="p-org" data-p="org" value="${esc(S.profile.org)}" autocomplete="organization"></label>
+      <label class="fl">Phone<input id="p-phone" type="tel" data-p="phone" value="${esc(S.profile.phone)}" autocomplete="tel"></label>
+      <label class="fl">Postal address <span class="opt">needed only for RTI applications</span><textarea id="p-address" data-p="address" rows="2" autocomplete="street-address">${esc(S.profile.address)}</textarea></label>
+    </div></details>
+    <details class="box"><summary>Monthly report for your society</summary><div><p class="hint">A printable summary of every complaint by department. Take it to the ward office or your committee meeting.</p><div class="row"><a class="btn sm" href="#monthly" data-go="monthly"><i class="fa-solid fa-file-lines"></i>Open the report</a></div></div></details>
+    <details class="box"><summary>Backup and move to another device</summary><div>
+      <p class="hint">Download a backup file, then use Restore on your other phone or computer. Photos are not included.</p>
+      <div class="row"><button class="btn sm" data-act="export-json"><i class="fa-solid fa-download"></i>Download backup</button><label class="btn sm" for="f-import"><i class="fa-solid fa-upload"></i>Restore a backup</label><input type="file" id="f-import" accept="application/json,.json" hidden><button class="btn sm quiet" data-act="export-csv"><i class="fa-solid fa-table"></i>Spreadsheet</button></div>
+    </div></details></div>
+  </div></div>`;
+}
+const box=(id,title,inner,meta='')=>`<details class="box" data-box="${id}" ${openBox.has(id)?'open':''}><summary>${title}${meta?`<span class="muted">${meta}</span>`:''}</summary><div>${inner}</div></details>`;
+function detailHTML(c){
+  const st=stage(c),s=STAGE[st],cat=CATS[c.cat],a=AG[cat.ag],ns=nextStep(c,st),D2=docs(c);
+  const k=docTab[c.id]||ns.doc||'complaint',n=days(c.filedAt||c.createdAt);
+  const has=x=>c.events.some(e=>e.k===x);
+  const tr=[['Reported',true],['Sent to department',!!c.filedAt],['Followed up',has('followup')||has('escalated')],['Fixed',st==='fixed']];
+  const nowI=tr.findIndex(t=>!t[1]);
+  const sent={complaint:c.status==='draft'?['filed','I’ve sent it']:null,followup:st!=='fixed'?['followup','I sent this']:null,escalate:st!=='fixed'?['escalated','I sent this']:null,x:null,rti:st!=='fixed'?['rti','I filed this']:null}[k];
+  const refForm=`<form class="search" data-form="ref"><input id="d-ref" value="${esc(c.ref)}" placeholder="e.g. 10/2026/123456" aria-label="Complaint number"><button class="btn">Save</button></form>`;
+  const nextBody=st==='file'?`<ol class="todo" style="margin-top:4px">
+      <li><div><h3>Copy the complaint</h3><div class="row"><button class="btn sm ink" data-act="copydoc-k" data-k="complaint"><i class="fa-regular fa-copy"></i>Copy complaint</button></div></div></li>
+      <li><div><h3>Send it to ${a.short}</h3><p>${esc(a.channel)}</p><div class="row"><span class="phone">${a.phone}</span><a class="btn sm" href="tel:${a.phone}"><i class="fa-solid fa-phone"></i>Call</a></div></div></li>
+      <li><div><h3>Type the complaint number they give you</h3>${refForm}</div></li></ol>`
+    :`<p>${esc(ns.p)}</p>${ns.doc?`<div class="row"><button class="btn ink" data-act="opendoc" data-k="${ns.doc}"><i class="fa-solid fa-file-lines"></i>Show me the ${DOCS.find(d=>d[0]===ns.doc)[1].toLowerCase()}</button></div>`:''}`;
+  const docsInner=`<p class="hint">Ready-made messages for every stage. Copy one and send it to the department.</p>
+    <div class="doctabs" role="tablist">${DOCS.map(([dk,l])=>`<button role="tab" aria-selected="${dk===k}" data-act="doctab" data-k="${dk}">${l}${dk===ns.doc?'<span class="rec" title="Recommended now"></span>':''}</button>`).join('')}</div>
+    <textarea class="doc" id="d-doc" rows="${k==='x'?5:k==='rti'?16:11}" aria-label="Message text">${esc(D2[k])}</textarea>
+    <div class="row">
+      <button class="btn sm ink" data-act="copydoc"><i class="fa-regular fa-copy"></i>Copy</button>
+      ${k==='x'?`<a class="btn sm" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(D2.x)}"><i class="fa-brands fa-x-twitter"></i>Post on X</a>`:`<button class="btn sm" data-act="printdoc"><i class="fa-solid fa-print"></i>Print</button>`}
+      ${sent?`<button class="btn sm quiet" data-act="logsent" data-k="${sent[0]}"><i class="fa-solid fa-check"></i>${sent[1]}</button>`:''}
+    </div>
+    ${k==='rti'?'<p class="hint">Hand it in or post it to the office named at the top, with the Rs 10 fee. People below the poverty line pay nothing.</p>':''}`;
+  return `<div class="wrap narrow">
+  <div class="phead" style="gap:14px">
+    <a class="link muted" href="#complaints" data-go="complaints"><i class="fa-solid fa-arrow-left"></i>My complaints</a>
+    <div class="row" style="gap:8px"><span class="pill t-${s.tone}">${s.l}</span>${c.sample?'<span class="ex">Example</span>':''}</div>
+    <h1 style="font-size:clamp(26px,3.4vw,34px)">${esc(c.title)}</h1>
+    <p class="small"><i class="fa-solid ${cat.ic}"></i> ${cat.n} · ${esc(c.area)}${c.landmark?`, ${esc(c.landmark)}`:''}</p>
+  </div>
+  <div class="pbody stack" style="gap:22px">
+    <ol class="track" aria-label="Progress">${tr.map((t,i)=>`<li class="${t[1]?'done':i===nowI?'now':''}">${t[0]}</li>`).join('')}</ol>
+    <section class="next t-${s.tone}"><p class="eyebrow">What to do now</p><h2 style="font-size:21px">${esc(ns.h)}</h2>${nextBody}</section>
+    <div class="photo" data-photobox hidden><img data-photo="${esc(c.id)}" alt="Photo of the problem"></div>
+    <div class="mapslot short" data-mapslot></div>
+    <div class="boxes">
+      ${box('docs','Messages and letters',docsInner)}
+      ${box('info','Complaint details',`<dl class="facts">
+        <dt>Department</dt><dd>${a.name} · <span class="mono">${a.phone}</span></dd>
+        <dt>Complaint no.</dt><dd>${refForm}</dd>
+        <dt>Sent</dt><dd>${c.filedAt?`${fmtD(c.filedAt)} (${n?`${plural(n,'day')} ago`:'today'})`:'Not yet'}</dd>
+        <dt>Usually fixed in</dt><dd>${plural(cat.days,'day')}</dd>
+        <dt>How serious</dt><dd>${SEV[c.sev]}</dd>
+        <dt>UrbOasis ref.</dt><dd class="mono">${esc(c.id)}</dd></dl>`)}
+      ${box('share','Ask neighbours to complain too',`<p class="hint">Send them a link that opens this complaint, ready for them to file. Several complaints about one spot are harder to ignore.</p>
+        <div class="row"><a class="btn sm" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(neighbourText(c))}"><i class="fa-brands fa-whatsapp"></i>WhatsApp</a>
+        ${navigator.share?'<button class="btn sm" data-act="nshare"><i class="fa-solid fa-share-nodes"></i>Share</button>':''}
+        <button class="btn sm" data-act="copylink"><i class="fa-solid fa-link"></i>Copy link</button></div>`)}
+      ${box('history','History and notes',`<ul class="tl">${[...c.events].reverse().map(e=>`<li><div><time>${fmtDT(e.t)}</time>${esc(e.x)}</div></li>`).join('')}</ul>
+        <form class="search" data-form="note"><input id="d-note" placeholder="Add a note, e.g. crew came, said 2 days" aria-label="Add a note"><button class="btn">Add</button></form>`,String(c.events.length))}
+    </div>
+    <div class="row">
+      ${st==='fixed'?'<button class="btn" data-act="reopen"><i class="fa-solid fa-rotate-left"></i>It’s broken again</button>':'<button class="btn" data-act="fixed"><i class="fa-solid fa-circle-check" style="color:var(--go)"></i>It’s been fixed</button>'}
+      <a class="btn quiet" target="_blank" rel="noopener" href="${gmaps(c.lat,c.lng)}"><i class="fa-solid fa-diamond-turn-right"></i>Directions</a>
+      <button class="btn quiet danger" data-act="del"><i class="fa-regular fa-trash-can"></i>Delete</button>
+    </div>
+    ${pendingDel===c.id?`<div class="confirm"><span>Delete this complaint from this device? This can’t be undone.</span><button class="btn sm danger" data-act="del-yes">Delete</button><button class="btn sm" data-act="del-no">Keep it</button></div>`:''}
+  </div></div>`;
+}
+function reportHTML(){
+  const names=['Problem','Location','Review','Send'];
+  const ag=D.cat?AG[CATS[D.cat].ag]:null;
+  const qs=[['What’s the problem?','Choose the closest match. This decides which department gets your complaint.'],
+    ['Where is it?','Put the pin exactly on the spot so the repair crew can find it.'],
+    ['Check your complaint','We wrote this from your answers. You can change anything.'],
+    [`Send it to ${ag?ag.short:'the department'}`,'Three quick steps. After that, UrbOasis keeps track of it for you.']];
+  const nav=(next,back=true)=>`<div class="err" id="werr" hidden></div><div class="wnav">${back?'<button class="btn lg" data-act="back-step"><i class="fa-solid fa-arrow-left"></i>Back</button>':'<span></span>'}${next?`<button class="btn primary lg" data-act="next-step">${next}<i class="fa-solid fa-arrow-right"></i></button>`:''}</div>`;
+  let body='';
+  if(D.step===0){
+    body=`<div class="catgrid" role="radiogroup" aria-label="Type of problem">${Object.entries(CATS).map(([k,c])=>`<button type="button" class="cat" role="radio" aria-checked="${D.cat===k}" data-act="cat" data-k="${k}"><i class="fa-solid ${c.ic}"></i><span>${c.n}<small lang="kn">${c.kn}</small></span></button>`).join('')}</div>
+    ${ag?`<p class="hint"><i class="fa-solid fa-circle-check" style="color:var(--go)"></i> This goes to <b style="color:var(--ink)">${ag.name}</b></p>`:''}
+    <label class="fl">Describe it in a few words<input id="f-title" data-f="title" maxlength="90" value="${esc(D.title)}" placeholder="${esc(D.cat?CATS[D.cat].ph:'e.g. Deep pothole in the left lane')}"></label>
+    <label class="fl">More details <span class="opt">Optional. How big is it, since when, who does it affect?</span><textarea id="f-desc" data-f="desc" rows="3">${esc(D.desc)}</textarea></label>
+    <fieldset class="seg"><legend>How serious is it?</legend><div class="segrow" role="radiogroup">${[['low','Minor','Annoying, not unsafe'],['hazard','Hazard','Could hurt someone'],['danger','Danger','Someone could be hurt now']].map(([k,l,d])=>`<button type="button" class="segb" role="radio" aria-checked="${D.sev===k}" data-act="sev" data-k="${k}">${l}<small>${d}</small></button>`).join('')}</div></fieldset>
+    ${D.sev==='danger'?`<div class="alert t-stop"><b><i class="fa-solid fa-triangle-exclamation"></i> Call for help first</b><span>Call <b class="mono" style="color:var(--ink)">112</b> now${ag?`, then ${ag.short} on <b class="mono" style="color:var(--ink)">${ag.phone}</b>`:''}. Keep people away from the spot. Finish this report afterwards so there is a written record.</span></div>`:''}
+    ${nav('Continue',false)}`;
+  }else if(D.step===1){
+    const dup=D.lat!=null&&D.cat?S.list.filter(c=>c.cat===D.cat&&c.status!=='fixed'&&dist(c,D)<150):[];
+    const exifOff=D.exif&&(D.lat==null||dist(D.exif,D)>25);
+    body=`<div class="row"><button class="btn" data-act="gps"><i class="fa-solid fa-location-crosshairs"></i>Use my current location</button></div>
+    <form class="search" data-form="search"><input type="search" id="f-search" value="${esc(lastQ)}" placeholder="Or search for a street or landmark" aria-label="Search for a place in Bengaluru"><button class="btn">Search</button></form>
+    ${results?`<div class="results">${results.length?results.map(r=>`<button data-act="pick" data-la="${r.lat}" data-ln="${r.lon}" data-name="${esc(r.name)}"><i class="fa-solid fa-location-dot muted"></i> ${esc(r.label)}</button>`).join(''):'<p class="hint">Nothing found in Bengaluru. Try a nearby main road or landmark.</p>'}</div>`:''}
+    <div class="mapslot tall" data-mapslot></div>
+    <div class="pinread ${D.lat!=null?'ok':''}"><i class="fa-solid ${D.lat!=null?'fa-circle-check':'fa-location-dot'}"></i>${D.lat!=null?'<span>Pin placed. Drag it if it’s not quite right.</span>':'<span class="muted">No pin yet. Tap the map, use your location, or search.</span>'}</div>
+    ${D.lat!=null&&!inBLR(D.lat,D.lng)?'<div class="alert t-wait"><b>This pin is outside Bengaluru</b><span>These departments only cover Bengaluru. Move the pin if that’s a mistake.</span></div>':''}
+    ${exifOff?`<div class="alert t-go"><b><i class="fa-solid fa-camera"></i> Your photo has a location</b><span>Use it to place the pin?</span><div><button class="btn sm" data-act="use-exif">Use the photo’s location</button></div></div>`:''}
+    ${dup.length?`<div class="alert t-wait"><b>You already reported this</b><span>${dup.map(c=>esc(c.title)).join('<br>')}</span><div><button class="btn sm" data-act="open" data-id="${esc(dup[0].id)}">Open that complaint instead</button></div></div>`:''}
+    <label class="fl">Area and street <span class="opt">Filled in from the pin. Correct it if it’s wrong.</span><input id="f-area" data-f="area" value="${esc(D.area)}" placeholder="e.g. 100 Feet Road, Indiranagar"></label>
+    <label class="fl">Nearest landmark <span class="opt">Optional, but it helps the crew find the spot.</span><input id="f-landmark" data-f="landmark" value="${esc(D.landmark)}" placeholder="e.g. opposite the bakery, next to pole 14"></label>
+    <div class="fl">Photo <span class="opt">Optional. A photo makes it harder to close the complaint without fixing it.</span></div>
+    ${D.hasPhoto?`<div class="photo" data-photobox hidden><img data-photo="draft" alt="Your photo"><button class="iconbtn" data-act="rm-photo" aria-label="Remove photo"><i class="fa-solid fa-xmark"></i></button></div>`:`<label class="drop" for="f-photo"><i class="fa-solid fa-camera"></i><span><b>Add a photo</b>Take one now or choose from your gallery</span></label>`}
+    <input type="file" id="f-photo" accept="image/*" hidden>
+    ${nav('Continue')}`;
+  }else if(D.step===2){
+    const cat=CATS[D.cat],st=strength(D,draftPhoto||D.hasPhoto),miss=st.filter(x=>!x[1]);
+    if(!D.textEdited)D.text=complaintText({...D,createdAt:now()});
+    body=`<div class="agency"><i class="fa-solid ${ag.ic}"></i><div><p class="small muted">This goes to</p><h3>${ag.name}</h3><p class="small muted">Helpline <b class="mono" style="color:var(--ink)">${ag.phone}</b> · usually fixed within ${plural(cat.days,'day')}</p></div></div>
+    <label class="fl"><span class="row" style="justify-content:space-between">Your complaint${D.textEdited?'<button type="button" class="link" data-act="regen">Undo my changes</button>':''}</span><textarea class="doc" id="f-text" data-f="text" rows="14">${esc(D.text)}</textarea></label>
+    ${miss.length?`<div class="meter"><h3>Make it stronger <span class="muted small" style="font-weight:400">(optional)</span></h3><ul>${miss.map(([l])=>`<li class="no"><i class="fa-regular fa-circle"></i>${l}</li>`).join('')}</ul><p class="hint">Go back to add these, or continue as it is.</p></div>`:'<div class="meter"><ul><li><i class="fa-solid fa-circle-check" style="color:var(--go)"></i>Looks complete. It has a pin, landmark, photo and details.</li></ul></div>'}
+    ${nav('Continue')}`;
+  }else{
+    const cat=CATS[D.cat],tmp={...D,id:'',createdAt:now(),filedAt:null};
+    body=`<div class="important"><i class="fa-solid fa-circle-info"></i><span><b>UrbOasis can’t send complaints for you.</b> Sending it yourself puts it on ${ag.short}’s official record and gets you a complaint number.</span></div>
+    <ol class="todo">
+      <li><div><h3>Copy your complaint</h3><div class="row"><button class="btn ink" data-act="copy-text"><i class="fa-regular fa-copy"></i>Copy complaint</button></div></div></li>
+      <li><div><h3>Send it to ${ag.short}</h3><p>${esc(ag.channel)}</p>
+        <div class="row"><span class="phone">${ag.phone}</span><a class="btn sm" href="tel:${ag.phone}"><i class="fa-solid fa-phone"></i>Call now</a>
+        <a class="btn sm" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet(tmp))}"><i class="fa-brands fa-x-twitter"></i>Post on X</a></div></div></li>
+      <li><div><h3>Type the complaint number they give you</h3><p>It arrives by SMS, in their app, or on the call. You can also add it later.</p>
+        <input id="f-ref" data-f="ref" value="${esc(D.ref)}" placeholder="e.g. 10/2026/123456" aria-label="Complaint number"></div></li>
+    </ol>
+    <label class="check"><input type="checkbox" id="f-filed" data-f="filed" ${D.filed||D.ref?'checked':''}><span>I’ve sent it to ${ag.short}. Start counting the ${cat.days}-day fix time.</span></label>
+    <button class="btn primary lg block" data-act="save"><i class="fa-solid fa-check"></i>Save and track this complaint</button>
+    <p class="hint" style="text-align:center">Haven’t sent it yet? Save it anyway. We’ll remind you on the My complaints page.</p>
+    ${nav('')}`;
+  }
+  return `<div class="wrap narrow">
+  <div class="phead" style="gap:18px">
+    ${D.cosign?'<div class="exnote"><span><b>A neighbour reported this.</b> File your own complaint about the same spot. Several complaints are harder to ignore.</span></div>':''}
+    <div class="row" style="justify-content:space-between"><p class="eyebrow">Report a problem · Step ${D.step+1} of 4</p>${D.cat||D.title||D.lat!=null?'<button class="link muted" data-act="reset-draft">Start over</button>':''}</div>
+    <div class="progress"><div class="bar"><span style="width:${(D.step+1)*25}%"></span></div>
+      <ol class="stepnames">${names.map((nm,i)=>`<li class="${i===D.step?'on':i<D.step?'done':''}"><button type="button" ${i<D.step?`data-act="jump" data-k="${i}"`:'tabindex="-1"'}>${nm}</button></li>`).join('')}</ol></div>
+    <div class="q"><h1 style="font-size:clamp(26px,3.4vw,34px)">${qs[D.step][0]}</h1><p>${qs[D.step][1]}</p></div>
+  </div>
+  <div class="pbody stack" style="gap:20px">${body}</div></div>`;
+}
+function guideHTML(){
+  const by={};Object.entries(CATS).forEach(([k,c])=>(by[c.ag]=by[c.ag]||[]).push(c));
+  return `<div class="wrap">
+  <div class="phead"><p class="eyebrow">Guide</p><h1>Who to contact in Bengaluru</h1><p>Four departments handle almost every street problem. Here’s who does what, their helpline, and who to go to if they don’t act.</p></div>
+  <div class="pbody stack" style="gap:40px">
+  <div class="agrid">${Object.entries(AG).map(([k,a])=>`<div class="acard">
+    <div class="ah"><i class="fa-solid ${a.ic}"></i><div><h3>${a.name}</h3><span class="small muted">${a.short}</span></div></div>
+    <div class="row" style="justify-content:space-between"><span class="phone">${a.phone}</span>${a.x?`<a class="link" target="_blank" rel="noopener" href="https://x.com/${a.x}">@${a.x}</a>`:''}</div>
+    <p class="small">${esc(a.channel)}</p>
+    <ul>${(by[k]||[]).map(c=>`<li><span><i class="fa-solid ${c.ic} muted" style="width:18px"></i> ${c.n}</span><span>~${plural(c.days,'day')}</span></li>`).join('')}</ul>
+    <p class="small muted"><b style="color:var(--ink)">If they don’t act:</b> write to ${a.escHint}.</p></div>`).join('')}</div>
+  <div class="stack" style="gap:14px"><h2>Tips for getting it fixed faster</h2><ol class="tips">
+    <li><b>Always get the complaint number.</b> Without it, a follow-up starts from zero.</li>
+    <li><b>Give a landmark, not just a road.</b> “Opposite the bakery, next to pole 14” gets a crew to the spot. “Hosur Road” doesn’t.</li>
+    <li><b>Attach a photo</b> with something for scale. It makes a complaint harder to close as “not found”.</li>
+    <li><b>Follow up once, then escalate.</b> Calling every day doesn’t help. One follow-up after the fix time, then a written escalation, does.</li>
+    <li><b>Ask neighbours to complain too.</b> Several complaints about one spot get noticed.</li>
+    <li><b>Use RTI as the last step.</b> It costs Rs 10 and the department must reply in writing within 30 days.</li>
+  </ol></div>
+  <div class="stack" style="gap:14px"><h2>Please note</h2><div class="prose">
+    <p>Helpline numbers were checked in 2026. If a number doesn’t connect, check the department’s official website.</p>
+    <p>The fix times shown are our guide to a reasonable wait, not official deadlines.</p>
+  </div></div>
+  <div class="cta"><div class="stack" style="gap:6px"><h2>Ready to report something?</h2><p>We’ll pick the right department for you.</p></div><button class="btn lg" data-go="report"><i class="fa-solid fa-plus"></i>Report a problem</button></div>
+  </div></div>`;
+}
+
+/* ============ Actions ============ */
+function err(m){const e=$('#werr');if(e){e.hidden=!m;e.innerHTML=m?`<i class="fa-solid fa-circle-exclamation"></i>${esc(m)}`:''}}
+function stepErr(){
+  if(D.step===0){if(!D.cat)return'Pick a category first.';if(!D.title.trim())return'Give it a short title.'}
+  if(D.step===1){if(D.lat==null)return'Drop a pin on the map, use your location, or search for the place.';if(!D.area.trim())return'Add the area and street name.'}
+  return'';
+}
+const cur=()=>S.list.find(x=>x.id===detail);
+function logEvent(c,k,x){c.events.push({t:now(),k,x});save();render()}
+async function act(a,el){
+  const c=cur();
+  switch(a){
+    case'cat':D.cat=el.dataset.k;saveDraft();render();break;
+    case'sev':D.sev=el.dataset.k;saveDraft();render();break;
+    case'next-step':{const m=stepErr();if(m)return err(m);D.step++;saveDraft();render();panel.firstElementChild?.classList.add('enter');window.scrollTo(0,0);break}
+    case'jump':D.step=+el.dataset.k;saveDraft();render();panel.firstElementChild?.classList.add('enter');window.scrollTo(0,0);break;
+    case'print-monthly':$('#printdoc').innerHTML=$('#paper').outerHTML;window.print();break;
+    case'lead-again':leadSent=false;render();break;
+    case'startcat':if(D.cat!==el.dataset.k){D.cat=el.dataset.k;D.title=''}D.step=0;saveDraft();go('report');break;
+    case'copydoc-k':copy(docs(c)[el.dataset.k]);break;
+    case'opendoc':docTab[c.id]=el.dataset.k;openBox.add('docs');render();panel.querySelector('[data-box="docs"]')?.scrollIntoView({behavior:'smooth',block:'start'});break;
+    case'back-step':D.step=Math.max(0,D.step-1);saveDraft();render();panel.firstElementChild?.classList.add('enter');window.scrollTo(0,0);break;
+    case'reset-draft':D=blankDraft();draftPhoto=null;idb.del('draft');saveDraft();render();break;
+    case'gps':
+      if(!navigator.geolocation)return toast('This browser can’t share your location. Tap the map instead.');
+      toast('Finding you…');
+      navigator.geolocation.getCurrentPosition(p=>{setPin(p.coords.latitude,p.coords.longitude);map.flyTo({center:[p.coords.longitude,p.coords.latitude],zoom:17})},
+        ()=>toast('Location is blocked. Allow it in your browser, or tap the map.'),{enableHighAccuracy:true,timeout:12000});break;
+    case'pick':{const la=+el.dataset.la,ln=+el.dataset.ln;results=null;if(D.areaAuto||!D.area){D.area=el.dataset.name;D.areaAuto=false}setPin(la,ln,false);map.flyTo({center:[ln,la],zoom:17});break}
+    case'use-exif':setPin(D.exif.lat,D.exif.lng);map.flyTo({center:[D.exif.lng,D.exif.lat],zoom:17.5});break;
+    case'rm-photo':draftPhoto=null;D.hasPhoto=false;D.exif=null;idb.del('draft');saveDraft();render();break;
+    case'regen':D.textEdited=false;saveDraft();render();break;
+    case'copy-text':copy(D.text||complaintText({...D,createdAt:now()}));break;
+    case'save':await saveComplaint();break;
+    case'open':go('complaints',el.dataset.id);break;
+    case'back':go('complaints');break;
+    case'filter':filter=el.dataset.k;render();break;
+    case'hideex':S.list=S.list.filter(x=>!x.sample);S.showEx=false;save();render();renderMarkers();break;
+    case'doctab':docTab[c.id]=el.dataset.k;render();break;
+    case'copydoc':copy($('#d-doc').value);break;
+    case'printdoc':printText(`${DOCS.find(d=>d[0]===(docTab[c.id]||nextStep(c,stage(c)).doc||'complaint'))[1]} · ${c.id}`,$('#d-doc').value);break;
+    case'logsent':{const k=el.dataset.k;
+      if(k==='filed'){c.status='filed';c.filedAt=now();logEvent(c,'filed',`Filed with ${AG[CATS[c.cat].ag].short}${c.ref?` · ${c.ref}`:''}`)}
+      else if(k==='followup')logEvent(c,'followup','Sent a follow-up');
+      else if(k==='escalated'){c.status='escalated';logEvent(c,'escalated',`Escalated to ${AG[CATS[c.cat].ag].escHint}`)}
+      else if(k==='rti')logEvent(c,'rti','Filed an RTI application');
+      delete docTab[c.id];render();toast('Logged');break}
+    case'fixed':c.status='fixed';c.fixedAt=now();if(!c.filedAt)c.filedAt=c.createdAt;logEvent(c,'fixed',`Marked fixed after ${plural(days(c.filedAt,c.fixedAt),'day')}`);toast('Marked fixed');break;
+    case'reopen':c.status=c.filedAt?'filed':'draft';delete c.fixedAt;c.filedAt=c.filedAt&&now();logEvent(c,'reopened','Reopened: the problem came back. Fix window restarted.');break;
+    case'map':map.flyTo({center:[c.lng,c.lat],zoom:17,duration:1200});if(innerWidth<=860)window.scrollTo({top:0,behavior:'smooth'});break;
+    case'copylink':copy(neighbourText(c));break;
+    case'nshare':{const blob=c.hasPhoto?await idb.get(c.id):null,data={text:neighbourText(c)};
+      if(blob){const f=new File([blob],`${c.id}.jpg`,{type:'image/jpeg'});if(navigator.canShare?.({files:[f]}))data.files=[f]}
+      try{await navigator.share(data)}catch{}break}
+    case'del':pendingDel=c.id;render();break;
+    case'del-no':pendingDel=null;render();break;
+    case'del-yes':S.list=S.list.filter(x=>x.id!==c.id);idb.del(c.id);save();toast('Deleted');go('complaints');break;
+    case'export-json':download(`urboasis-backup-${new Date().toISOString().slice(0,10)}.json`,'application/json',JSON.stringify({app:'urboasis',v:1,exportedAt:new Date().toISOString(),list:S.list.filter(x=>!x.sample),profile:S.profile},null,2));break;
+    case'export-csv':{const q=v=>`"${String(v??'').replace(/"/g,'""')}"`;
+      const rows=[['id','title','category','agency','area','landmark','lat','lng','severity','status','complaint_no','created','filed','fixed','days_open']]
+        .concat(S.list.filter(x=>!x.sample).map(x=>[x.id,x.title,CATS[x.cat].n,AG[CATS[x.cat].ag].short,x.area,x.landmark,x.lat,x.lng,SEV[x.sev],STAGE[stage(x)].l,x.ref,fmtD(x.createdAt),x.filedAt?fmtD(x.filedAt):'',x.fixedAt?fmtD(x.fixedAt):'',days(x.filedAt||x.createdAt,x.fixedAt||now())]));
+      download('urboasis-complaints.csv','text/csv',rows.map(r=>r.map(q).join(',')).join('\n'));break}
+  }
+}
+function setPin(lat,lng,geo=true){
+  D.lat=lat;D.lng=lng;saveDraft();render();
+  if(geo)reverseGeo(lat,lng);
+}
+let geoT;
+function reverseGeo(lat,lng){
+  clearTimeout(geoT);
+  geoT=setTimeout(async()=>{
+    try{
+      const r=await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1&accept-language=en`);
+      const a=(await r.json()).address||{};
+      const area=[...new Set([a.road||a.pedestrian||a.footway,a.neighbourhood||a.quarter||a.suburb,a.suburb!==a.neighbourhood?a.suburb:null].filter(Boolean))].join(', ');
+      if(area&&(D.areaAuto||!D.area)&&D.lat===lat){D.area=area;D.areaAuto=true;saveDraft();const f=$('#f-area');if(f)f.value=area}
+    }catch{}
+  },700);
+}
+async function search(q){
+  lastQ=q;if(!q.trim())return;
+  try{
+    const r=await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&accept-language=en&countrycodes=in&bounded=1&viewbox=${BLR.w},${BLR.n},${BLR.e},${BLR.s}&q=${encodeURIComponent(q)}`);
+    results=(await r.json()).map(x=>({lat:x.lat,lon:x.lon,label:x.display_name.split(', ').slice(0,4).join(', '),name:x.display_name.split(', ').slice(0,2).join(', ')}));
+  }catch{results=[];toast('Search isn’t reachable right now. Tap the map instead.')}
+  render();
+}
+async function onPhoto(file){
+  if(!file)return;
+  const gps=await exifGPS(file).catch(()=>null);
+  draftPhoto=await shrink(file);
+  idb.set('draft',draftPhoto).catch(()=>{});
+  D.hasPhoto=true;D.exif=gps&&inBLR(gps.lat,gps.lng)?gps:null;saveDraft();render();
+  if(D.exif&&D.lat==null){setPin(D.exif.lat,D.exif.lng);map.flyTo({center:[D.exif.lng,D.exif.lat],zoom:17.5});toast('Pinned at the photo’s location')}
+}
+async function saveComplaint(){
+  const t=now(),a=AG[CATS[D.cat].ag],filed=!!(D.filed||D.ref.trim());
+  const c={id:newId(),cat:D.cat,title:D.title.trim(),desc:D.desc.trim(),sev:D.sev,lat:D.lat,lng:D.lng,area:D.area.trim(),landmark:D.landmark.trim(),
+    hasPhoto:!!draftPhoto,createdAt:t,filedAt:filed?t:null,ref:D.ref.trim(),status:filed?'filed':'draft',text:D.textEdited?D.text:'',
+    events:[{t,k:'created',x:D.cosign?'Reported in UrbOasis from a neighbour’s link':'Reported in UrbOasis'}]};
+  if(filed)c.events.push({t,k:'filed',x:`Filed with ${a.short}${c.ref?` · ${c.ref}`:''}`});
+  if(draftPhoto){try{await idb.set(c.id,draftPhoto)}catch{c.hasPhoto=false;toast('The photo couldn’t be stored on this device')}}
+  if(S.list.some(x=>x.sample)){S.list=S.list.filter(x=>!x.sample);S.showEx=false}
+  S.list.unshift(c);save();
+  D=blankDraft();draftPhoto=null;idb.del('draft');saveDraft();
+  toast(filed?`Saved. The ${CATS[c.cat].days}-day clock is running`:`Saved. Send it to ${AG[CATS[c.cat].ag].short} when you’re ready`);
+  go('complaints',c.id);
+}
+
+/* ============ Events ============ */
+document.addEventListener('click',e=>{
+  const g=e.target.closest('[data-go]');if(g){e.preventDefault();go(g.dataset.go,null,g.dataset.anchor);return}
+  const a=e.target.closest('[data-act]');if(a){e.preventDefault();act(a.dataset.act,a)}
+});
+panel.addEventListener('input',e=>{
+  const t=e.target,f=t.dataset.f;
+  if(f){D[f]=t.type==='checkbox'?t.checked:t.value;if(f==='text')D.textEdited=true;if(f==='area')D.areaAuto=false;saveDraft();err('')}
+  if(t.dataset.p){S.profile[t.dataset.p]=t.value;save()}
+});
+panel.addEventListener('change',e=>{
+  if(e.target.id==='f-photo')onPhoto(e.target.files[0]);
+  if(e.target.id==='f-import')importJSON(e.target.files[0]);
+});
+panel.addEventListener('submit',e=>{
+  e.preventDefault();const f=e.target.dataset.form,c=cur();
+  if(f==='search')search($('#f-search').value);
+  if(f==='ref'&&c){const v=$('#d-ref').value.trim();if(v===c.ref)return;c.ref=v;
+    if(v&&c.status==='draft'){c.status='filed';c.filedAt=now();logEvent(c,'filed',`Filed with ${AG[CATS[c.cat].ag].short} · ${v}`)}
+    else logEvent(c,'ref',v?`Complaint number set to ${v}`:'Complaint number removed');toast('Saved')}
+  if(f==='note'&&c){const v=$('#d-note').value.trim();if(v)logEvent(c,'note',v)}
+  if(f==='lead'){const v=id=>($('#'+id).value||'').trim();
+    if(['l-soc','l-area','l-name','l-contact'].some(i=>!v(i)))return toast('Fill in the society name, area, your name and a contact');
+    const text=`UrbOasis pilot request\nSociety: ${v('l-soc')}\nArea: ${v('l-area')}\nHomes: ${v('l-homes')||'not given'}\nName: ${v('l-name')} (${v('l-role')})\nContact: ${v('l-contact')}`;
+    if(LEAD.whatsapp)window.open(`https://wa.me/${LEAD.whatsapp}?text=${encodeURIComponent(text)}`,'_blank','noopener');
+    else if(LEAD.email)location.href=`mailto:${LEAD.email}?subject=${encodeURIComponent('UrbOasis pilot request: '+v('l-soc'))}&body=${encodeURIComponent(text)}`;
+    else copy(text);
+    leadSent=true;render();document.getElementById('join')?.scrollIntoView()}
+});
+panel.addEventListener('toggle',e=>{const d=e.target.dataset?.box;if(d)e.target.open?openBox.add(d):openBox.delete(d)},true);
+panel.addEventListener('mouseover',e=>{const c=e.target.closest('.ccard');if(c)markerEls[c.dataset.id]?.classList.add('hl')});
+panel.addEventListener('mouseout',e=>{const c=e.target.closest('.ccard');if(c&&!c.contains(e.relatedTarget))markerEls[c.dataset.id]?.classList.remove('hl')});
+async function importJSON(file){
+  if(!file)return;
+  try{const j=JSON.parse(await file.text());if(!Array.isArray(j.list))throw 0;
+    const have=new Set(S.list.map(x=>x.id));
+    const add=j.list.filter(x=>x&&x.id&&CATS[x.cat]&&isFinite(x.lat)&&isFinite(x.lng)&&Array.isArray(x.events)&&!have.has(x.id)).map(x=>({...x,hasPhoto:false,sample:false}));
+    S.list=S.list.filter(x=>!x.sample).concat(add);S.showEx=false;
+    if(j.profile&&!S.profile.name)S.profile=Object.assign(S.profile,j.profile);
+    save();render();toast(`Restored ${plural(add.length,'complaint')}`);
+  }catch{toast('That file isn’t an UrbOasis backup')}
+}
+
+/* ============ Map ============ */
+let map,markers=[],markerEls={},pinMk=null;
+const isDark=()=>{const t=document.documentElement.dataset.theme;return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches};
+const styleURL=()=>`https://tiles.openfreemap.org/styles/${isDark()?'dark':'positron'}`;
+function initMap(){
+  map=new maplibregl.Map({container:'map',style:styleURL(),center:[77.5946,12.9716],zoom:11.2,attributionControl:false,maxBounds:[[77.0,12.45],[78.2,13.5]]});
+  map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');
+  map.addControl(new maplibregl.NavigationControl({showCompass:false}),'top-right');
+  map.on('click',e=>{if(view==='report'&&D.step===1){setPin(e.lngLat.lat,e.lngLat.lng)}});
+  frameMap();renderMarkers();syncPin();
+}
+function frameMap(){
+  if(!map||!mapShown)return;
+  if(view==='report'){map.jumpTo(D.lat!=null?{center:[D.lng,D.lat],zoom:16.5}:{center:[77.5946,12.9716],zoom:11.5});return}
+  const c=detail&&cur();if(c){map.jumpTo({center:[c.lng,c.lat],zoom:16});return}
+  const L=S.list;if(!L.length){map.jumpTo({center:[77.5946,12.9716],zoom:11});return}
+  const b=new maplibregl.LngLatBounds();L.forEach(x=>b.extend([x.lng,x.lat]));map.fitBounds(b,{padding:50,maxZoom:15,duration:0});
+}
+function renderMarkers(){
+  if(!map)return;markers.forEach(m=>m.remove());markers=[];markerEls={};
+  S.list.forEach(c=>{
+    const el=document.createElement('button');const s=STAGE[stage(c)];
+    el.className=`mk t-${s.tone}${c.sample?' sample':''}${detail===c.id?' sel':''}`;el.type='button';
+    el.setAttribute('aria-label',`${c.title}, ${s.l}`);el.title=`${c.title} · ${s.l}`;
+    el.innerHTML=`<i class="fa-solid ${CATS[c.cat].ic}"></i>`;
+    markerEls[c.id]=el;
+    el.addEventListener('mouseenter',()=>panel.querySelector(`.ccard[data-id="${c.id}"]`)?.classList.add('hl'));
+    el.addEventListener('mouseleave',()=>panel.querySelector(`.ccard[data-id="${c.id}"]`)?.classList.remove('hl'));
+    el.addEventListener('click',ev=>{ev.stopPropagation();if(view==='report'&&D.step===1){setPin(c.lat,c.lng);return}go('complaints',c.id)});
+    markers.push(new maplibregl.Marker({element:el}).setLngLat([c.lng,c.lat]).addTo(map));
+  });
+}
+function syncPin(){
+  if(!map)return;
+  const show=view==='report'&&D.step>=1&&D.lat!=null;
+  if(!show){if(pinMk){pinMk.remove();pinMk=null}return}
+  if(!pinMk){const el=document.createElement('div');el.className='pinmk';el.setAttribute('aria-label','Problem location, drag to adjust');
+    pinMk=new maplibregl.Marker({element:el,draggable:true,anchor:'bottom'}).setLngLat([D.lng,D.lat]).addTo(map);
+    pinMk.on('dragend',()=>{const p=pinMk.getLngLat();setPin(p.lat,p.lng)})}
+  else pinMk.setLngLat([D.lng,D.lat]);
+  pinMk.setDraggable(D.step===1);
+}
+
+/* ============ Theme ============ */
+const savedTheme=LS.get('uo2-theme',null);if(savedTheme)document.documentElement.dataset.theme=savedTheme;
+$('#theme').addEventListener('click',()=>{const t=isDark()?'light':'dark';document.documentElement.dataset.theme=t;LS.set('uo2-theme',t);map&&map.setStyle(styleURL())});
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(!document.documentElement.dataset.theme&&map)map.setStyle(styleURL())});
+
+/* ============ Boot ============ */
+let routeAnchor=null;
+function route(){
+  const h=location.hash.slice(1);detail=null;routeAnchor=null;
+  if(h.startsWith('s=')){
+    try{const s=JSON.parse(b64u.dec(h.slice(2)));if(!CATS[s.c]||!isFinite(s.la)||!isFinite(s.ln))throw 0;
+      D=Object.assign(blankDraft(),{cat:s.c,title:String(s.t||'').slice(0,90),desc:String(s.d||''),area:String(s.a||''),landmark:String(s.l||''),lat:+s.la,lng:+s.ln,sev:SEV[s.s]?s.s:'hazard',areaAuto:false,cosign:true,step:2});
+      saveDraft();view='report';
+    }catch{toast('That shared link is damaged. Ask for it again.')}
+  }else if(h.startsWith('c-')){view='complaints';detail=h.slice(2)}
+  else if(h==='how'){view='home';routeAnchor='how'}
+  else if(h==='join'){view='societies';routeAnchor='join'}
+  else if(['home','report','complaints','guide','societies','monthly'].includes(h))view=h;
+}
+window.addEventListener('hashchange',()=>{route();go(view,detail,routeAnchor)});
+(async function boot(){
+  route();
+  if(D.hasPhoto)draftPhoto=await idb.get('draft');if(D.hasPhoto&&!draftPhoto)D.hasPhoto=false;
+  go(view,detail,routeAnchor);
+})();
+</script>
+</body>
+</html>
