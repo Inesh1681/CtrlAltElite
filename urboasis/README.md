@@ -22,6 +22,15 @@ when to follow up, when to escalate and when to file an RTI, with each document 
   [FIREBASE-SETUP.md](FIREBASE-SETUP.md). Until then it shows a labelled preview.
 - **Neighbour co-signing:** a share link (WhatsApp, native share with photo, or copy) opens the same
   complaint pre-filled so neighbours can file their own.
+- **City Console and Contractor app (prototype, sample data):** use **View as** in the header, or open
+  `#city` and `#contractor`. Reports of the same category within 50 m merge into one issue, scored 0-100
+  (severity, public demand, overdue, location risk, category risk) with weight sliders. Officials assign
+  the best-matched contractor; contractors accept, then prove the fix with before and after photos that
+  must be taken within 100 m. An issue is verified only when the city approves and a resident confirms
+  (or 72 hours pass with no dispute). "Not fixed" reopens it to the same contractor. State is in
+  `localStorage` (`uo-ops`, versioned) and syncs live across tabs. `index.html#demo` runs a 60-second
+  guided demo and restores your data afterwards. Not a live government system: every contractor, ward,
+  cost and seeded report is fictional.
 - **Private by design:** no account and no server. Data lives in `localStorage`, photos in IndexedDB,
   re-encoded so their location metadata is removed. JSON backup/restore and CSV export.
 

@@ -40,3 +40,10 @@ Not verified, so hidden. Fill in from an official source to switch on one-tap se
 - [ ] Create the Firebase project and paste its config into `const FIREBASE` (see FIREBASE-SETUP.md)
 - [ ] Publish `firestore.rules` and add `inesh1681.github.io` to Firebase authorized domains
 - [ ] Decide who moderates posts, and check the Firestore console regularly
+
+## City Console and Contractor app (prototype)
+- [ ] Everything here is sample data: contractors, ward numbers, wards per corporation, costs, location flags (school, hospital, main road, bus stop) and the seeded reports. Replace with real data only through a signed pilot
+- [ ] "Ward Engineer, Bengaluru South (demo)" is a demo profile, not a real post or person. Confirm the right title with a corporation before any pilot
+- [ ] Priority weights and band cut-offs (Critical 80+, High 60-79, Medium 40-59) are our proposal. Agree them with the city in a pilot
+- [ ] The 72-hour no-dispute rule, the 100 m photo radius and the 50 m merge radius are prototype choices
+- [ ] Shared state is per browser (localStorage). A real pilot needs a backend, accounts for officials and contractors, and an audit log

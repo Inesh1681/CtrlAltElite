@@ -227,7 +227,24 @@ footer .wrap{display:grid;gap:8px}
 .proof .card{display:grid;gap:4px}
 .proof b{font:800 34px/1.1 var(--f-body);font-variant-numeric:tabular-nums}
 .show-verify [data-verify]{outline:2px dashed #e0a100;outline-offset:2px}
+
+.loop{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;position:relative}
+.loop .card{display:grid;gap:10px;align-content:start;position:relative}
+.loop .who{display:flex;gap:12px;align-items:center}
+.loop .who i{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-ink);font-size:18px;flex:none}
+.loop .who small{display:block;font-size:13px;color:var(--muted)}
+.loop ol{margin:0;padding-left:20px;display:grid;gap:6px;font-size:15px;color:var(--muted)}
+.loop .tag{justify-self:start;font:700 11.5px var(--f-body);letter-spacing:.04em;text-transform:uppercase;padding:4px 8px;border-radius:6px;color:var(--wait);background:color-mix(in srgb,var(--wait) 14%,transparent)}
+.loop .tag.live{color:var(--go);background:color-mix(in srgb,var(--go) 14%,transparent)}
+.loopcta{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:24px}
+.loopcta .note{flex:1 1 280px}
+.tiers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:40px}
+.tiers .card{display:grid;gap:8px;align-content:start}
+.tiers .amt{font:800 24px/1.1 var(--f-body)}
+.tiers p{font-size:15px;color:var(--muted)}
+.tiers .card.future{border-style:dashed}
 @media (max-width:960px){
+  .loop,.tiers{grid-template-columns:1fr}
   .hero .grid,.funnel,.sim,.calc,.pitch .grid{grid-template-columns:minmax(0,1fr)}
   .sdgs,.pillars,.road,.kpis{grid-template-columns:1fr 1fr}
   .roots{grid-template-columns:1fr}
@@ -257,7 +274,7 @@ footer .wrap{display:grid;gap:8px}
     </div>
   </div>
   <nav class="secnav" aria-label="Sections"><div class="wrap">
-    <a href="#top">Overview</a><a href="#sdg">SDG alignment</a><a href="#problem">Problem</a><a href="#whynow">Why now</a><a href="#innovation">Innovation</a><a href="#competition">Competition</a><a href="#feasibility">Feasibility</a><a href="#roadmap">Roadmap</a><a href="#pitch">Pitch</a>
+    <a href="#top">Overview</a><a href="#sdg">SDG alignment</a><a href="#problem">Problem</a><a href="#whynow">Why now</a><a href="#loop">Three users</a><a href="#innovation">Innovation</a><a href="#competition">Competition</a><a href="#feasibility">Feasibility</a><a href="#roadmap">Roadmap</a><a href="#pitch">Pitch</a>
   </div></nav>
   <div class="progress" id="progress"></div>
 </header>
@@ -271,7 +288,7 @@ footer .wrap{display:grid;gap:8px}
       <h1>Getting a complaint filed is easy. Getting it fixed is the hard part.</h1>
       <p class="lede">UrbOasis is the follow-through layer for civic complaints. It routes each problem to the right department and city corporation, sends the complaint in one tap through the department’s official channel, and chases it with follow-ups, escalation letters and RTI applications until it’s fixed.</p>
       <p class="oneliner">You report it once. UrbOasis routes it, sends it and chases it until it’s fixed.</p>
-      <div class="row"><a class="btn primary" href="index.html#report"><i class="fa-solid fa-play"></i>Try a report (2 min)</a><a class="btn" href="#pitch">Jump to the pitch</a></div>
+      <div class="row"><a class="btn primary" href="index.html#report"><i class="fa-solid fa-play"></i>Try a report (2 min)</a><a class="btn" href="index.html#demo"><i class="fa-solid fa-circle-play"></i>Run the 60-second demo</a><a class="btn" href="#pitch">Jump to the pitch</a></div>
     </div>
     <div class="stack">
       <div class="facts">
@@ -314,6 +331,22 @@ footer .wrap{display:grid;gap:8px}
     <div class="card"><i class="fa-solid fa-circle-question"></i><h3>Residents don’t know who owns their street</h3><p>New boundaries and new offices mean more complaints at the wrong desk. UrbOasis suggests the likely corporation from the pin and addresses letters to it.</p></div>
     <div class="card" data-verify><i class="fa-solid fa-check-to-slot"></i><h3>Corporation elections are due</h3><p>Elections to the new city corporations are due by December 2026. Ward-level evidence of what gets fixed, and how fast, will matter to residents and candidates.</p><!-- TODO-VERIFY: election timeline --></div>
   </div>
+</div></section>
+
+<!-- ============ ONE LOOP, THREE USERS ============ -->
+<section id="loop"><div class="wrap">
+  <div class="shead"><p class="eyebrow">One loop, three users</p><h2>From “that’s broken” to “verified fixed”, with everyone who touches the problem</h2>
+    <p>Residents report. The city sees one ranked queue instead of a pile of duplicates. Contractors prove the fix on site. The resident has the final say.</p></div>
+  <div class="loop">
+    <div class="card"><span class="tag live">Live today</span><div class="who"><i class="fa-solid fa-user" aria-hidden="true"></i><div><h3>Resident</h3><small>Free, no account</small></div></div>
+      <ol><li>Reports in about two minutes, with the exact spot and a photo</li><li>Sends it through the department’s official channel in one tap</li><li>Confirms the fix, or reopens it in one tap</li></ol></div>
+    <div class="card"><span class="tag">Prototype · sample data</span><div class="who"><i class="fa-solid fa-building-columns" aria-hidden="true"></i><div><h3>City official</h3><small>City Console</small></div></div>
+      <ol><li>Reports of the same problem within 50 m merge into one issue</li><li>A 0–100 priority score from severity, public demand, overdue days, location risk and category, with weights the city controls</li><li>Assigns the best-matched contractor and approves the photos</li></ol></div>
+    <div class="card"><span class="tag">Prototype · sample data</span><div class="who"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i><div><h3>Contractor</h3><small>Mobile app</small></div></div>
+      <ol><li>Accepts or declines jobs with a reason</li><li>Before and after photos must be taken within 100 m of the site</li><li>A job is verified only when the city approves and a resident confirms, or 72 hours pass with no dispute</li></ol></div>
+  </div>
+  <div class="loopcta"><a class="btn primary" href="index.html#demo"><i class="fa-solid fa-play"></i>Run the 60-second demo</a><a class="btn" href="index.html#city"><i class="fa-solid fa-building-columns"></i>Open the City Console</a><a class="btn" href="index.html#contractor"><i class="fa-solid fa-helmet-safety"></i>Open the Contractor app</a>
+    <p class="note">The City Console and Contractor app are a prototype on sample data, with fictional contractors and wards. No city corporation uses them today.</p></div>
 </div></section>
 
 <!-- ============ INNOVATION ============ -->
@@ -378,6 +411,11 @@ footer .wrap{display:grid;gap:8px}
     <div class="card"><span class="status next">Next</span><h3>Directory upkeep</h3><p>A monthly check of each department’s published channels as GBA restructures. Unverified channels stay hidden. One person-hour a month.</p></div>
   </div>
   <div class="panel" data-panel="fin" hidden>
+    <div class="tiers" style="margin-top:0;grid-column:1/-1">
+      <div class="card"><span class="status done">Live</span><h3>Residents</h3><p class="amt">Free</p><p>Reporting, sending, follow-ups and the community board. Free forever: residents drive adoption and the data.</p></div>
+      <div class="card"><span class="status next">Pilot</span><h3>Housing societies and RWAs</h3><p class="amt">₹999<small style="font-size:15px;font-weight:500"> / month, proposed</small></p><p>Free 3-month pilot first. Shared board, monthly report and follow-up on every open complaint.</p></div>
+      <div class="card future"><span class="status next">Future</span><h3>City corporations (B2G)</h3><p class="amt">Pilot pricing</p><p>The City Console and Contractor app for one ward or zone, priced per pilot. No government contract or partnership exists today.</p></div>
+    </div>
     <div class="calc card">
       <div class="controls">
         <div><h3>Revenue calculator</h3><p class="muted" style="font-size:15px;margin-top:4px">Residents use UrbOasis free. Revenue comes only from housing societies and RWAs. Drag to test the assumptions.</p></div>
@@ -412,11 +450,13 @@ footer .wrap{display:grid;gap:8px}
     <li><span class="when">Months 3–6</span><h3>Shared boards</h3><ul><li>Accounts and society boards</li><li>WhatsApp reminders</li><li>First paid societies</li></ul></li>
     <li><span class="when">Months 6–12</span><h3>Scorecards</h3><ul><li>Ward and department fix-time scorecards</li><li>Full Kannada interface</li><li>RWA federations</li></ul></li>
   </ol>
-  <div class="kpis">
-    <div class="card"><b>Time to fix</b><p>Median days from filing to fixed, compared with each society’s past experience.</p></div>
-    <div class="card"><b>Escalation success</b><p>Share of overdue complaints fixed after a follow-up or escalation letter.</p></div>
-    <div class="card"><b>Societies active</b><p>Societies that log at least one complaint a month.</p></div>
-    <div class="card"><b>Homes covered</b><p>Residents whose surroundings are tracked through a society board.</p></div>
+  <p class="note" style="margin-top:14px"><i class="fa-solid fa-flask" aria-hidden="true"></i> After that, if a city corporation agrees: a B2G pilot of the City Console and Contractor app in one ward. Today they are a prototype on sample data.</p>
+  <h3 style="margin-top:36px">Pilot impact metrics</h3><p class="note" style="margin-top:6px">What a pilot will measure. There are no results yet, so no numbers are shown.</p>
+  <div class="kpis" style="margin-top:14px">
+    <div class="card"><b>Median days to fix</b><p>From the first report to verified fixed, compared with the same ward before the pilot.</p></div>
+    <div class="card"><b>SLA compliance</b><p>Share of issues fixed by the date the city set when it assigned them.</p></div>
+    <div class="card"><b>Reopen rate</b><p>Share of “fixed” issues that a resident reopens because the fix didn’t hold.</p></div>
+    <div class="card"><b>Duplicates merged</b><p>Repeat reports of the same problem folded into one issue, so crews aren’t sent twice.</p></div>
   </div>
 </div></section>
 
@@ -437,7 +477,7 @@ footer .wrap{display:grid;gap:8px}
         <div><dt>Problem</dt><dd>Complaints reach the wrong department and nobody follows up, so they quietly die.</dd></div>
         <div><dt>Solution</dt><dd>Automatic routing, one-tap sending through each department’s official channel, and a follow-up, escalation and RTI engine that chases it.</dd></div>
         <div><dt>Customer</dt><dd>Residents, who report and vote, and the housing societies and RWAs that chase civic problems every month.</dd></div>
-        <div><dt>Model</dt><dd>Free for residents (drives adoption and data). Societies and RWAs pay: a free 3-month pilot, then ₹999 per society per month, or custom pricing for federations.</dd></div>
+        <div><dt>Model</dt><dd>Free for residents (drives adoption and data). Societies and RWAs pay: a free 3-month pilot, then ₹999 per society per month, or custom pricing for federations. Later, a B2G pilot tier for city corporations (City Console and Contractor app), priced per pilot.</dd></div>
         <div><dt>Edge</dt><dd>Built for follow-through rather than filing. Once society boards launch, pooled fix times by ward and department become evidence that is hard to get today.</dd></div>
         <div><dt>Impact</dt><dd>SDG 11 and 16: safer streets, basic services that work, and more accountable local government.</dd></div>
       </dl>
@@ -524,6 +564,8 @@ const CMP=[
   ['One-tap RTI application','n','n','n','y'],
   ['Reports for housing societies','n','n','p','y'],
   ['Works without an account','n','n','n','y'],
+  ['Merges duplicate reports and ranks them by risk (prototype)','n','n','p','y'],
+  ['Fix proven with on-site before and after photos (prototype)','n','n','n','y'],
 ];
 const ic={y:'<i class="fa-solid fa-circle-check y" aria-label="Yes"></i>',p:'<i class="fa-solid fa-circle-half-stroke p" aria-label="Partly"></i>',n:'<i class="fa-regular fa-circle n" aria-label="No"></i>'};
 $('#cmp').innerHTML=CMP.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map((v,i)=>`<td class="${i===3?'us':''}">${ic[v]}</td>`).join('')}</tr>`).join('');

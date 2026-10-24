@@ -38,6 +38,7 @@
   --nav-h:64px;
   --map-bg:#eef2f8; --map-chip:#ffffff; --map-ink:#1b2236; --map-edge:rgba(30,40,80,.12);
   --mk-act:#c2620a; --mk-wait:#0e7490; --mk-fixed:#047857; --mk-cluster:#7c3aed;
+  --b-crit:#d61f45; --b-high:#d9480f; --b-med:#a16207; --b-low:#2563eb;
   color-scheme:light;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
@@ -45,13 +46,13 @@
   --accent:#4fc69b; --accent-ink:#86dcbc; --accent-soft:#16302a; --on-accent:#0b120f;
   --st-wait:#e8b25c; --st-act:#94b3ff; --st-over:#f49a85; --st-fixed:#66d09b; --on-tone:#0f1312; --focus:#86a8ff;
   --sh-1:0 1px 2px rgba(0,0,0,.35); --sh-2:0 12px 32px rgba(0,0,0,.4); color-scheme:dark;
-  --map-bg:#0a0f1f; --map-chip:#0d1426; --map-ink:#e3e8ff; --map-edge:rgba(255,255,255,.14); --map-attrib-filter:invert(1); --mk-act:#fbbf24; --mk-wait:#22d3ee; --mk-fixed:#34d399; --mk-cluster:#c084fc}}
+  --map-bg:#0a0f1f; --map-chip:#0d1426; --map-ink:#e3e8ff; --map-edge:rgba(255,255,255,.14); --map-attrib-filter:invert(1); --mk-act:#fbbf24; --mk-wait:#22d3ee; --mk-fixed:#34d399; --mk-cluster:#c084fc; --b-crit:#fb7185; --b-high:#fb923c; --b-med:#facc15; --b-low:#60a5fa}}
 :root[data-theme="dark"]{
   --bg:#0f1312; --surface:#161b19; --field:#121615; --ink:#e6ebe8; --muted:#a0aaa5; --line:#2a322f; --hover:#1e2522;
   --accent:#4fc69b; --accent-ink:#86dcbc; --accent-soft:#16302a; --on-accent:#0b120f;
   --st-wait:#e8b25c; --st-act:#94b3ff; --st-over:#f49a85; --st-fixed:#66d09b; --on-tone:#0f1312; --focus:#86a8ff;
   --sh-1:0 1px 2px rgba(0,0,0,.35); --sh-2:0 12px 32px rgba(0,0,0,.4); color-scheme:dark;
-  --map-bg:#0a0f1f; --map-chip:#0d1426; --map-ink:#e3e8ff; --map-edge:rgba(255,255,255,.14); --map-attrib-filter:invert(1); --mk-act:#fbbf24; --mk-wait:#22d3ee; --mk-fixed:#34d399; --mk-cluster:#c084fc}
+  --map-bg:#0a0f1f; --map-chip:#0d1426; --map-ink:#e3e8ff; --map-edge:rgba(255,255,255,.14); --map-attrib-filter:invert(1); --mk-act:#fbbf24; --mk-wait:#22d3ee; --mk-fixed:#34d399; --mk-cluster:#c084fc; --b-crit:#fb7185; --b-high:#fb923c; --b-med:#facc15; --b-low:#60a5fa}
 
 *{box-sizing:border-box}
 html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + var(--s4));overflow-x:clip}
@@ -526,7 +527,248 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
   .whatnext li::after{left:calc(76px + var(--s3) + 6.5px)}
   .track li{font-size:11.5px}
 }
-@media (prefers-reduced-motion:reduce){.mk .ring{display:none}*{transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}html{scroll-behavior:auto}.skel{animation:none}}
+
+/* ---------- role switcher ---------- */
+.rolewrap{position:relative;flex:none}
+.rolebtn{appearance:none;display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--surface);font:650 var(--fs-sm) var(--f-body);color:var(--ink);cursor:pointer;white-space:nowrap}
+.rolebtn:hover{background:var(--hover)}
+.rolebtn .cv{font-size:10px;color:var(--muted)}
+.rolebtn[data-role="city"]{border-color:color-mix(in srgb,var(--st-act) 45%,var(--line));color:var(--st-act)}
+.rolebtn[data-role="contractor"]{border-color:color-mix(in srgb,var(--st-wait) 45%,var(--line));color:var(--st-wait)}
+.rolemenu{position:absolute;right:0;top:calc(100% + 8px);z-index:45;width:min(340px,calc(100vw - 24px));background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-2);padding:var(--s3);display:grid;gap:4px}
+.rolemenu .eyebrow{padding:4px 8px 2px}
+.rolemenu hr{border:0;border-top:1px solid var(--line);margin:6px 0}
+.rolemenu .hint{padding:4px 8px 2px;font-size:var(--fs-xs)}
+.ropt{appearance:none;display:grid;grid-template-columns:36px 1fr auto;gap:10px;align-items:center;text-align:left;width:100%;min-height:52px;padding:8px;border:0;border-radius:var(--r-md);background:transparent;cursor:pointer}
+.ropt:hover,.ropt[aria-pressed="true"]{background:var(--hover)}
+.ropt b{display:block;font-size:15px}
+.ropt small{display:block;font-size:var(--fs-xs);color:var(--muted);line-height:1.35}
+.ropt>i{color:var(--accent)}
+.ropt.act{grid-template-columns:36px 1fr}
+.av{width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-ink);flex:none;font-size:16px}
+.av.sm{width:34px;height:34px;font-size:13px;font-weight:700}
+
+/* ---------- shared ops chrome ---------- */
+.wrap.wide{max-width:1680px}
+.grow{flex:1 1 auto}
+.protobar{display:flex;flex-wrap:wrap;gap:var(--s2) var(--s3);align-items:center;margin-top:var(--s4);padding:10px 14px;border-radius:var(--r-md);font-size:var(--fs-sm);
+  background:color-mix(in srgb,var(--st-wait) 11%,var(--surface));border:1px solid color-mix(in srgb,var(--st-wait) 32%,transparent)}
+.protobar>i{color:var(--st-wait)}
+.protobar>span:first-of-type{flex:1 1 220px}
+.protobar .sync{font-weight:650;color:var(--st-fixed);display:inline-flex;gap:6px;align-items:center}
+.protobar .btn{min-height:38px}
+.ex.sm{font-size:10px}
+.tag.flag{color:var(--st-over);background:color-mix(in srgb,var(--st-over) 13%,transparent);display:inline-flex;gap:5px;align-items:center}
+.stt{color:var(--tone);font-weight:650}
+.synced{animation:synced 1.6s ease-out}
+@keyframes synced{0%,30%{box-shadow:0 0 0 2px var(--accent),0 0 18px color-mix(in srgb,var(--accent) 40%,transparent)}100%{box-shadow:0 0 0 0 transparent}}
+input[type="date"],input[type="number"]{font:400 16px var(--f-body);min-height:48px;padding:var(--s3) 14px;border:1px solid var(--line);border-radius:var(--r-md);background:var(--field);color:var(--ink);width:100%;min-width:0}
+/* priority bands */
+.b-critical{--band:var(--b-crit)} .b-high{--band:var(--b-high)} .b-medium{--band:var(--b-med)} .b-low{--band:var(--b-low)}
+.bchip{display:inline-flex;align-items:center;gap:6px;font:700 12.5px/1 var(--f-body);padding:5px 10px 5px 5px;border-radius:999px;color:var(--band);background:color-mix(in srgb,var(--band) 14%,transparent);white-space:nowrap}
+.bchip b{background:var(--band);color:#fff;border-radius:999px;padding:3px 7px;font-size:12px}
+.sc{display:grid;gap:5px;min-width:0}
+.scn{display:flex;align-items:baseline;gap:6px}
+.scn b{font-size:17px;color:var(--band)}
+.scn small{font-size:12px;font-weight:650;color:var(--band)}
+.sbar{display:flex;height:6px;border-radius:3px;overflow:hidden;background:var(--hover);width:100%}
+.sbar i{display:block;height:100%;transition:width .4s ease}
+.mk.b-critical{--mc:var(--b-crit)}.mk.b-high{--mc:var(--b-high)}.mk.b-medium{--mc:var(--b-med)}.mk.b-low{--mc:var(--b-low)}
+.mk .mono{font-weight:700}
+
+/* ---------- City Console ---------- */
+.ops{padding-bottom:var(--s8)}
+.ohead{display:flex;justify-content:space-between;align-items:flex-end;gap:var(--s5);flex-wrap:wrap;padding:var(--s5) 0 var(--s4)}
+.ohead h1{font-size:var(--fs-2xl)}
+.who{display:flex;gap:var(--s3);align-items:center;padding:8px 16px 8px 8px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.who b{display:block;font-size:var(--fs-sm)}
+.who small{display:block;font-size:var(--fs-xs);color:var(--muted)}
+.otools{padding-bottom:var(--s4)}
+.otools .btn{min-height:40px}
+.okpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:var(--s3);margin-bottom:var(--s5)}
+.okpi{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s4);display:grid;gap:6px;transition:box-shadow .3s,border-color .3s}
+.okpi small{font-size:var(--fs-xs);font-weight:650;color:var(--muted);display:flex;gap:7px;align-items:center}
+.okpi b{font-size:30px;line-height:1;font-weight:750;letter-spacing:-.02em}
+.okpi.crit b{color:var(--b-crit)} .okpi.over b{color:var(--st-over)}
+.okpi.bump{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 20%,transparent)}
+.ogrid{display:grid;grid-template-columns:minmax(320px,380px) minmax(0,1fr);gap:var(--s5);align-items:start}
+.oside{position:sticky;top:calc(var(--nav-h) + var(--s4));display:grid;gap:var(--s5)}
+.ocard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s4) var(--s5);display:grid;gap:var(--s3);min-width:0}
+.ocardh{display:flex;justify-content:space-between;align-items:center;gap:var(--s3);flex-wrap:wrap}
+.ocardh h2{font-size:var(--fs-lg)}
+.chip.sm{min-height:36px;font-size:13px;padding:0 12px}
+.mapslot.ops-map{height:380px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:var(--fs-xs);font-weight:600}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:10px;height:10px;border-radius:50%;background:var(--band);box-shadow:0 0 6px var(--band)}
+.wlist{display:grid;gap:var(--s2)}
+.wrow{display:grid;grid-template-columns:minmax(0,1fr) 120px 44px;gap:var(--s3);align-items:center}
+.wrow label{display:flex;gap:8px;align-items:center;font-weight:650;font-size:var(--fs-sm);flex-wrap:wrap}
+.wrow label i{width:10px;height:10px;border-radius:3px;flex:none}
+.wrow label small{font-weight:400;color:var(--muted);font-size:12px}
+.wrow input{width:100%;accent-color:var(--accent);min-height:32px}
+.wrow output{font-size:var(--fs-sm);text-align:right}
+.ofilters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--s2)}
+.ofl{display:grid;gap:4px;font-size:12px;font-weight:650;color:var(--muted);min-width:0}
+.ofl select{min-height:40px;padding:6px 10px;font-size:14px}
+.bulk{display:flex;gap:var(--s3);align-items:center;flex-wrap:wrap;padding:8px 12px;border-radius:var(--r-md);background:var(--accent-soft)}
+.bulk .btn{min-height:38px}
+.qhead,.qrow{display:grid;grid-template-columns:24px 34px minmax(0,1fr) 48px 112px 44px 122px;gap:10px;align-items:center}
+.qhead{font-size:12px;font-weight:650;color:var(--muted);padding:0 12px 6px;border-bottom:1px solid var(--line)}
+.qsort{appearance:none;border:0;background:none;padding:6px 0;min-height:32px;font:inherit;color:inherit;cursor:pointer;text-align:left;display:inline-flex;gap:5px;align-items:center}
+.qsort[aria-pressed="true"]{color:var(--ink)}
+.qlist{list-style:none;margin:0;padding:0;display:grid;gap:4px}
+.qrow{position:relative;padding:8px 12px;border-radius:var(--r-md);border:1px solid transparent;background:var(--surface);transition:background .15s,border-color .15s}
+.qrow:hover,.qrow.hl{background:var(--hover)}
+.qrow.on{border-color:var(--accent);background:var(--accent-soft)}
+.qrow.fixed{opacity:.72}
+.qpick input{width:20px;height:20px;accent-color:var(--accent);margin:0}
+.qrank{font-size:var(--fs-sm);font-weight:600;color:var(--muted)}
+.qmain{appearance:none;border:0;background:none;text-align:left;padding:4px 0;cursor:pointer;display:grid;gap:2px;min-width:0;min-height:44px}
+.qmain b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qmain small{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qmain small i{margin-right:5px}
+.qmain::after{content:"";position:absolute;inset:0}
+.qpick,.qmain .ex{position:relative;z-index:1}
+.qrep{font-size:var(--fs-sm);display:inline-flex;gap:6px;align-items:center;color:var(--muted)}
+.qdays{font-size:var(--fs-sm);color:var(--muted)}
+.qsla{font-size:12.5px;font-weight:650;color:var(--tone)}
+.ogrid2{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:var(--s5);margin-top:var(--s5);align-items:start}
+.otable{width:100%;border-collapse:collapse;font-size:var(--fs-sm)}
+.otable th{text-align:left;font-size:12px;font-weight:650;color:var(--muted);padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;background:var(--surface)}
+.otable td{padding:9px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.otable td small{display:block;font-size:12px;color:var(--muted)}
+.otable td .tag{margin-top:4px}
+.otable .bad{color:var(--st-over);font-weight:700}
+.otable .warn{color:var(--st-wait);font-weight:700}
+.otable tr.flagged td{background:color-mix(in srgb,var(--st-over) 5%,transparent)}
+.wardscroll{max-height:420px;overflow:auto}
+/* drawer */
+.drawer{position:fixed;top:calc(var(--nav-h) + env(safe-area-inset-top,0px));right:0;bottom:0;z-index:28;width:min(480px,100vw);background:var(--surface);border-left:1px solid var(--line);box-shadow:-18px 0 40px rgba(0,0,0,.14);display:grid;grid-template-rows:auto 1fr;overscroll-behavior:contain}
+.drh{display:flex;justify-content:space-between;align-items:center;gap:var(--s3);padding:var(--s3) var(--s3) var(--s3) var(--s5);border-bottom:1px solid var(--line)}
+.drb{overflow:auto;padding:var(--s4) var(--s5) var(--s7);display:grid;gap:var(--s4);align-content:start}
+.drb h2{font-size:var(--fs-xl)}
+.flags{display:flex;flex-wrap:wrap;gap:6px}
+.flags span{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;font-weight:650;padding:4px 10px;border-radius:999px;background:var(--hover)}
+.flags i{color:var(--accent-ink)}
+.why{display:grid;grid-template-columns:auto 1fr;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--r-md);background:var(--accent-soft)}
+.why>i{color:var(--accent-ink);margin-top:4px}
+.why b{font-size:var(--fs-sm)}
+.why p{font-size:var(--fs-sm)}
+.bks{display:flex;flex-wrap:wrap;gap:6px}
+.bk{display:inline-flex;gap:7px;align-items:center;font-size:12.5px;padding:5px 10px;border-radius:999px;border:1px solid var(--line)}
+.bk i{width:9px;height:9px;border-radius:3px}
+.bk b{font-size:12px}
+.dact{display:grid;gap:var(--s3);padding:var(--s4);border:1px solid var(--line);border-radius:var(--r-lg)}
+.dact p{font-size:var(--fs-sm)}
+.dact .facts{margin:0}
+.dphoto{margin:0;display:grid;gap:6px}
+.dphoto img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:var(--r-md);background:var(--hover)}
+.dphoto figcaption{font-size:var(--fs-xs);color:var(--muted)}
+.reps{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.reps li{display:flex;gap:var(--s3);align-items:center}
+.reps b{display:block;font-size:var(--fs-sm)}
+.reps small{display:block;font-size:12px;color:var(--muted)}
+/* before/after slider */
+.ba{position:relative;border-radius:var(--r-md);overflow:hidden;aspect-ratio:4/3;background:var(--hover);user-select:none}
+.ba img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ba .bef{clip-path:inset(0 calc(100% - var(--p)) 0 0)}
+.ba::after{content:"";position:absolute;top:0;bottom:0;left:var(--p);width:2px;margin-left:-1px;background:#fff;box-shadow:0 0 8px rgba(0,0,0,.5);pointer-events:none}
+.bah{position:absolute;top:50%;left:var(--p);width:36px;height:36px;margin:-18px 0 0 -18px;border-radius:50%;background:#fff;color:#111;display:grid;place-items:center;z-index:2;pointer-events:none;box-shadow:0 2px 8px rgba(0,0,0,.4)}
+.bal{position:absolute;bottom:10px;z-index:2;font:700 11.5px var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:#fff;background:rgba(0,0,0,.55);padding:4px 8px;border-radius:6px;pointer-events:none}
+.bal.bl{left:10px}.bal.br{right:10px}
+.ba-r{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize;z-index:3}
+.ba:has(.ba-r:focus-visible){outline:3px solid var(--focus);outline-offset:2px}
+/* assign modal */
+.bestpick{display:grid;grid-template-columns:auto 1fr;gap:var(--s3);padding:var(--s3) var(--s4);border-radius:var(--r-md);background:var(--accent-soft)}
+.bestpick>i{color:var(--accent-ink);margin-top:4px}
+.bestpick p{font-size:var(--fs-sm);color:var(--muted)}
+.kpick{border:0;margin:0;padding:0;display:grid;gap:6px;max-height:300px;overflow:auto}
+.kpick legend{font-weight:650;font-size:15px;margin-bottom:6px;padding:0}
+.kopt{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:var(--s3);align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:var(--r-md);cursor:pointer}
+.kopt:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}
+.kopt input{width:18px;height:18px;accent-color:var(--accent);margin:0}
+.km b{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:15px}
+.km small{display:block;font-size:12px;color:var(--muted);line-height:1.4}
+.kscore{font-weight:700;font-size:var(--fs-sm);color:var(--muted)}
+
+/* ---------- Contractor app (mobile first) ---------- */
+.capp{max-width:560px;display:grid;gap:var(--s4);padding-bottom:var(--s8)}
+.kprof{display:flex;flex-wrap:wrap;gap:var(--s3);align-items:center;padding:var(--s3);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface)}
+.kprof b{display:block;font-size:var(--fs-md)}
+.kprof small{display:block;font-size:12.5px;color:var(--muted)}
+.ksel{width:auto;flex:1 1 100%;min-height:44px;font-size:14px}
+.ktabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;padding:4px;border-radius:var(--r-lg);background:var(--hover)}
+.ktabs button{appearance:none;border:0;background:transparent;border-radius:var(--r-md);min-height:56px;padding:6px 4px;display:grid;justify-items:center;gap:2px;cursor:pointer;font:650 12.5px/1.2 var(--f-body);color:var(--muted);text-align:center}
+.ktabs button small{display:block;font-weight:400;font-size:10.5px}
+.ktabs button b{font-size:13px;min-width:22px;padding:1px 6px;border-radius:999px;background:var(--surface)}
+.ktabs button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--sh-1)}
+.ktabs button[aria-selected="true"] b{background:var(--accent);color:var(--on-accent)}
+.jlist{display:grid;gap:var(--s3)}
+.jcard{appearance:none;text-align:left;display:grid;gap:6px;padding:var(--s4);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);cursor:pointer;font:inherit;color:inherit;width:100%}
+.jcard:hover,.jcard.hl{border-color:var(--accent)}
+.jcard>b{font-size:16.5px;line-height:1.3}
+.jcard>small{font-size:var(--fs-sm);color:var(--muted)}
+.jtop{display:flex;justify-content:space-between;gap:var(--s2);align-items:center;flex-wrap:wrap}
+.jsla{font-size:12.5px;font-weight:700;color:var(--tone);display:inline-flex;gap:6px;align-items:center}
+.jmeta{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted)}
+.jmeta span{display:inline-flex;gap:6px;align-items:center}
+.jh{font-size:var(--fs-2xl)}
+.jfacts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:var(--r-md);overflow:hidden}
+.jfacts div{background:var(--surface);padding:10px 12px;display:grid;gap:2px}
+.jfacts small{font-size:12px;color:var(--muted)}
+.jfacts b{font-size:15px;color:var(--tone,var(--ink))}
+.jact{display:grid;gap:var(--s3);padding:var(--s4);border-radius:var(--r-lg);border:1.5px solid var(--accent);background:color-mix(in srgb,var(--accent) 5%,var(--surface))}
+.jact .row .btn.grow{flex:1}
+.proofbox{display:grid;gap:var(--s3);padding:var(--s3);border:1px dashed var(--line);border-radius:var(--r-md);background:var(--surface)}
+.proofbox.ok{border-style:solid}
+.proofh b{display:flex;gap:8px;align-items:center;font-size:15px}
+.proofh b i{color:var(--st-fixed)}
+.proofh small{display:block;font-size:12.5px;color:var(--muted)}
+.req{font:700 10.5px var(--f-body);letter-spacing:.05em;text-transform:uppercase;color:var(--st-over);background:color-mix(in srgb,var(--st-over) 12%,transparent);padding:3px 6px;border-radius:5px}
+.pf{margin:0;display:grid;gap:6px}
+.pf img{width:100%;max-height:220px;object-fit:cover;border-radius:var(--r-md)}
+.pf figcaption{font-size:12px;color:var(--muted);display:flex;gap:6px;align-items:baseline}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+
+/* ---------- citizen: city progress ---------- */
+.citybox{display:grid;gap:var(--s3);padding:var(--s5);border-radius:var(--r-xl);border:1.5px solid var(--st-act);background:color-mix(in srgb,var(--st-act) 6%,var(--surface))}
+.citybox h2{font-size:var(--fs-xl)}
+.citybox .eyebrow{display:flex;gap:8px;align-items:center;color:var(--st-act)}
+.cbsteps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;font-size:12.5px;font-weight:650;color:var(--muted)}
+.cbsteps li{display:grid;gap:6px}
+.cbsteps li::before{content:"";height:5px;border-radius:3px;background:var(--line)}
+.cbsteps li.done{color:var(--ink)}
+.cbsteps li.done::before{background:var(--st-fixed)}
+
+/* ---------- guided demo ---------- */
+.dm-spot{position:fixed;z-index:70;border-radius:14px;pointer-events:none;box-shadow:0 0 0 3px var(--accent),0 0 0 9999px rgba(5,8,12,.55);transition:left .35s ease,top .35s ease,width .35s ease,height .35s ease}
+.dm-cap{position:fixed;z-index:71;left:50%;bottom:calc(16px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(620px,calc(100vw - 24px));background:var(--surface);border-radius:var(--r-xl);box-shadow:var(--sh-2);padding:var(--s4) var(--s5);display:grid;gap:var(--s3);border:1px solid var(--line)}
+.dm-cap h2{font-size:var(--fs-lg)}
+.dm-cap .dmtext p:last-child{font-size:var(--fs-sm);color:var(--muted)}
+.dm-cap .dmtext{display:grid;gap:4px}
+.dm-bar{height:4px;border-radius:2px;background:var(--hover);overflow:hidden}
+.dm-bar span{display:block;height:100%;background:var(--accent);transform-origin:left;transform:scaleX(0)}
+.dm-ctl .btn{min-height:40px}
+body.demo-on .bottombar{display:none}
+body.demo-on .toasts{bottom:200px}
+
+@media (min-width:1600px){.ogrid{grid-template-columns:minmax(380px,460px) minmax(0,1fr)}}
+@media (max-width:1100px){.okpis{grid-template-columns:repeat(3,minmax(0,1fr))}.ofilters{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:1100px){.ogrid,.ogrid2{grid-template-columns:minmax(0,1fr)}.oside{position:static}}
+@media (max-width:760px){
+  .qhead{display:none}
+  .qrow{grid-template-columns:24px minmax(0,1fr) auto;grid-template-areas:"p m s" "p r d";row-gap:4px}
+  .qpick{grid-area:p}.qrank{display:none}.qmain{grid-area:m}.qrow .sc{grid-area:s;width:96px}.qrep{grid-area:r;padding-left:0}.qdays{display:none}.qsla{grid-area:d;justify-self:end}
+  .ofilters{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .okpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .okpi b{font-size:24px}
+  .who{width:100%}
+  .drawer{top:0;z-index:35}
+}
+@media (max-width:520px){.rolebtn .rl{display:none}.rolebtn{padding:0 12px}.jfacts b{font-size:14px}.wrow{grid-template-columns:minmax(0,1fr) 100px 40px}}
+@media print{#demoui,.drawer{display:none!important}}
+@media (prefers-reduced-motion:reduce){.mk .ring{display:none}.dm-spot{transition:none}*{transition:none!important;animation-duration:.01ms!important;animation-iteration-count:1!important}html{scroll-behavior:auto}.skel{animation:none}}
 @media print{
   body{background:#fff;color:#000;padding:0}
   body>*:not(#printdoc){display:none!important}
@@ -550,6 +792,7 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
       <a class="nl" href="#complaints" data-go="complaints">My complaints<span class="badge" data-badge hidden></span></a>
     </nav>
     <a class="btn primary nav-cta" href="#report" data-go="report"><i class="fa-solid fa-plus"></i>Report a problem</a>
+    <div class="rolewrap"><button class="rolebtn" id="roleBtn" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="roleMenu" aria-label="View as: switch between citizen, city official and contractor"><i class="fa-solid fa-user" data-ri aria-hidden="true"></i><span class="rl">Citizen</span><i class="fa-solid fa-chevron-down cv" aria-hidden="true"></i></button><div class="rolemenu" id="roleMenu" hidden></div></div>
     <button class="iconbtn" id="theme" type="button" aria-label="Switch between light and dark theme" title="Switch theme"><i class="fa-solid fa-circle-half-stroke"></i></button>
     <button class="iconbtn menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="menu" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
   </div>
@@ -560,6 +803,8 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
       <a class="nl" href="#board" data-go="board">Community board</a>
       <a class="nl" href="#societies" data-go="societies">For societies</a>
       <a class="nl" href="#complaints" data-go="complaints">My complaints<span class="badge" data-badge hidden></span></a>
+      <a class="nl" href="#city" data-go="city"><i class="fa-solid fa-building-columns" aria-hidden="true"></i>City Console (prototype)</a>
+      <a class="nl" href="#contractor" data-go="contractor"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i>Contractor app (prototype)</a>
       <a class="nl" href="pitch.html">About the project</a>
     </nav>
   </div>
@@ -798,7 +1043,7 @@ function migrate(raw){
 }
 let S=migrate(LS.get('uo2',null));
 if(S.showEx&&!S.list.length)S.list=examples();
-function save(){if(!LS.set('uo2',{v:SCHEMA,list:S.list.filter(c=>!c.sample),profile:S.profile,showEx:S.showEx}))toast('This browser is blocking storage, so changes will be lost when you close the tab','fa-triangle-exclamation')}
+function save(){if(!LS.set('uo2',{v:SCHEMA,list:S.list.filter(c=>!c.sample),profile:S.profile,showEx:S.showEx}))toast('This browser is blocking storage, so changes will be lost when you close the tab','fa-triangle-exclamation');syncOut('cit')}
 const mine=()=>S.list.filter(c=>!c.sample);
 const blankDraft=()=>({step:0,cat:'',title:'',desc:'',sev:'hazard',lat:null,lng:null,area:'',landmark:'',areaAuto:true,corp:'',corpAuto:true,hasPhoto:false,exif:null,text:'',textEdited:false,ref:'',filed:false,cosign:false,post:true,publicId:null,sentVia:'',concierge:false});
 let D=Object.assign(blankDraft(),LS.get('uo2-draft',{}));
@@ -1377,7 +1622,7 @@ function detailHTML(c){
   </div>
   <div class="pbody stack" style="gap:var(--s5)">
     <ol class="track" aria-label="Progress">${tr.map((t,i)=>`<li class="${t[1]?'done':i===nowI?'now':''}"><span class="bar"><span></span></span>${t[0]}</li>`).join('')}</ol>
-    <section class="next t-${s.tone}" aria-labelledby="nexth"><span class="glow" aria-hidden="true"></span><p class="eyebrow">What to do now</p><h2 id="nexth">${esc(ns.h)}</h2><p>${esc(ns.p)}</p>${action}</section>
+    ${cityBoxHTML(c)}${cityBoxHTML(c)&&c.status!=='draft'?'':`<section class="next t-${s.tone}" aria-labelledby="nexth"><span class="glow" aria-hidden="true"></span><p class="eyebrow">What to do now</p><h2 id="nexth">${esc(ns.h)}</h2><p>${esc(ns.p)}</p>${action}</section>`}
     <div class="photo" data-photobox hidden><img data-photo="${esc(c.id)}" alt="Photo of the problem"></div>
     <div class="boxes">
       ${box('docs','Messages and letters',docsInner)}
@@ -1727,9 +1972,9 @@ function afterView(changed){
 let mapShown=false;
 const cur=()=>S.list.find(x=>x.id===detail);
 const draftC=()=>({...D,id:'',createdAt:now(),filedAt:null,events:[],hasPhoto:!!draftPhoto||D.hasPhoto});
-const hashFor=()=>view==='issue'&&detail?`#i-${detail}`:view==='complaints'&&detail?`#c-${detail}`:view==='done'&&detail?`#done-${detail}`:`#${view}`;
+const hashFor=()=>view==='city'&&detail?`#city-${detail}`:view==='contractor'&&detail?`#job-${detail}`:view==='issue'&&detail?`#i-${detail}`:view==='complaints'&&detail?`#c-${detail}`:view==='done'&&detail?`#done-${detail}`:`#${view}`;
 function go(v,id,anchor){
-  const nd=['complaints','done','issue'].includes(v)?(id||null):null;if(nd!==detail)openBox=new Set();
+  const nd=['complaints','done','issue','city','contractor'].includes(v)?(id||null):null;if(v==='contractor'&&nd!==detail)kDecline=null;if(nd!==detail)openBox=new Set();
   const changed=v!==view||nd!==detail;
   view=v;detail=nd;pendingDel=null;results=null;fieldErr=null;indPrev=null;closeMenu();
   render();
@@ -1742,12 +1987,13 @@ function render(){
   const holder=$('#mapholder');$('#park').appendChild(holder);
   let c=detail&&S.list.find(x=>x.id===detail);
   if(['complaints','done'].includes(view)&&detail&&!c){detail=null;if(view==='done')view='complaints'}
-  panel.innerHTML=view==='report'?reportHTML():view==='departments'?departmentsHTML():view==='board'?boardHTML():view==='issue'?issueHTML(Board.get(detail)):view==='societies'?societiesHTML():view==='monthly'?monthlyHTML()
+  if(['city','contractor'].includes(view)&&detail&&!getIssue(detail))detail=null;
+  panel.innerHTML=view==='city'?cityHTML():view==='contractor'?contractorHTML():view==='report'?reportHTML():view==='departments'?departmentsHTML():view==='board'?boardHTML():view==='issue'?issueHTML(Board.get(detail)):view==='societies'?societiesHTML():view==='monthly'?monthlyHTML()
     :view==='done'?doneHTML(c):view==='complaints'?(c?detailHTML(c):trackerHTML()):homeHTML();
   $$('.nl[data-go]').forEach(t=>{if(t.dataset.go===view&&!t.dataset.anchor)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current')});
   const act=mine().filter(needsYou).length;
   $$('[data-badge]').forEach(b=>{b.hidden=!act;b.textContent=act;b.setAttribute('aria-label',`${act} need${act===1?'s':''} your action`)});
-  const bar=!['report','done'].includes(view)&&!(view==='complaints'&&detail);
+  const bar=!['report','done','city','contractor'].includes(view)&&!(view==='complaints'&&detail);
   $('#bottombar').classList.toggle('on',bar);document.body.classList.toggle('has-bar',bar);
   $('#maphint').hidden=!(view==='report'&&D.step===1&&D.lat==null);
   placeMap();
@@ -1755,7 +2001,7 @@ function render(){
     const blob=img.dataset.photo==='draft'?draftPhoto:await idb.get(img.dataset.photo);
     if(blob){img.src=URL.createObjectURL(blob);img.closest('[data-photobox]')?.removeAttribute('hidden')}
   });
-  renderMarkers();syncPin();moveInd(false);
+  renderMarkers();syncPin();moveInd(false);syncRole();if(view==='city')countUp();
 }
 function placeMap(){
   const holder=$('#mapholder');
@@ -1802,6 +2048,7 @@ async function shareNeighbours(c){
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`,'_blank','noopener');
 }
 async function act(a,el){
+  if(a.startsWith('o-'))return opsAct(a,el);
   const c=cur(),byId=el.dataset.id?S.list.find(x=>x.id===el.dataset.id):c;
   switch(a){
     case'cat':{D.cat=el.dataset.k;if(CATS[D.cat].ag!=='gba')D.corp='';if(fieldErr?.id==='f-cat')fieldErr=null;saveDraft();render();
@@ -1941,7 +2188,7 @@ async function saveComplaint(){
   if(draftPhoto){try{await idb.set(c.id,draftPhoto)}catch{c.hasPhoto=false;toast('The photo couldn’t be stored on this device','fa-circle-info')}}
   if(S.list.some(x=>x.sample)){S.list=S.list.filter(x=>!x.sample);S.showEx=false}
   c.publicId=D.publicId||null;
-  S.list.unshift(c);save();
+  S.list.unshift(c);linkComplaint(c);save();
   if(c.publicId&&Board.user&&!Board.mine.has(c.publicId))await Board.vote(c.publicId,true).catch(()=>{});
   if(wantPost){if(Board.user)await postToBoard(c);else toast('Saved without posting to the board. You can post it from the complaint page.','fa-circle-info')}
   D=blankDraft();draftPhoto=null;idb.del('draft');saveDraft();
@@ -1989,8 +2236,8 @@ panel.addEventListener('submit',e=>{
     leadSent=true;fieldErr=null;render();document.getElementById('join')?.scrollIntoView()}
 });
 panel.addEventListener('toggle',e=>{const d=e.target.dataset?.box;if(!d)return;e.target.open?openBox.add(d):openBox.delete(d);if(d==='map'&&e.target.open){placeMap();frameMap()}if(d==='docs'&&e.target.open)moveInd(false)},true);
-panel.addEventListener('mouseover',e=>{const c=e.target.closest('.ccard,.icard');if(c)markerEls[c.dataset.id||c.dataset.iid]?.classList.add('hl')});
-panel.addEventListener('mouseout',e=>{const c=e.target.closest('.ccard,.icard');if(c&&!c.contains(e.relatedTarget))markerEls[c.dataset.id||c.dataset.iid]?.classList.remove('hl')});
+panel.addEventListener('mouseover',e=>{const c=e.target.closest('.ccard,.icard,.qrow,.jcard');if(c)markerEls[c.dataset.id||c.dataset.iid||c.dataset.is]?.classList.add('hl')});
+panel.addEventListener('mouseout',e=>{const c=e.target.closest('.ccard,.icard,.qrow,.jcard');if(c&&!c.contains(e.relatedTarget))markerEls[c.dataset.id||c.dataset.iid||c.dataset.is]?.classList.remove('hl')});
 async function importJSON(file){
   if(!file)return;
   try{const j=migrate(JSON.parse(await file.text()));
@@ -2070,6 +2317,7 @@ function initMap(){
   map.addControl(new maplibregl.AttributionControl({compact:true}),'bottom-right');   // the tile source supplies "OpenFreeMap © OpenMapTiles Data from OpenStreetMap"
   map.on('click',e=>{if(view==='report'&&D.step===1){setPin(e.lngLat.lat,e.lngLat.lng);return}hideMapCard()});
   map.on('idle',()=>$('#mapholder').classList.add('ready'));
+  map.on('style.load',syncHeat);
   map.on('pitchend',syncMapCtl);
   map.on('zoomend',()=>{if(clusterable())renderMarkers()});
   frameMap();renderMarkers();syncPin();syncMapCtl();
@@ -2082,7 +2330,7 @@ function showMapFail(){
     ${at?`<a class="btn" target="_blank" rel="noopener" href="${gmaps(at.lat,at.lng)}"><i class="fa-solid fa-arrow-up-right-from-square"></i>Open in Google Maps</a>`:''}`;
   f.hidden=false;$('#mapholder').classList.add('ready','failed');
 }
-const isOverview=()=>view==='board'||(view==='complaints'&&!detail);
+const isOverview=()=>view==='board'||(view==='city'&&!detail)||(view==='contractor'&&!detail)||(view==='complaints'&&!detail);
 function camFor(){
   if(view==='report')return{pitch:0,bearing:0};
   return want3D?{pitch:isOverview()?58:50,bearing:-15}:{pitch:0,bearing:0};
@@ -2094,6 +2342,7 @@ function frameMap(){
   if(view==='report'){map.jumpTo({...(D.lat!=null?{center:[D.lng,D.lat],zoom:16.5}:{center:BLR_CENTER,zoom:11.5}),...cam});return}
   if(view==='issue'){const x=Board.get(detail);if(x)map.jumpTo({center:[x.lng,x.lat],zoom:16,...cam});return}
   if(view==='board')return fit(boardList());
+  if(view==='city'||view==='contractor'){const is=detail&&getIssue(detail);if(is){map.jumpTo({center:[is.lng,is.lat],zoom:view==='city'?14:16,...cam});return}return fit(view==='city'?cityList():myJobs())}
   const c=detail&&cur();if(c){map.jumpTo({center:[c.lng,c.lat],zoom:16,...cam});return}
   fit(S.list);
 }
@@ -2103,6 +2352,7 @@ function syncMapCtl(){
 }
 /* Map items: one shape for complaints and board issues, so markers, cards and clusters share code. */
 function mapItems(){
+  if(view==='city'||view==='contractor')return opsMapItems();
   if(view==='board'||view==='issue')return(view==='issue'?[Board.get(detail)].filter(Boolean):boardList()).map(x=>({id:x.id,lat:x.lat,lng:x.lng,title:x.title,sub:`${x.area} · ${plural(x.votes,'vote')}`,
     tone:x.status==='fixed'?'fixed':'act',label:x.status==='fixed'?'Fixed':'Open',inner:`<span class="mono">${x.votes}</span>`,pulse:x.status!=='fixed',open:['issue',x.id],hover:`.icard[data-iid="${x.id}"]`}));
   return S.list.map(c=>{const s=status(c);return{id:c.id,lat:c.lat,lng:c.lng,title:c.title,sub:c.area,tone:s.tone,label:s.l,inner:`<i class="fa-solid ${CATS[c.cat].ic}" aria-hidden="true"></i>`,
@@ -2123,18 +2373,20 @@ function renderMarkers(){
       el.className='mk cluster';el.innerHTML=`<span class="mono">${it.n}</span>`;el.setAttribute('aria-label',`${it.n} issues here, zoom in`);
       el.addEventListener('click',ev=>{ev.stopPropagation();map.flyTo({center:[it.lng,it.lat],zoom:Math.min(16,map.getZoom()+2),curve:1.4})});
     }else{
-      el.className=`mk t-${it.tone}${(detail===it.id||selId===it.id)?' sel':''}`;
+      el.className=`mk t-${it.tone}${it.cls?' '+it.cls:''}${(detail===it.id||selId===it.id)?' sel':''}`;if(it.size){el.style.width=el.style.height=it.size+'px'}
       el.innerHTML=`${it.pulse?'<span class="ring" aria-hidden="true"></span>':''}${it.inner}`;
       el.setAttribute('aria-label',`${it.title}, ${it.label}`);el.title=`${it.title} · ${it.label}`;markerEls[it.id]=el;
       el.addEventListener('mouseenter',()=>panel.querySelector(it.hover)?.classList.add('hl'));
       el.addEventListener('mouseleave',()=>panel.querySelector(it.hover)?.classList.remove('hl'));
       el.addEventListener('click',ev=>{ev.stopPropagation();
         if(view==='report'&&D.step===1){const c=S.list.find(x=>x.id===it.id)||Board.get(it.id);if(c)setPin(c.lat,c.lng);return}
+        if(it.onClick){it.onClick();return}
         if(detail===it.id)return;
         selId===it.id?go(it.open[0],it.open[1]):showMapCard(it)});
     }
     markers.push(new maplibregl.Marker({element:el}).setLngLat([it.lng,it.lat]).addTo(map));
   });
+  syncHeat();
 }
 function showMapCard(it){
   selId=it.id;Object.entries(markerEls).forEach(([k,e])=>e.classList.toggle('sel',k===it.id));
@@ -2169,15 +2421,820 @@ function syncPin(){
   pinMk.setDraggable(D.step===1);
   if(pinDrop){pinDrop=false;A(pinMk.getElement().querySelector('.pindrop'),{y:[-34,0],opacity:[0,1]},{type:'spring',stiffness:600,damping:14})}
 }
-function restyleMap(){if(!map)return;$('#mapholder').classList.remove('ready');map.setStyle(MAP_STYLE(isDark()))}
+function restyleMap(){if(!map)return;$('#mapholder').classList.remove('ready');map.setStyle(MAP_STYLE(isDark()));map.once('idle',syncHeat)}
 
 /* ============ Theme ============ */
 const savedTheme=LS.get('uo2-theme',null);if(savedTheme)document.documentElement.dataset.theme=savedTheme;
 $('#theme').addEventListener('click',()=>{const t=isDark()?'light':'dark';document.documentElement.dataset.theme=t;LS.set('uo2-theme',t);restyleMap()});
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(!document.documentElement.dataset.theme)restyleMap()});
 
+/* ======================================================================
+   OPS: City Console (#city) and Contractor app (#contractor). PROTOTYPE ON SAMPLE DATA.
+   Not a live government system. All officers, contractors, wards, costs and reports below are fictional samples.
+   Shared state lives in localStorage under OPS_KEY (versioned, with a migration) and syncs across tabs
+   with BroadcastChannel, falling back to the storage event. Citizen complaints stay under 'uo2' and link to issues by issueId.
+   ====================================================================== */
+const OPS_KEY='uo-ops',OPS_V=1;
+const W_DEFAULT={sev:1,demand:1,overdue:1,loc:1,cat:1};
+const W_MAX={sev:30,demand:25,overdue:20,loc:15,cat:10};
+const W_LABEL={sev:'Severity',demand:'Public demand',overdue:'Overdue',loc:'Location risk',cat:'Category risk',reopen:'Reopened'};
+const W_COLOR={sev:'#e8475f',demand:'#9b5de5',overdue:'#f59e0b',loc:'#06b6d4',cat:'#10b981',reopen:'#be123c'};
+const SEV_PTS={low:8,hazard:18,danger:30};
+const SEV_RANK={low:0,hazard:1,danger:2};
+const CAT_RISK={power:10,sewage:9,tree:8,traffic:8,pothole:7,water:6,mosquito:6,streetlight:6,footpath:5,garbage:5,dogs:4};
+const FLAG_PTS={school:6,hospital:6,mainRoad:4,busStop:3};
+const FLAG_LABEL={school:'near a school',hospital:'near a hospital',mainRoad:'on a main road',busStop:'at a bus stop'};
+const FLAG_IC={school:'fa-school',hospital:'fa-hospital',mainRoad:'fa-road',busStop:'fa-bus'};
+const SPEC_OF={pothole:'roads',footpath:'roads',traffic:'roads',sewage:'drains',water:'drains',mosquito:'drains',power:'electrical',streetlight:'electrical',garbage:'waste',tree:'trees',dogs:'general'};
+const COST_SAMPLE={pothole:8000,footpath:15000,traffic:12000,sewage:18000,water:10000,mosquito:4000,power:6000,streetlight:5000,garbage:3000,tree:7000,dogs:2000};
+const ST_LABEL={new:'New',assigned:'Assigned',accepted:'Accepted',in_progress:'In progress',submitted:'Awaiting verification',verified_fixed:'Verified fixed',reopened:'Reopened'};
+const ST_TONE={new:'act',assigned:'wait',accepted:'wait',in_progress:'wait',submitted:'act',verified_fixed:'fixed',reopened:'over'};
+const OPEN_ST=['new','assigned','accepted','in_progress','submitted','reopened'];
+const band=s=>s>=80?['critical','Critical']:s>=60?['high','High']:s>=40?['medium','Medium']:['low','Low'];
+const inr=n=>'₹'+Math.round(+n||0).toLocaleString('en-IN');
+const pad2=n=>String(n).padStart(2,'0');
+const isoDate=t=>{const d=new Date(t);return`${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`};
+const fmtKm=m=>m<1000?`${Math.round(m)} m`:`${(m/1000).toFixed(1)} km`;
+
+function sampleContractors(){return[
+  {id:'k1',name:'Sample Infra Works',spec:['roads'],home:[77.6200,12.9300],rating:4.6,base:{done:48,onTime:.92,days:4.1,reopen:.04}},
+  {id:'k2',name:'Demo Roads & Drains Co.',spec:['roads','drains'],home:[77.5800,12.9900],rating:4.2,base:{done:36,onTime:.81,days:5.6,reopen:.08}},
+  {id:'k3',name:'Example Electricals',spec:['electrical'],home:[77.6400,12.9750],rating:4.5,base:{done:52,onTime:.9,days:2.3,reopen:.05}},
+  {id:'k4',name:'Placeholder Waste Services',spec:['waste'],home:[77.5600,12.9700],rating:4.1,base:{done:61,onTime:.86,days:1.8,reopen:.06}},
+  {id:'k5',name:'Sample GreenCare Trees',spec:['trees'],home:[77.5950,13.0300],rating:4.4,base:{done:22,onTime:.88,days:2.0,reopen:.03}},
+  {id:'k6',name:'Demo Quickfix Civil Co.',spec:['roads','general'],home:[77.6900,12.9600],rating:3.4,base:{done:40,onTime:.64,days:7.8,reopen:.24}},
+  {id:'k7',name:'Sample Water & Drain Works',spec:['drains'],home:[77.6100,12.9100],rating:4.0,base:{done:30,onTime:.78,days:4.9,reopen:.10}},
+]}
+/* Sample issues: category, title, area, lat, lng, corporation, ward, reports, age in days, severity, location flags, status, contractor, days to fix (verified only), co-signs.
+   Areas are real Bengaluru places so the map reads; every issue, ward number, report and cost is sample data. */
+const SEED=[
+  ['pothole','Deep pothole before the Silk Board signal','Hosur Road, Silk Board Junction',12.9176,77.6230,'south','Ward 172',7,12,'hazard','mainRoad,busStop','in_progress','k6',0,2],
+  ['pothole','Pothole outside the school gate','80 Feet Road, Koramangala 4th Block',12.9338,77.6297,'south','Ward 151',11,9,'hazard','school,mainRoad','new','',0,0],
+  ['sewage','Manhole overflowing onto the street','27th Main, HSR Layout',12.9116,77.6389,'south','Ward 174',6,11,'hazard','busStop,school','reopened','k7',0,1],
+  ['garbage','Garbage black spot near the market','11th Main, Jayanagar 4th Block',12.9255,77.5838,'south','Ward 169',4,5,'low','','assigned','k4',0,0],
+  ['streetlight','Five streetlights out on a dark stretch','16th Main, BTM Layout 2nd Stage',12.9166,77.6101,'south','Ward 176',3,6,'hazard','','accepted','k3',0,0],
+  ['water','Water main leaking onto the footpath','15th Cross, JP Nagar 6th Phase',12.9077,77.5850,'south','Ward 178',2,3,'low','','new','',0,0],
+  ['footpath','Broken footpath slabs over the drain','Banashankari 2nd Stage',12.9255,77.5468,'south','Ward 165',2,20,'hazard','school','submitted','k6',0,0],
+  ['traffic','Signal stuck on red at the junction','Hosur Road, Electronic City Phase 1',12.8452,77.6602,'south','Ward 192',3,2,'danger','mainRoad','new','',0,0],
+  ['power','Loose wire hanging over the footpath','100 Feet Road, Indiranagar',12.9784,77.6408,'east','Ward 80',6,12,'danger','busStop,mainRoad','accepted','k3',0,3],
+  ['pothole','Crater in the left lane','ITPL Main Road, Whitefield',12.9855,77.7305,'east','Ward 84',3,10,'hazard','mainRoad','assigned','k1',0,0],
+  ['garbage','Construction debris dumped on the corner','Outer Ring Road, Marathahalli',12.9569,77.7011,'east','Ward 85',2,9,'low','','verified_fixed','k4',2,0],
+  ['sewage','Blocked drain flooding the service road','Old Madras Road, KR Puram',13.0075,77.6950,'east','Ward 52',1,2,'hazard','','new','',0,0],
+  ['tree','Large branch hanging over the road','Outer Ring Road, Bellandur',12.9260,77.6762,'east','Ward 150',2,8,'danger','mainRoad','verified_fixed','k5',1,0],
+  ['mosquito','Stagnant water in an empty plot','12th Main, Indiranagar',12.9719,77.6412,'east','Ward 81',1,1,'low','','new','',0,0],
+  ['pothole','Potholes on the flyover ramp','Hebbal Flyover',13.0358,77.5970,'north','Ward 21',3,7,'hazard','mainRoad','submitted','k1',0,0],
+  ['streetlight','Streetlights out near the bus stand','Yelahanka New Town',13.1007,77.5963,'north','Ward 4',1,9,'hazard','busStop','verified_fixed','k3',5,0],
+  ['dogs','Injured stray dog near the park gate','RT Nagar Main Road',13.0213,77.5946,'north','Ward 18',1,1,'low','','new','',0,0],
+  ['water','No water supply for three days','Yeshwanthpur, 8th Main',13.0285,77.5409,'north','Ward 37',2,6,'hazard','hospital','assigned','k7',0,0],
+  ['garbage','Garbage piling up outside the hospital','Rajajinagar 1st Block',12.9915,77.5545,'west','Ward 99',1,8,'hazard','hospital','verified_fixed','k4',3,0],
+  ['footpath','Footpath blocked by debris','Vijayanagar Main Road',12.9719,77.5371,'west','Ward 123',1,14,'hazard','busStop','reopened','k6',0,0],
+  ['tree','Dead tree leaning towards houses','Basaveshwaranagar',12.9940,77.5390,'west','Ward 101',1,3,'hazard','','assigned','k5',0,0],
+  ['power','Transformer sparking at night','Kengeri Satellite Town',12.9081,77.4853,'west','Ward 159',1,2,'danger','','in_progress','k3',0,0],
+  ['streetlight','Dark lane, two lights out','Sampige Road, Malleshwaram',13.0031,77.5643,'west','Ward 45',1,7,'low','','verified_fixed','k3',2,0],
+  ['traffic','Faded zebra crossing near a school','MG Road',12.9755,77.6070,'central','Ward 111',2,5,'hazard','school,mainRoad','submitted','k1',0,0],
+  ['sewage','Sewage leaking near the bus stop','Shivajinagar Bus Stand',12.9857,77.6057,'central','Ward 92',1,4,'hazard','busStop','accepted','k7',0,0],
+  ['garbage','Garbage black spot behind the bus stand','Gandhinagar, Majestic',12.9767,77.5713,'central','Ward 94',1,6,'low','busStop','verified_fixed','k4',1,0],
+  ['mosquito','Clogged drain breeding mosquitoes','Richmond Town',12.9650,77.6000,'central','Ward 112',1,3,'low','school','new','',0,0],
+  ['dogs','Aggressive stray dogs near the market','Frazer Town, Mosque Road',12.9965,77.6150,'central','Ward 78',1,4,'hazard','','submitted','k6',0,0],
+  ['tree','Fallen branch on the walking path','Cubbon Park, Kasturba Road',12.9763,77.5929,'central','Ward 110',1,6,'hazard','','verified_fixed','k5',4,0],
+  ['water','Pipe burst flooding the road','Koramangala 5th Block',12.9339,77.6185,'south','Ward 151',1,1,'hazard','mainRoad','new','',0,0],
+  ['footpath','Footpath caved in near the metro exit','Hosur Road, Bommanahalli',12.9010,77.6240,'south','Ward 175',2,4,'hazard','busStop','accepted','k1',0,0],
+  ['pothole','Potholes on the service road','Outer Ring Road, HSR Layout',12.9200,77.6480,'south','Ward 174',3,14,'hazard','mainRoad','verified_fixed','k1',4,0],
+];
+/* A drawn placeholder, clearly marked DEMO, so no real photo is ever implied. */
+function samplePhoto(kind,cat){
+  const after=kind==='after',lbl={pothole:'pothole',footpath:'footpath',traffic:'signal',sewage:'drain',water:'pipe',mosquito:'drain',power:'wire',streetlight:'light',garbage:'garbage',tree:'tree',dogs:'street'}[cat]||'site';
+  const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 300'><defs><linearGradient id='g' x1='0' y1='0' x2='0' y2='1'><stop offset='0' stop-color='${after?'#41618a':'#2a3346'}'/><stop offset='1' stop-color='${after?'#24364f':'#161c27'}'/></linearGradient></defs>`
+   +`<rect width='400' height='300' fill='url(#g)'/><rect y='190' width='400' height='110' fill='${after?'#39404d':'#252a33'}'/><path d='M0 250h400' stroke='#e5e7eb' stroke-width='4' stroke-dasharray='26 18' opacity='.55'/>`
+   +(after?`<rect x='120' y='205' width='160' height='34' rx='8' fill='#4a5262' stroke='#6b7486' stroke-width='2'/><circle cx='340' cy='60' r='24' fill='#34d399'/><path d='M329 60l8 8 15-16' stroke='#0b1220' stroke-width='5' fill='none' stroke-linecap='round'/>`
+     :`<ellipse cx='200' cy='224' rx='90' ry='22' fill='#0b0f16'/><ellipse cx='200' cy='220' rx='72' ry='14' fill='#030406'/><circle cx='340' cy='60' r='24' fill='#f59e0b'/><path d='M340 47v16M340 71v2' stroke='#0b1220' stroke-width='5' stroke-linecap='round'/>`)
+   +`<rect x='14' y='14' width='196' height='32' rx='16' fill='#000' opacity='.5'/><text x='30' y='36' font-family='Arial' font-size='15' fill='#fff' font-weight='700'>${after?'AFTER':'BEFORE'} · ${lbl} · DEMO</text></svg>`;
+  return'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg);
+}
+function seedIssues(){
+  const t=now(),K=sampleContractors();
+  return SEED.map((r,i)=>{
+    const[cat,title,area,lat,lng,corp,ward,nRep,age,sev,flags,st,kid,fixD,cos]=r;
+    const t0=t-age*DAY,win=Math.max(2,CATS[cat].days);
+    const is={id:'IS-'+(1001+i),cat,title,area,lat,lng,corp,ward,status:st,cosigns:cos,sev,flags:flags?flags.split(','):[],sample:true,reopenCount:0,
+      reporters:Array.from({length:nRep},(_,j)=>({t:t0+(j/nRep)*age*.8*DAY,sev:j===0||j%3===0?sev:'low',src:'sample'})),
+      firstAt:t0,lastAt:t0+(nRep>1?age*.8*(nRep-1)/nRep*DAY:0),photos:[samplePhoto('before',cat)],events:[{t:t0,k:'report',x:'First reported by a resident (sample)'}]};
+    if(nRep>1)is.events.push({t:is.lastAt,k:'merge',x:`${plural(nRep-1,'more report')} within 50 m merged into this issue`});
+    if(kid){
+      const tA=Math.min(t-.2*DAY,t0+.6*DAY),step=(k,x,dt,by='contractor')=>{const tt=Math.min(t-.05*DAY,tA+dt*DAY);is.events.push({t:tt,k,x,by});return tt};
+      Object.assign(is,{contractorId:kid,assignedAt:tA,slaDue:tA+win*DAY,cost:COST_SAMPLE[cat],note:''});
+      is.events.push({t:tA,k:'assign',x:`Assigned to ${K.find(k=>k.id===kid).name}, due ${fmtDs(is.slaDue)}`,by:'city'});
+      if(st!=='assigned')is.acceptedAt=step('accept','Accepted the job',.25);
+      if(['in_progress','submitted','verified_fixed','reopened'].includes(st)){const tb=step('before','Before photo taken on site (demo)',.5);is.before={img:samplePhoto('before',cat),t:tb,lat,lng,demo:true};step('start','Work started',.5)}
+      if(st==='reopened'){is.reopenCount=1;step('submit','Submitted as fixed',Math.min(age-2,3));is.events.push({t:t-1.5*DAY,k:'reopen',x:'A resident said it isn’t fixed. Reopened and sent back to the same contractor'})}
+      if(st==='submitted'||st==='verified_fixed'){
+        const tS=st==='verified_fixed'?tA+(fixD-.2)*DAY:t-(i%2?.8:1.6)*DAY;
+        is.after={img:samplePhoto('after',cat),t:tS,lat,lng,demo:true};is.submittedAt=tS;is.events.push({t:tS,k:'submit',x:'After photo taken on site (demo). Submitted as fixed',by:'contractor'});
+        if(st==='submitted'&&i%2===0){is.cityApproved=true;is.events.push({t:tS+.1*DAY,k:'approve',x:'City approved the before and after photos',by:'city'})}
+      }
+      if(st==='verified_fixed'){is.cityApproved=true;is.fixedAt=tA+fixD*DAY;is.events.push({t:is.fixedAt,k:'verified',x:'Verified fixed: the city approved and a resident confirmed',by:'city'})}
+    }
+    is.events.sort((a,b)=>a.t-b.t);
+    return is;
+  });
+}
+function freshOps(){return{v:OPS_V,weights:{...W_DEFAULT},contractors:sampleContractors(),issues:seedIssues(),seededAt:now()}}
+/* Versioned load. v1 is current; anything older or unreadable is reseeded, and citizen complaints are re-linked by linkMine(). */
+function migrateOps(o){
+  if(!o||typeof o!=='object'||!Array.isArray(o.issues))return freshOps();
+  if(o.v!==OPS_V)return freshOps();
+  o.weights=Object.assign({...W_DEFAULT},o.weights||{});
+  if(!Array.isArray(o.contractors)||!o.contractors.length)o.contractors=sampleContractors();
+  o.issues=o.issues.filter(i=>i&&i.id&&CATS[i.cat]&&isFinite(i.lat)&&isFinite(i.lng)&&Array.isArray(i.reporters)&&i.reporters.length).map(i=>({flags:[],events:[],photos:[],cosigns:0,reopenCount:0,...i,status:ST_LABEL[i.status]?i.status:'new'}));
+  return o;
+}
+let OPS=migrateOps(LS.get(OPS_KEY,null));
+const opsBC=('BroadcastChannel' in window)?new BroadcastChannel('urboasis'):null;
+function syncOut(kind){try{opsBC&&opsBC.postMessage({kind})}catch{}}
+function saveOps(){if(!LS.set(OPS_KEY,OPS))toast('This browser is blocking storage, so console changes will be lost','fa-triangle-exclamation');syncOut('ops')}
+const getIssue=id=>OPS.issues.find(i=>i.id===id);
+const kOf=id=>OPS.contractors.find(k=>k.id===id);
+const kName=id=>kOf(id)?.name||'a contractor';
+const ev=(is,k,x,by)=>is.events.push({t:now(),k,x,by});
+const demandN=is=>is.reporters.length+(is.cosigns||0);
+const dueOf=is=>is.slaDue||(is.firstAt+CATS[is.cat].days*DAY);
+const overdueDays=is=>is.status==='verified_fixed'?0:Math.max(0,Math.floor((now()-dueOf(is))/DAY));
+
+/* ---------- priority score (0-100) ---------- */
+function scoreParts(is){
+  return{sev:SEV_PTS[is.sev]||8,demand:Math.min(25,25*Math.log2(1+demandN(is))/Math.log2(31)),overdue:Math.min(20,overdueDays(is)*2.5),
+    loc:Math.min(15,(is.flags||[]).reduce((s,f)=>s+(FLAG_PTS[f]||0),0)),cat:CAT_RISK[is.cat]||5};
+}
+/* Each part's share of the 0-100 score under the current weights. Weights rescale so the maximum is always 100. Reopened issues get +10. */
+function weighted(is){
+  const p=scoreParts(is),W=OPS.weights;let den=0;for(const k in W_MAX)den+=W[k]*W_MAX[k];
+  const out={};for(const k in W_MAX)out[k]=den?100*W[k]*p[k]/den:0;
+  if(is.status==='reopened')out.reopen=10;
+  return out;
+}
+const score=is=>Math.max(0,Math.min(100,Math.round(Object.values(weighted(is)).reduce((a,b)=>a+b,0))));
+function rankMap(){const R={};OPS.issues.filter(i=>OPEN_ST.includes(i.status)).sort((a,b)=>score(b)-score(a)||a.firstAt-b.firstAt).forEach((i,n)=>R[i.id]=n+1);return R}
+function whyRank(is){
+  const n=demandN(is),bits=[`${n===1?'1 resident has':`${n} residents have`} reported or backed it`];
+  if(is.sev==='danger')bits.push('it’s a danger to life');else if(is.sev==='hazard')bits.push('it can hurt people or vehicles');
+  (is.flags||[]).slice(0,2).forEach(f=>bits.push(`it’s ${FLAG_LABEL[f]}`));
+  const od=overdueDays(is);if(od>0)bits.push(`it’s ${plural(od,'day')} past its fix date`);
+  if(is.status==='reopened')bits.push('a resident said the last fix didn’t work');
+  const s=bits.length>1?bits.slice(0,-1).join(', ')+' and '+bits[bits.length-1]:bits[0];
+  return s[0].toUpperCase()+s.slice(1)+'.';
+}
+
+/* ---------- linking citizen complaints to issues (same category within 50 m) ---------- */
+function linkComplaint(c){
+  if(!c||c.sample||(c.issueId&&getIssue(c.issueId)))return null;
+  const t=now(),r={t,sev:c.sev,src:'you',cid:c.id};
+  let is=OPS.issues.filter(i=>i.cat===c.cat&&i.status!=='verified_fixed'&&dist(i,c)<50).sort((a,b)=>dist(a,c)-dist(b,c))[0];
+  if(is){is.reporters.push(r);is.lastAt=t;if(SEV_RANK[c.sev]>SEV_RANK[is.sev])is.sev=c.sev;ev(is,'merge','New report from a resident, merged into this issue')}
+  else{is={id:'IS-'+(2000+Math.floor(Math.random()*8000)),cat:c.cat,title:c.title,area:c.area,lat:c.lat,lng:c.lng,corp:c.corp||'',ward:'',status:'new',
+    reporters:[r],cosigns:0,firstAt:t,lastAt:t,sev:c.sev,flags:[],events:[{t,k:'report',x:'Reported by a resident'}],sample:false,reopenCount:0,photos:[]};OPS.issues.push(is)}
+  c.issueId=is.id;saveOps();return is;
+}
+const issueOf=c=>c&&c.issueId?getIssue(c.issueId):null;
+function linkMine(){let n=0;S.list.forEach(c=>{if(!c.sample&&c.status!=='fixed'&&!issueOf(c)){c.issueId=null;if(linkComplaint(c))n++}});if(n)save();return n}
+
+/* ---------- verification: city approval AND (a reporter confirms OR 72 hours pass with no dispute) ---------- */
+const VERIFY_MS=72*36e5;
+function settleAll(){
+  let o=false,ci=false;
+  OPS.issues.forEach(is=>{
+    if(is.status==='submitted'&&is.cityApproved&&(is.citizenConfirmed||now()-is.submittedAt>=VERIFY_MS)){
+      is.status='verified_fixed';is.fixedAt=now();ev(is,'verified',is.citizenConfirmed?'Verified fixed: the city approved and a resident confirmed':'Verified fixed: the city approved and nobody disputed it for 72 hours','city');o=true}
+  });
+  S.list.forEach(c=>{const is=issueOf(c);if(is&&is.status==='verified_fixed'&&c.status!=='fixed'){c.status='fixed';c.fixedAt=is.fixedAt;if(!c.filedAt)c.filedAt=c.createdAt;c.events.push({t:now(),k:'fixed',x:'Verified fixed in the City Console (prototype)'});ci=true}});
+  if(o)saveOps();if(ci)save();
+  return o||ci;
+}
+function reopenIssue(is,why){is.status='reopened';is.reopenCount=(is.reopenCount||0)+1;is.cityApproved=false;is.citizenConfirmed=false;is.after=null;is.submittedAt=null;ev(is,'reopen',why)}
+
+/* ---------- contractors ---------- */
+function kStats(k){
+  const jobs=OPS.issues.filter(i=>i.contractorId===k.id),done=jobs.filter(i=>i.status==='verified_fixed');
+  const active=jobs.filter(i=>['assigned','accepted','in_progress','reopened'].includes(i.status)),B=k.base,N=B.done+done.length;
+  const onTime=(B.onTime*B.done+done.filter(i=>i.fixedAt<=i.slaDue).length)/N;
+  const dAvg=(B.days*B.done+done.reduce((s,i)=>s+Math.max(0,(i.fixedAt-i.assignedAt)/DAY),0))/N;
+  const reopen=(B.reopen*B.done+jobs.reduce((s,i)=>s+(i.reopenCount||0),0))/N;
+  const overdue=active.filter(i=>now()>dueOf(i)).length;
+  return{done:N,onTime,days:dAvg,reopen,active:active.length,overdue,flag:reopen>=.15?'High reopen rate':overdue>=2?`${overdue} jobs overdue`:''};
+}
+function matchScore(k,is){
+  const st=kStats(k),spec=k.spec.includes(SPEC_OF[is.cat]),km=dist({lat:k.home[1],lng:k.home[0]},is)/1000;
+  const parts={spec:spec?35:k.spec.includes('general')?12:0,load:Math.max(0,20*(1-st.active/6)),dist:km<=3?15:Math.max(0,15*(1-(km-3)/17)),
+    ontime:15*st.onTime,reopen:Math.max(0,10*(1-st.reopen/.3)),rating:5*k.rating/5};
+  const reason=`${spec?`Specialises in ${SPEC_OF[is.cat]}`:'Not a specialist'} · ${plural(st.active,'active job')} · ${km.toFixed(1)} km away · ${Math.round(st.onTime*100)}% on time · ${Math.round(st.reopen*100)}% reopened · ★ ${k.rating}`;
+  return{total:Object.values(parts).reduce((a,b)=>a+b,0),parts,km,st,spec,reason};
+}
+function rankContractors(iss){
+  return OPS.contractors.map(k=>{const ms=iss.map(is=>matchScore(k,is));return{k,m:ms[0],total:Math.round(ms.reduce((s,m)=>s+m.total,0)/ms.length)}}).sort((a,b)=>b.total-a.total);
+}
+function assignIssues(ids,kid,due,costEach,note){
+  ids.forEach(id=>{const is=getIssue(id);if(!is)return;
+    Object.assign(is,{contractorId:kid,status:'assigned',assignedAt:now(),slaDue:due,cost:costEach,note,cityApproved:false,citizenConfirmed:false});
+    ev(is,'assign',`Assigned to ${kName(kid)}, due ${fmtDs(due)}${note?`. Note: ${note}`:''}`,'city')});
+  saveOps();
+}
+function opsKPIs(){
+  const I=OPS.issues,open=I.filter(i=>OPEN_ST.includes(i.status)),fixed=I.filter(i=>i.status==='verified_fixed');
+  const sub=I.filter(i=>i.submittedAt||i.status==='verified_fixed'||i.reopenCount);
+  return{open:open.length,critical:open.filter(i=>score(i)>=80).length,overdue:open.filter(i=>overdueDays(i)>0).length,
+    avgDays:fixed.length?fixed.reduce((s,i)=>s+(i.fixedAt-i.firstAt)/DAY,0)/fixed.length:0,
+    sla:fixed.length?100*fixed.filter(i=>i.fixedAt<=dueOf(i)).length/fixed.length:0,
+    reopened:sub.length?100*sub.filter(i=>i.reopenCount>0).length/sub.length:0,
+    merged:I.reduce((s,i)=>s+Math.max(0,i.reporters.length-1),0)};
+}
+function resetOps(){OPS=freshOps();S.list.forEach(c=>{c.issueId=null});linkMine();save();saveOps()}
+function clearSampleOps(){
+  OPS.issues=OPS.issues.filter(i=>i.reporters.some(r=>r.src!=='sample')).map(i=>{const reps=i.reporters.filter(r=>r.src!=='sample');
+    return{...i,sample:false,reporters:reps,cosigns:0,firstAt:Math.min(...reps.map(r=>r.t)),events:i.events.concat([{t:now(),k:'clear',x:'Sample reports removed'}])}});
+  saveOps();
+}
+const blobToURL=b=>new Promise((res,rej)=>{const f=new FileReader();f.onload=()=>res(f.result);f.onerror=rej;f.readAsDataURL(b)});
+const getPos=()=>new Promise((res,rej)=>{if(!navigator.geolocation)return rej(new Error('none'));navigator.geolocation.getCurrentPosition(p=>res({lat:p.coords.latitude,lng:p.coords.longitude}),rej,{enableHighAccuracy:true,timeout:12000,maximumAge:60000})});
+
+/* ---------- cross-tab sync ---------- */
+function reloadShared(){
+  OPS=migrateOps(LS.get(OPS_KEY,null));
+  S=migrate(LS.get('uo2',null));if(S.showEx&&!S.list.length)S.list=examples();
+}
+let syncPend=false,prevSig=null;
+function onRemote(){
+  if(!prevSig)prevSig=sigs();
+  reloadShared();
+  const a=document.activeElement;
+  if(a&&panel.contains(a)&&a.matches('input[type="text"],input:not([type]),textarea,select,input[type="range"],input[type="date"]')){syncPend=true;return}
+  remoteRender();
+}
+function remoteRender(){
+  syncPend=false;const sig=prevSig||{};prevSig=null;
+  if(!['city','contractor','complaints','done','home'].includes(view))return;
+  flipRender();
+  panel.querySelectorAll('[data-flip]').forEach(el=>{if(sig[el.dataset.flip]!==undefined&&sig[el.dataset.flip]!==sigOf(getIssue(el.dataset.flip))){el.classList.remove('synced');void el.offsetWidth;el.classList.add('synced')}});
+  if(view==='complaints'&&detail){const b=panel.querySelector('.citybox');if(b){b.classList.remove('synced');void b.offsetWidth;b.classList.add('synced')}}
+  frameMapSoft();
+  if(view==='city'||view==='contractor'){const p=$('.protobar .sync');if(p){p.hidden=false;A(p,{opacity:[0,1,1,0]},{duration:2.2})}}
+}
+const sigOf=is=>is?`${is.status}|${is.reporters.length}|${score(is)}|${is.contractorId||''}|${is.cityApproved?1:0}`:'';
+function sigs(){const o={};panel.querySelectorAll('[data-flip]').forEach(el=>o[el.dataset.flip]=sigOf(getIssue(el.dataset.flip)));return o}
+if(opsBC)opsBC.onmessage=()=>onRemote();
+else addEventListener('storage',e=>{if(e.key===OPS_KEY||e.key==='uo2')onRemote()});
+addEventListener('focusout',()=>{if(syncPend)setTimeout(()=>{if(syncPend&&!(document.activeElement&&panel.contains(document.activeElement)&&document.activeElement.matches('input,textarea,select')))remoteRender()},50)});
+
+/* ---------- render helpers shared by both views ---------- */
+let of={corp:'',ward:'',cat:'',st:'open',band:''},oSort={k:'score',dir:-1},opsPick=new Set(),opsHeat=false,kTab='new',proofErr={},kDecline=null,kpiPrev={};
+let KID=LS.get('uo-kid','k1');if(!kOf(KID))KID='k1';
+const roleOf=v=>v==='city'?'city':v==='contractor'?'contractor':'citizen';
+const ROLES={
+  citizen:{l:'Citizen',ic:'fa-user',v:'home',who:'Resident of Bengaluru',sub:'Report problems and track them'},
+  city:{l:'City official',ic:'fa-building-columns',v:'city',who:'Ward Engineer, Bengaluru South (demo)',sub:'Prioritise, assign and verify'},
+  contractor:{l:'Contractor',ic:'fa-helmet-safety',v:'contractor',who:()=>`${kName(KID)} (demo)`,sub:'Accept jobs and prove the fix'},
+};
+const protoBar=()=>`<div class="protobar" role="note"><i class="fa-solid fa-flask" aria-hidden="true"></i><span><b>Prototype with sample data.</b> Not a live government system.</span>
+  <span class="sync" hidden><i class="fa-solid fa-arrows-rotate" aria-hidden="true"></i>Synced from another tab</span>
+  <button class="btn sm" data-act="o-demo"><i class="fa-solid fa-play"></i>Run the 60-second demo</button></div>`;
+const bandChip=is=>{const s=score(is),[b,l]=band(s);return`<span class="bchip b-${b}"><b class="mono">${s}</b>${l}</span>`};
+function scoreChip(is){
+  const w=weighted(is),s=score(is),[b,l]=band(s);
+  return`<span class="sc b-${b}" title="${l} priority, score ${s} of 100"><span class="scn"><b class="mono">${s}</b><small>${l}</small></span><span class="sbar" aria-hidden="true">${Object.entries(w).map(([k,v])=>`<i style="width:${v.toFixed(1)}%;background:${W_COLOR[k]}"></i>`).join('')}</span></span>`;
+}
+function slaInfo(is){
+  if(is.status==='verified_fixed')return is.fixedAt>dueOf(is)?{l:'Fixed late',tone:'over'}:{l:'Fixed on time',tone:'fixed'};
+  if(is.status==='submitted')return{l:'Awaiting check',tone:'act'};
+  const d=(dueOf(is)-now())/DAY,pre=is.contractorId?'':'Unassigned · ';
+  return d<0?{l:`${pre}${Math.max(1,Math.floor(-d))}d overdue`,tone:'over'}:{l:`${pre}due in ${Math.max(1,Math.ceil(d))}d`,tone:is.contractorId?'wait':'act'};
+}
+function countdown(is){
+  const ms=dueOf(is)-now(),a=Math.abs(ms),d=Math.floor(a/DAY),h=Math.floor(a%DAY/36e5),txt=d?`${d}d ${h}h`:`${h}h ${Math.floor(a%36e5/6e4)}m`;
+  return ms<0?{l:`Overdue by ${txt}`,tone:'over'}:{l:`${txt} left`,tone:ms<DAY?'act':'wait'};
+}
+function baHTML(is){
+  if(!is.before||!is.after)return'';
+  return`<div class="ba" style="--p:50%"><img src="${is.after.img}" alt="After the fix"><img class="bef" src="${is.before.img}" alt="Before the fix">
+    <span class="bal bl">Before</span><span class="bal br">After</span><span class="bah" aria-hidden="true"><i class="fa-solid fa-left-right"></i></span>
+    <input class="ba-r" type="range" min="0" max="100" value="50" aria-label="Slide to compare the before and after photos"></div>
+    <p class="hint">Before ${fmtDT(is.before.t)} · after ${fmtDT(is.after.t)} · both taken within 100 m of the site${is.before.demo||is.after.demo?' · sample photos (demo)':''}</p>`;
+}
+const tlHTML=is=>`<ul class="tl">${[...is.events].reverse().map(e=>`<li><div><time>${fmtDT(e.t)}${e.by?` · ${e.by==='city'?'City':'Contractor'}`:''}</time>${esc(e.x)}</div></li>`).join('')}</ul>`;
+
+/* ---------- City Console ---------- */
+function cityList(){
+  const R=rankMap(),list=OPS.issues.filter(is=>(!of.corp||is.corp===of.corp)&&(!of.ward||is.ward===of.ward)&&(!of.cat||is.cat===of.cat)
+    &&(of.st==='all'||(of.st==='open'?OPEN_ST.includes(is.status):is.status===of.st))&&(!of.band||band(score(is))[0]===of.band));
+  const key={score:is=>score(is),days:is=>now()-is.firstAt,reports:is=>demandN(is),sla:is=>is.status==='verified_fixed'?1e15:dueOf(is)-now()}[oSort.k];
+  return list.sort((a,b)=>oSort.dir*(key(a)-key(b))||(R[a.id]||999)-(R[b.id]||999));
+}
+const assignable=is=>['new','reopened','assigned','accepted'].includes(is.status);
+const kpi=(k,l,v,dec,suf,cls='',ic='')=>`<div class="okpi ${cls}"><small>${ic?`<i class="fa-solid ${ic}" aria-hidden="true"></i>`:''}${l}</small><b class="mono" data-count="${k}" data-to="${v}" data-dec="${dec}" data-suf="${suf}">${(+v).toFixed(dec)}${suf}</b></div>`;
+function kpiHTML(){
+  const K=opsKPIs();
+  return kpi('open','Open issues',K.open,0,'','','fa-folder-open')+kpi('critical','Critical',K.critical,0,'','crit','fa-triangle-exclamation')+kpi('overdue','Overdue',K.overdue,0,'','over','fa-clock')
+    +kpi('avg','Average days to fix',K.avgDays,1,'','','fa-stopwatch')+kpi('sla','SLA compliance',K.sla,0,'%','','fa-calendar-check')+kpi('reo','Reopened',K.reopened,0,'%','','fa-rotate-left');
+}
+function countUp(){
+  panel.querySelectorAll('[data-count]').forEach(el=>{
+    const k=el.dataset.count,to=+el.dataset.to,dec=+el.dataset.dec,suf=el.dataset.suf,from=kpiPrev[k]??0;kpiPrev[k]=to;
+    if(RM.matches||Math.abs(from-to)<1e-9){el.textContent=to.toFixed(dec)+suf;return}
+    const t0=performance.now(),D=800;el.textContent=from.toFixed(dec)+suf;
+    const f=t=>{const p=Math.min(1,(t-t0)/D),e=1-Math.pow(1-p,3);el.textContent=(from+(to-from)*e).toFixed(dec)+suf;if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f);
+    if(from!==to)el.parentElement.classList.add('bump'),setTimeout(()=>el.parentElement?.classList.remove('bump'),900);
+  });
+}
+function weightsHTML(){
+  const W=OPS.weights,custom=Object.keys(W_DEFAULT).some(k=>W[k]!==W_DEFAULT[k]);
+  return`<div class="ocardh"><h2>Priority weights</h2><button class="btn sm quiet" data-act="o-wreset" ${custom?'':'disabled'}><i class="fa-solid fa-rotate-left"></i>Reset to default</button></div>
+    <p class="hint">Decide what matters most. The queue re-sorts as you drag.</p>
+    <div class="wlist">${Object.keys(W_MAX).map(k=>`<div class="wrow"><label for="w-${k}"><i style="background:${W_COLOR[k]}" aria-hidden="true"></i>${W_LABEL[k]}<small>up to ${W_MAX[k]} pts</small></label>
+      <input type="range" id="w-${k}" min="0" max="2" step="0.1" value="${W[k]}" data-w="${k}"><output for="w-${k}" id="wo-${k}" class="mono">×${(+W[k]).toFixed(1)}</output></div>`).join('')}</div>
+    <p class="hint">Reopened issues get +10. Bands: Critical 80+, High 60–79, Medium 40–59, Low under 40.</p>`;
+}
+function filtersHTML(){
+  const wards=[...new Set(OPS.issues.filter(i=>!of.corp||i.corp===of.corp).map(i=>i.ward).filter(Boolean))].sort((a,b)=>parseInt(a.slice(5))-parseInt(b.slice(5)));
+  const sel=(k,l,opts)=>`<label class="ofl"><span>${l}</span><select data-of="${k}" id="of-${k}">${opts.map(([v,t])=>`<option value="${v}" ${of[k]===v?'selected':''}>${esc(t)}</option>`).join('')}</select></label>`;
+  return`<div class="ofilters">
+    ${sel('corp','Corporation',[['','All 5 corporations'],...Object.entries(CORPS).map(([k,v])=>[k,v.replace('Bengaluru ','').replace(' City Corporation','')])])}
+    ${sel('ward','Ward',[['','All wards'],...wards.map(w=>[w,w+' (sample)'])])}
+    ${sel('cat','Category',[['','All categories'],...Object.entries(CATS).map(([k,c])=>[k,c.n])])}
+    ${sel('st','Status',[['open','All open'],['all','All, including fixed'],...Object.entries(ST_LABEL).map(([k,l])=>[k,l])])}
+    ${sel('band','Band',[['','All bands'],['critical','Critical (80+)'],['high','High (60–79)'],['medium','Medium (40–59)'],['low','Low (under 40)']])}
+  </div>`;
+}
+const bulkHTML=()=>opsPick.size?`<div class="bulk" id="bulk"><b>${plural(opsPick.size,'issue')} selected</b><button class="btn sm primary" data-act="o-assign-bulk"><i class="fa-solid fa-user-check"></i>Assign selected</button><button class="btn sm quiet" data-act="o-pick-none">Clear</button></div>`:'<div id="bulk" hidden></div>';
+function queueHTML(){
+  const list=cityList(),R=rankMap();
+  const sb=(k,l)=>`<button class="qsort" data-act="o-sort" data-k="${k}" aria-label="Sort by ${l}" aria-pressed="${oSort.k===k}">${l}${oSort.k===k?`<i class="fa-solid fa-arrow-${oSort.dir<0?'down':'up'}" aria-hidden="true"></i>`:''}</button>`;
+  return`<div class="qhead"><span></span><span>Rank</span><span>Issue</span>${sb('reports','Reports')}${sb('score','Score')}${sb('days','Open')}${sb('sla','SLA')}</div>
+  ${list.length?`<ol class="qlist">${list.map(is=>{const sla=slaInfo(is);return`<li class="qrow${detail===is.id?' on':''}${is.status==='verified_fixed'?' fixed':''}" data-flip="${is.id}" data-is="${is.id}">
+    <span class="qpick">${assignable(is)?`<input type="checkbox" data-pick="${is.id}" ${opsPick.has(is.id)?'checked':''} aria-label="Select ${esc(is.title)}">`:''}</span>
+    <span class="qrank mono">${R[is.id]?'#'+R[is.id]:'·'}</span>
+    <button class="qmain" data-act="o-open" data-id="${is.id}"><b>${esc(is.title)}</b><small><i class="fa-solid ${CATS[is.cat].ic}" aria-hidden="true"></i>${esc(is.area)}${is.ward?` · ${esc(is.ward)}`:''} · <span class="stt t-${ST_TONE[is.status]}">${ST_LABEL[is.status]}</span>${is.sample?'':' · <span class="ex">Resident</span>'}</small></button>
+    <span class="qrep mono" title="${plural(is.reporters.length,'report')}${is.cosigns?`, ${plural(is.cosigns,'co-sign')}`:''}"><i class="fa-solid fa-users" aria-hidden="true"></i>${demandN(is)}</span>
+    ${scoreChip(is)}
+    <span class="qdays mono">${is.status==='verified_fixed'?'done':days(is.firstAt)+'d'}</span>
+    <span class="qsla t-${sla.tone}">${sla.l}</span></li>`}).join('')}</ol>`
+  :`<div class="empty"><i class="fa-solid fa-filter-circle-xmark" aria-hidden="true"></i><h3>No issues match these filters</h3><button class="btn" data-act="o-fclear">Clear filters</button></div>`}`;
+}
+function leaderHTML(){
+  const rows=OPS.contractors.map(k=>({k,s:kStats(k)})).sort((a,b)=>(b.s.onTime*.5+(1-b.s.reopen)*.3+b.k.rating/25)-(a.s.onTime*.5+(1-a.s.reopen)*.3+a.k.rating/25));
+  return`<div class="ocardh"><h2>Contractor leaderboard</h2><span class="ex">Demo contractors</span></div>
+  <div class="tscroll"><table class="otable"><thead><tr><th>#</th><th>Contractor</th><th>Active</th><th>Done</th><th>On time</th><th>Avg days</th><th>Reopened</th><th>Rating</th></tr></thead>
+  <tbody>${rows.map((r,i)=>`<tr data-flip="k-${r.k.id}" class="${r.s.flag?'flagged':''}"><td class="mono">${i+1}</td><td><b>${esc(r.k.name)}</b><small>${r.k.spec.join(', ')}</small>${r.s.flag?`<span class="tag flag"><i class="fa-solid fa-flag" aria-hidden="true"></i>${r.s.flag}</span>`:''}</td>
+    <td class="mono">${r.s.active}</td><td class="mono">${r.s.done}</td><td class="mono">${Math.round(r.s.onTime*100)}%</td><td class="mono">${r.s.days.toFixed(1)}</td><td class="mono${r.s.reopen>=.15?' bad':''}">${Math.round(r.s.reopen*100)}%</td><td class="mono">★ ${r.k.rating}</td></tr>`).join('')}</tbody></table></div>
+  <p class="hint">History includes sample past jobs. Flagged: reopen rate of 15% or more, or two or more overdue jobs.</p>`;
+}
+function wardRows(){
+  const g={};OPS.issues.forEach(i=>{const k=(i.corp||'?')+'|'+(i.ward||'Unmapped');(g[k]=g[k]||[]).push(i)});
+  return Object.entries(g).map(([k,L])=>{const[corp,ward]=k.split('|'),open=L.filter(i=>OPEN_ST.includes(i.status)),fx=L.filter(i=>i.status==='verified_fixed');
+    return{corp,ward,open:open.length,crit:open.filter(i=>score(i)>=80).length,over:open.filter(i=>overdueDays(i)>0).length,fixed:fx.length,
+      avg:fx.length?fx.reduce((s,i)=>s+(i.fixedAt-i.firstAt)/DAY,0)/fx.length:null,on:fx.length?100*fx.filter(i=>i.fixedAt<=dueOf(i)).length/fx.length:null}})
+    .sort((a,b)=>b.crit-a.crit||b.over-a.over||b.open-a.open);
+}
+function wardHTML(){
+  return`<div class="ocardh"><h2>Ward scorecard</h2><span class="ex">Sample wards</span></div>
+  <div class="tscroll wardscroll"><table class="otable"><thead><tr><th>Ward</th><th>Corporation</th><th>Open</th><th>Critical</th><th>Overdue</th><th>Fixed</th><th>Avg days</th><th>On time</th></tr></thead>
+  <tbody>${wardRows().map(w=>`<tr><td><b>${esc(w.ward)}</b></td><td>${esc((CORPS[w.corp]||'Not mapped').replace('Bengaluru ','').replace(' City Corporation',''))}</td><td class="mono">${w.open}</td><td class="mono${w.crit?' bad':''}">${w.crit}</td><td class="mono${w.over?' warn':''}">${w.over}</td><td class="mono">${w.fixed}</td><td class="mono">${w.avg==null?'·':w.avg.toFixed(1)}</td><td class="mono">${w.on==null?'·':Math.round(w.on)+'%'}</td></tr>`).join('')}</tbody></table></div>`;
+}
+function drawerHTML(is){
+  const p=scoreParts(is),w=weighted(is),k=is.contractorId&&kOf(is.contractorId),sla=slaInfo(is),R=rankMap();
+  const top=assignable(is)&&!k?rankContractors([is])[0]:null;
+  let actHTML='';
+  if(!k||is.status==='new')actHTML=`<div class="dact"><p>${top?`<b>Best match: ${esc(top.k.name)}.</b> ${esc(top.m.reason)}`:''}</p><button class="btn primary lg block" data-act="o-assign" data-id="${is.id}"><i class="fa-solid fa-user-check"></i>Assign a contractor</button></div>`;
+  else if(is.status==='submitted')actHTML=`<div class="dact"><p><b>${esc(k.name)} submitted it as fixed</b> on ${fmtDT(is.submittedAt)}. Check the before and after photos.</p>${baHTML(is)}
+    ${is.cityApproved?`<div class="alert t-wait"><b>Approved by the city</b><span>${is.citizenConfirmed?'A resident has confirmed too.':`Waiting for a resident to confirm. If nobody disputes it, it’s verified on ${fmtDT(is.submittedAt+VERIFY_MS)}.`}</span></div>
+      <button class="btn sm quiet" data-act="o-ff" data-id="${is.id}"><i class="fa-solid fa-forward"></i>Skip ahead 72 hours (demo)</button>`
+    :`<div class="row"><button class="btn primary" data-act="o-approve" data-id="${is.id}"><i class="fa-solid fa-circle-check"></i>Approve the fix</button><button class="btn danger" data-act="o-sendback" data-id="${is.id}"><i class="fa-solid fa-rotate-left"></i>Not fixed, send back</button></div>`}</div>`;
+  else if(is.status==='verified_fixed')actHTML=`<div class="dact"><div class="alert t-fixed"><b>Verified fixed on ${fmtD(is.fixedAt)}</b><span>${plural(Math.max(1,Math.round((is.fixedAt-is.firstAt)/DAY)),'day')} from first report · ${sla.l.toLowerCase()} · fixed by ${esc(k.name)}</span></div>${baHTML(is)}</div>`;
+  else actHTML=`<div class="dact"><dl class="facts"><dt>Contractor</dt><dd><b>${esc(k.name)}</b> <span class="ex">Demo</span></dd><dt>Status</dt><dd>${ST_LABEL[is.status]}${is.status==='reopened'?' · sent back with higher priority':''}</dd><dt>Fix by</dt><dd>${fmtD(dueOf(is))} · <span class="stt t-${sla.tone}">${sla.l}</span></dd><dt>Sample cost</dt><dd>${inr(is.cost)}</dd>${is.note?`<dt>Note</dt><dd>${esc(is.note)}</dd>`:''}</dl>
+    ${assignable(is)?`<button class="btn sm" data-act="o-assign" data-id="${is.id}"><i class="fa-solid fa-arrows-rotate"></i>Reassign</button>`:''}</div>`;
+  const photo=is.after?'':is.before?`<figure class="dphoto"><img src="${is.before.img}" alt="Before photo from the contractor"><figcaption>Before photo · ${fmtDT(is.before.t)}</figcaption></figure>`:is.photos&&is.photos[0]?`<figure class="dphoto"><img src="${is.photos[0]}" alt="Photo from the first report"><figcaption>From the first report${is.sample?' · sample photo':''}</figcaption></figure>`:'';
+  const L=n=>n<26?String.fromCharCode(65+n):String.fromCharCode(65+Math.floor(n/26)-1)+String.fromCharCode(65+n%26);
+  return`<aside class="drawer" id="drawer" aria-labelledby="dr-t">
+    <div class="drh"><div class="row" style="gap:var(--s2)">${bandChip(is)}<span class="pill t-${ST_TONE[is.status]}">${ST_LABEL[is.status]}</span>${R[is.id]?`<span class="mono small muted">#${R[is.id]} in queue</span>`:''}</div><button class="iconbtn" data-act="o-close" aria-label="Close issue"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="drb">
+    <div class="stack" style="gap:var(--s2)"><h2 id="dr-t">${esc(is.title)}</h2><p class="small muted"><i class="fa-solid ${CATS[is.cat].ic}" aria-hidden="true"></i> ${CATS[is.cat].n} · ${esc(is.area)}${is.ward?` · ${esc(is.ward)}`:''}${CORPS[is.corp]?` · ${esc(CORPS[is.corp].replace('Bengaluru ',''))}`:''} · <span class="mono">${is.id}</span>${is.sample?' · <span class="ex">Sample</span>':''}</p>
+    ${is.flags.length?`<div class="flags">${is.flags.map(f=>`<span><i class="fa-solid ${FLAG_IC[f]}" aria-hidden="true"></i>${FLAG_LABEL[f].replace(/^(on|at|near) a /,'')}</span>`).join('')}</div>`:''}</div>
+    <div class="why"><i class="fa-solid fa-ranking-star" aria-hidden="true"></i><div><b>Why this rank</b><p>${whyRank(is)}</p></div></div>
+    <div class="bks" aria-label="Score breakdown">${Object.entries(w).map(([kk,v])=>`<span class="bk"><i style="background:${W_COLOR[kk]}" aria-hidden="true"></i>${W_LABEL[kk]}<b class="mono">${kk==='reopen'?'+10':`${Math.round(p[kk])}/${W_MAX[kk]}`}</b></span>`).join('')}</div>
+    ${actHTML}${photo}
+    <details class="box" open><summary>Linked complaints <span class="cnt">${plural(is.reporters.length,'report')}${is.cosigns?` + ${plural(is.cosigns,'co-sign')}`:''}</span></summary><div>
+      <p class="hint">Names and phone numbers are never shown here. Reports of the same problem within 50 m merge into one issue.</p>
+      <ul class="reps">${is.reporters.map((r,n)=>`<li><span class="av sm" aria-hidden="true">${L(n)}</span><span><b>Resident ${L(n)}${r.src==='you'?' · via UrbOasis':''}</b><small>${fmtDT(r.t)} · ${SEV[r.sev]}${r.src==='sample'?' · sample':''}</small></span></li>`).join('')}</ul></div></details>
+    <details class="box"><summary>Timeline <span class="cnt">${is.events.length}</span></summary><div>${tlHTML(is)}</div></details>
+    </div></aside>`;
+}
+function cityHTML(){
+  const sel=detail&&getIssue(detail),K=opsKPIs();
+  return`<div class="wrap wide ops">
+  ${protoBar()}
+  <div class="ohead"><div class="stack" style="gap:var(--s2)"><p class="eyebrow">City Console</p><h1>What to fix first</h1><p class="muted">Every complaint, merged into issues and ranked by risk and public demand.</p></div>
+    <div class="who"><span class="av" aria-hidden="true"><i class="fa-solid fa-user-tie"></i></span><span><b>Ward Engineer, Bengaluru South</b><small>Demo profile · sample data</small></span></div></div>
+  <div class="otools row">
+    <button class="btn sm" data-act="o-csv"><i class="fa-solid fa-file-csv"></i>Export CSV</button><button class="btn sm" data-act="o-print"><i class="fa-solid fa-print"></i>Print or save PDF</button>
+    <span class="grow"></span><span class="small muted">${plural(K.merged,'duplicate report')} merged</span>
+    <button class="btn sm quiet" data-act="o-reset"><i class="fa-solid fa-rotate"></i>Reset demo data</button><button class="btn sm quiet" data-act="o-clear"><i class="fa-solid fa-broom"></i>Clear sample data</button></div>
+  <div class="okpis" id="okpis" aria-label="Key numbers (sample data)">${kpiHTML()}</div>
+  <div class="ogrid">
+    <div class="oside">
+      <section class="ocard" aria-labelledby="om-h"><div class="ocardh"><h2 id="om-h">Map</h2><button class="chip sm" data-act="o-heat" aria-pressed="${opsHeat}"><i class="fa-solid fa-fire" aria-hidden="true"></i> Heatmap</button></div>
+        <div class="mapslot ops-map" data-mapslot></div>
+        <div class="legend" aria-label="Legend"><span><i class="b-critical"></i>Critical</span><span><i class="b-high"></i>High</span><span><i class="b-medium"></i>Medium</span><span><i class="b-low"></i>Low</span><span class="muted">Bigger = more reports</span></div></section>
+      <section class="ocard" id="weights">${weightsHTML()}</section>
+    </div>
+    <section class="ocard oq" aria-labelledby="oq-h"><div class="ocardh"><h2 id="oq-h">Priority queue</h2><span class="small muted" id="oq-n">${plural(cityList().length,'issue')}</span></div>
+      ${filtersHTML()}${bulkHTML()}<div id="oqueue">${queueHTML()}</div></section>
+  </div>
+  <div class="ogrid2"><section class="ocard" id="lboard">${leaderHTML()}</section><section class="ocard">${wardHTML()}</section></div>
+  ${sel?drawerHTML(sel):''}
+  </div>`;
+}
+/* Update only the queue (and what depends on it) so sliders keep their drag. */
+function flipQueue(){
+  const q=$('#oqueue');if(!q)return render();
+  const before={};q.querySelectorAll('[data-flip]').forEach(el=>before[el.dataset.flip]=el.getBoundingClientRect().top);
+  q.innerHTML=queueHTML();$('#okpis').innerHTML=kpiHTML();$('#oq-n').textContent=plural(cityList().length,'issue');
+  const d=$('#drawer');if(d&&detail){const is=getIssue(detail);if(is){const sc=d.scrollTop;d.outerHTML=drawerHTML(is);$('#drawer').scrollTop=sc}}
+  countUp();renderMarkers();
+  if(!M||RM.matches)return;
+  q.querySelectorAll('[data-flip]').forEach(el=>{const o=before[el.dataset.flip];if(o==null){A(el,{opacity:[0,1]},{duration:.25});return}const dy=o-el.getBoundingClientRect().top;if(Math.abs(dy)>1)A(el,{y:[dy,0]},{duration:.5,ease:[.2,.8,.2,1]})});
+}
+function flipRender(){
+  const before={};panel.querySelectorAll('[data-flip]').forEach(el=>before[el.dataset.flip]=el.getBoundingClientRect().top);
+  const dsc=$('#drawer')?.scrollTop;
+  render();if(dsc&&$('#drawer'))$('#drawer').scrollTop=dsc;
+  if(!M||RM.matches)return;
+  panel.querySelectorAll('[data-flip]').forEach(el=>{const o=before[el.dataset.flip];if(o==null)return;const dy=o-el.getBoundingClientRect().top;if(Math.abs(dy)>1)A(el,{y:[dy,0]},{duration:.5,ease:[.2,.8,.2,1]})});
+}
+function opsOpen(id){
+  if(view!=='city'){go('city',id);return}
+  const was=detail;detail=id;render();history.replaceState(null,'',hashFor());
+  const is=getIssue(id);if(map&&is&&mapShown)map.easeTo({center:[is.lng,is.lat],zoom:Math.max(map.getZoom(),14),duration:RM.matches?0:700});
+  if(!was)A($('#drawer'),{x:[48,0],opacity:[0,1]},{duration:.28});
+  $('#drawer [data-act="o-close"]')?.focus({preventScroll:true});
+}
+function opsClose(){const id=detail;detail=null;render();history.replaceState(null,'',hashFor());panel.querySelector(`.qrow[data-is="${id}"] .qmain`)?.focus({preventScroll:true})}
+function frameMapSoft(){if(view==='city'||view==='contractor')renderMarkers()}
+function openAssign(ids){
+  const iss=ids.map(getIssue).filter(Boolean);if(!iss.length)return;
+  const ranked=rankContractors(iss),top=ranked[0],win=Math.max(...iss.map(is=>Math.max(2,CATS[is.cat].days)));
+  const cost=iss.reduce((s,is)=>s+(is.cost||COST_SAMPLE[is.cat]),0);
+  openOverlay(`<div class="bar"><h2 id="as-t" style="font-size:var(--fs-xl)">${iss.length>1?`Assign ${iss.length} issues`:'Assign a contractor'}</h2><button class="iconbtn" data-close data-act="close-ov" aria-label="Close"><i class="fa-solid fa-xmark"></i></button></div>
+    <p class="small muted">${iss.map(i=>esc(i.title)).join(' · ')}</p>
+    <div class="bestpick"><i class="fa-solid fa-wand-magic-sparkles" aria-hidden="true"></i><div><b>Recommended: ${esc(top.k.name)}</b><p>${esc(top.m.reason)}</p></div></div>
+    <fieldset class="kpick"><legend>Contractors, best match first</legend>${ranked.map((r,i)=>`<label class="kopt"><input type="radio" name="as-k" value="${r.k.id}" ${i===0?'checked':''}>
+      <span class="km"><b>${esc(r.k.name)}${i===0?' <span class="tag now">Best match</span>':''}${r.m.st.flag?` <span class="tag flag">${r.m.st.flag}</span>`:''}</b><small>${esc(r.m.reason)}</small></span><span class="kscore mono" title="Match score">${r.total}</span></label>`).join('')}</fieldset>
+    <div class="two"><label class="fl" for="as-due">Fix by (SLA)<input type="date" id="as-due" value="${isoDate(now()+win*DAY)}" min="${isoDate(now())}"></label>
+      <label class="fl" for="as-cost">Sample cost (₹)${iss.length>1?' in total':''}<input type="number" id="as-cost" min="0" step="500" value="${cost}"></label></div>
+    <label class="fl" for="as-note">Note for the contractor <span class="opt">(optional)</span><textarea id="as-note" rows="2" placeholder="e.g. Work after 10 pm, the road is busy by day"></textarea></label>
+    <p class="hint">Sample costs only. No real tender, budget or contract.</p>
+    <button class="btn primary lg block" data-act="o-do-assign" data-ids="${ids.join(',')}"><i class="fa-solid fa-user-check"></i>Assign</button>`,'as-t');
+}
+function doAssign(ids){
+  const kid=$('input[name="as-k"]:checked')?.value,d=$('#as-due')?.value,cost=Math.max(0,+$('#as-cost')?.value||0),note=($('#as-note')?.value||'').trim();
+  if(!kid)return;
+  const due=d?new Date(d+'T18:00').getTime():now()+3*DAY;
+  assignIssues(ids,kid,due,cost/ids.length,note);ids.forEach(id=>opsPick.delete(id));closeOverlay();
+  toast(`Assigned to ${kName(kid)}, due ${fmtDs(due)}`,'fa-user-check');flipRender();
+}
+function opsCSV(){
+  const q=v=>`"${String(v??'').replace(/"/g,'""')}"`,R=rankMap();
+  const rows=[['rank','issue_id','title','category','area','corporation','ward','status','score','band','severity','reports','co_signs','days_open','fix_by','contractor','sample_cost_inr','sample_data']]
+    .concat(cityList().map(i=>[R[i.id]||'',i.id,i.title,CATS[i.cat].n,i.area,CORPS[i.corp]||'',i.ward,ST_LABEL[i.status],score(i),band(score(i))[1],SEV[i.sev],i.reporters.length,i.cosigns||0,days(i.firstAt),fmtD(dueOf(i)),i.contractorId?kName(i.contractorId):'',i.cost||'',i.sample?'yes':'no']));
+  download(`urboasis-console-sample-${isoDate(now())}.csv`,'text/csv',rows.map(r=>r.map(q).join(',')).join('\n'));toast('CSV downloaded');
+}
+function opsPrint(){
+  const K=opsKPIs(),R=rankMap(),L=cityList();
+  $('#printdoc').innerHTML=`<div class="paper"><div class="rh"><h1>UrbOasis City Console: priority report</h1><p>Prototype with sample data. Not a live government system. Printed ${fmtDT(now())}.</p></div>
+    <h2>Key numbers</h2><table><tr><th>Open</th><th>Critical</th><th>Overdue</th><th>Avg days to fix</th><th>SLA compliance</th><th>Reopened</th></tr><tr><td>${K.open}</td><td>${K.critical}</td><td>${K.overdue}</td><td>${K.avgDays.toFixed(1)}</td><td>${Math.round(K.sla)}%</td><td>${Math.round(K.reopened)}%</td></tr></table>
+    <h2>Priority queue (${L.length})</h2><table><tr><th>#</th><th>Issue</th><th>Area</th><th>Status</th><th>Score</th><th>Reports</th><th>SLA</th><th>Contractor</th></tr>
+    ${L.map(i=>`<tr><td>${R[i.id]||''}</td><td>${esc(i.title)}</td><td>${esc(i.area)}${i.ward?`, ${esc(i.ward)}`:''}</td><td>${ST_LABEL[i.status]}</td><td>${score(i)} ${band(score(i))[1]}</td><td>${demandN(i)}</td><td>${slaInfo(i).l}</td><td>${i.contractorId?esc(kName(i.contractorId)):''}</td></tr>`).join('')}</table>
+    <h2>Contractors (demo)</h2><table><tr><th>Contractor</th><th>Active</th><th>On time</th><th>Reopened</th><th>Flag</th></tr>${OPS.contractors.map(k=>{const s=kStats(k);return`<tr><td>${esc(k.name)}</td><td>${s.active}</td><td>${Math.round(s.onTime*100)}%</td><td>${Math.round(s.reopen*100)}%</td><td>${s.flag||''}</td></tr>`}).join('')}</table>
+    <p class="foot">Sample data only: issues, wards, contractors and costs are fictional.</p></div>`;
+  window.print();
+}
+function syncHeat(){
+  if(!map||!map.getStyle||!map.isStyleLoaded())return;
+  const on=view==='city'&&opsHeat;
+  const data={type:'FeatureCollection',features:on?cityList().filter(i=>i.status!=='verified_fixed').map(i=>({type:'Feature',properties:{w:score(i)/100},geometry:{type:'Point',coordinates:[i.lng,i.lat]}})):[]};
+  try{
+    if(!map.getSource('ops-heat')){if(!on)return;map.addSource('ops-heat',{type:'geojson',data});
+      map.addLayer({id:'ops-heat',type:'heatmap',source:'ops-heat',paint:{'heatmap-weight':['get','w'],'heatmap-intensity':['interpolate',['linear'],['zoom'],9,1,15,2.2],
+        'heatmap-radius':['interpolate',['linear'],['zoom'],9,22,13,40,16,70],'heatmap-opacity':.8,
+        'heatmap-color':['interpolate',['linear'],['heatmap-density'],0,'rgba(0,0,0,0)',.15,'rgba(34,211,238,.55)',.4,'rgba(250,204,21,.7)',.7,'rgba(251,146,60,.85)',1,'rgba(244,63,94,.95)']}},map.getLayer('road-label-major')?'road-label-major':undefined)}
+    else map.getSource('ops-heat').setData(data);
+    map.setLayoutProperty('ops-heat','visibility',on?'visible':'none');
+  }catch{}
+}
+const mkSize=is=>Math.round(26+Math.min(20,6.5*Math.log2(demandN(is))));
+function opsMapItems(){
+  if(view==='city')return cityList().map(is=>{const s=score(is),[b,l]=band(s),fx=is.status==='verified_fixed';
+    return{id:is.id,lat:is.lat,lng:is.lng,title:is.title,sub:`${is.area} · score ${s}`,tone:fx?'fixed':'act',label:fx?'Fixed':`${l} priority`,cls:fx?'':'b-'+b,size:mkSize(is),
+      inner:`<span class="mono">${demandN(is)}</span>`,pulse:b==='critical'&&!fx,open:['city',is.id],onClick:()=>opsOpen(is.id),hover:`.qrow[data-is="${is.id}"]`}});
+  const L=detail?[getIssue(detail)].filter(Boolean):myJobs();
+  return L.map(is=>{const[b,l]=band(score(is));return{id:is.id,lat:is.lat,lng:is.lng,title:is.title,sub:is.area,tone:'act',label:`${l} priority`,cls:'b-'+b,size:30,
+    inner:`<i class="fa-solid ${CATS[is.cat].ic}" aria-hidden="true"></i>`,pulse:false,open:['contractor',is.id],onClick:()=>{if(detail!==is.id)go('contractor',is.id)},hover:`.jcard[data-id="${is.id}"]`}});
+}
+
+/* ---------- Contractor app ---------- */
+const KTABS={new:['New jobs','ಹೊಸ ಕೆಲಸ',['assigned','reopened']],prog:['In progress','ಪ್ರಗತಿಯಲ್ಲಿ',['accepted','in_progress']],sub:['Submitted','ಸಲ್ಲಿಸಲಾಗಿದೆ',['submitted']],done:['Completed','ಪೂರ್ಣಗೊಂಡಿದೆ',['verified_fixed']]};
+const myAll=()=>OPS.issues.filter(i=>i.contractorId===KID);
+const myJobs=(t=kTab)=>myAll().filter(i=>KTABS[t][2].includes(i.status)).sort((a,b)=>t==='done'?b.fixedAt-a.fixedAt:score(b)-score(a));
+const kmFrom=is=>{const k=kOf(KID);return k?dist({lat:k.home[1],lng:k.home[0]},is):0};
+function jobCard(is){
+  const c=countdown(is);
+  return`<button class="jcard" data-act="o-job" data-id="${is.id}" data-flip="${is.id}">
+    <span class="jtop">${bandChip(is)}${is.status==='verified_fixed'?'<span class="pill t-fixed">Verified fixed</span>':is.status==='submitted'?'<span class="pill t-act">Awaiting verification</span>':`<span class="jsla t-${c.tone}"><i class="fa-regular fa-clock" aria-hidden="true"></i>${c.l}</span>`}</span>
+    <b>${esc(is.title)}</b><small>${esc(is.area)}</small>
+    <span class="jmeta"><span><i class="fa-solid fa-route" aria-hidden="true"></i>${fmtKm(kmFrom(is))} from base</span><span><i class="fa-solid fa-indian-rupee-sign" aria-hidden="true"></i>${inr(is.cost).slice(1)} sample</span>${is.status==='reopened'?'<span class="tag flag">Reopened</span>':''}</span></button>`;
+}
+function photoProofHTML(is,kind){
+  const p=is[kind],err=proofErr[is.id+kind],id=`pf-${kind}-${is.id}`;
+  return`<div class="proofbox${p?' ok':''}"><div class="proofh"><b>${kind==='before'?'1. Before photo':'2. After photo'} ${p?'<i class="fa-solid fa-circle-check" aria-hidden="true"></i>':'<span class="req">Required</span>'}</b><small>Must be taken within 100 m of the job. The time and place are recorded.</small></div>
+    ${p?`<figure class="pf"><img src="${p.img}" alt="${kind==='before'?'Before':'After'} photo"><figcaption><i class="fa-solid fa-location-dot" aria-hidden="true"></i>${p.demo?'Sample photo (demo), placed at the job':`${Math.round(p.d)} m from the job, checked by ${p.how==='photo'?'the photo’s location':'your device location'}`} · ${fmtDT(p.t)}</figcaption></figure>`:''}
+    ${err?`<p class="ferr" role="alert"><i class="fa-solid fa-ban" aria-hidden="true"></i>${esc(err)}</p>`:''}
+    <div class="row"><label class="btn" for="${id}" tabindex="0"><i class="fa-solid fa-camera"></i>${p?'Retake':'Take photo'}</label><input class="sr" type="file" accept="image/*" capture="environment" id="${id}" data-pf="${kind}" data-id="${is.id}" tabindex="-1">
+    <button class="btn quiet" data-act="o-pf-sample" data-k="${kind}" data-id="${is.id}"><i class="fa-regular fa-image"></i>Use sample photo (demo)</button></div></div>`;
+}
+function jobHTML(is){
+  const k=kOf(KID),mine=is.contractorId===KID,c=countdown(is),cat=CATS[is.cat];
+  let a='';
+  if(!mine)a=`<div class="alert t-wait"><b>Not your job</b><span>This issue isn’t assigned to ${esc(k.name)}.</span></div>`;
+  else if(['assigned','reopened'].includes(is.status))a=kDecline===is.id?`<div class="stack" style="gap:var(--s3)"><label class="fl" for="k-reason">Why are you declining?<select id="k-reason"><option>Outside our specialisation</option><option>Too many jobs right now</option><option>Can’t reach the site</option><option>The sample cost doesn’t cover the work</option></select></label>
+      <div class="row"><button class="btn danger" data-act="o-decline-yes" data-id="${is.id}">Decline the job</button><button class="btn quiet" data-act="o-decline-no">Cancel</button></div></div>`
+    :`${is.status==='reopened'?'<div class="alert t-over"><b>Reopened</b><span>A resident said the last fix didn’t work. It’s back with you at higher priority, and it counts towards your reopen rate.</span></div>':''}
+      <div class="row"><button class="btn primary lg grow" data-act="o-accept" data-id="${is.id}"><i class="fa-solid fa-check"></i>Accept job</button><button class="btn lg" data-act="o-decline" data-id="${is.id}">Decline</button></div>`;
+  else if(is.status==='accepted')a=`${photoProofHTML(is,'before')}<button class="btn primary lg block" data-act="o-start" data-id="${is.id}" ${is.before?'':'disabled'}><i class="fa-solid fa-person-digging"></i>Start work</button>${is.before?'':'<p class="hint">Add the before photo to start.</p>'}`;
+  else if(is.status==='in_progress')a=`${photoProofHTML(is,'before')}${photoProofHTML(is,'after')}<button class="btn primary lg block" data-act="o-submit" data-id="${is.id}" ${is.after?'':'disabled'}><i class="fa-solid fa-paper-plane"></i>Submit as fixed</button>${is.after?'':'<p class="hint">Add the after photo to submit.</p>'}`;
+  else if(is.status==='submitted')a=`<div class="alert t-act"><b>Submitted, awaiting verification</b><span>It’s verified once the city approves your photos and a resident confirms, or 72 hours pass with no dispute.${is.cityApproved?' The city has approved it.':''}</span></div>${baHTML(is)}`;
+  else if(is.status==='verified_fixed')a=`<div class="alert t-fixed"><b>Verified fixed</b><span>${fmtD(is.fixedAt)} · ${is.fixedAt<=dueOf(is)?'on time':'late'}</span></div>${baHTML(is)}`;
+  return`<div class="wrap capp">
+    ${protoBar()}
+    <a class="link muted" href="#contractor" data-act="o-job-back"><i class="fa-solid fa-arrow-left"></i>All jobs</a>
+    <div class="stack" style="gap:var(--s2)"><div class="row" style="gap:var(--s2)">${bandChip(is)}<span class="pill t-${ST_TONE[is.status]}">${ST_LABEL[is.status]}</span>${is.sample?'<span class="ex">Sample</span>':''}</div>
+      <h1 class="jh">${esc(is.title)}</h1><p class="small muted"><i class="fa-solid ${cat.ic}" aria-hidden="true"></i> ${cat.n} · ${esc(is.area)}${is.ward?` · ${esc(is.ward)}`:''}</p></div>
+    <div class="jfacts"><div><small>Fix by</small><b class="t-${c.tone}">${is.status==='verified_fixed'||is.status==='submitted'?fmtDs(dueOf(is)):c.l}</b></div><div><small>Sample cost</small><b>${inr(is.cost)}</b></div><div><small>Distance</small><b>${fmtKm(kmFrom(is))}</b></div></div>
+    <section class="jact" id="jact" aria-label="Job actions">${a}</section>
+    <div class="why"><i class="fa-solid fa-ranking-star" aria-hidden="true"></i><div><b>Why it’s a priority</b><p>${whyRank(is)}</p></div></div>
+    <div class="ocard"><b class="small">City notes</b><p class="small ${is.note?'':'muted'}">${is.note?esc(is.note):'No notes from the city.'}</p></div>
+    <div class="mapslot short" data-mapslot></div>
+    <a class="btn block" target="_blank" rel="noopener" href="${gmaps(is.lat,is.lng)}"><i class="fa-solid fa-diamond-turn-right"></i>Directions</a>
+    ${is.photos&&is.photos[0]&&!is.after?`<figure class="dphoto"><img src="${is.photos[0]}" alt="Photo from the first report"><figcaption>From the first report${is.sample?' · sample photo':''}</figcaption></figure>`:''}
+    <details class="box"><summary>Timeline <span class="cnt">${is.events.length}</span></summary><div>${tlHTML(is)}</div></details>
+  </div>`;
+}
+function contractorHTML(){
+  const k=kOf(KID);
+  if(detail){const is=getIssue(detail);if(is)return jobHTML(is)}
+  const counts=Object.fromEntries(Object.keys(KTABS).map(t=>[t,myJobs(t).length])),L=myJobs(),st=kStats(k);
+  return`<div class="wrap capp">
+  ${protoBar()}
+  <h1 class="sr">Contractor app: your jobs</h1>
+  <div class="kprof"><span class="av" aria-hidden="true"><i class="fa-solid fa-helmet-safety"></i></span><span class="grow"><b>${esc(k.name)} (demo)</b><small>${k.spec.join(', ')} · ${Math.round(st.onTime*100)}% on time · ★ ${k.rating}</small></span>
+    <label class="sr" for="k-prof">Switch demo contractor</label><select id="k-prof" class="ksel">${OPS.contractors.map(x=>`<option value="${x.id}" ${x.id===KID?'selected':''}>${esc(x.name)}</option>`).join('')}</select></div>
+  <div class="ktabs" role="tablist" aria-label="Jobs">${Object.entries(KTABS).map(([t,[l,kn]])=>`<button role="tab" aria-selected="${kTab===t}" data-act="o-ktab" data-k="${t}"><span>${l}<small lang="kn">${kn}</small></span><b class="mono">${counts[t]}</b></button>`).join('')}</div>
+  <div class="jlist">${L.length?L.map(jobCard).join(''):`<div class="empty"><i class="fa-solid fa-mug-hot" aria-hidden="true"></i><h3>Nothing here</h3><p>${kTab==='new'?'New jobs from the city appear here. Keep this open; it updates live.':'No jobs in this list yet.'}</p></div>`}</div>
+  ${L.length?'<div class="mapslot short" data-mapslot></div>':''}
+  </div>`;
+}
+async function proofPhoto(is,kind,file){
+  const key=is.id+kind;delete proofErr[key];
+  let p;
+  if(file==='sample')p={img:samplePhoto(kind,is.cat),t:now(),lat:is.lat,lng:is.lng,demo:true,d:0,how:'sample'};
+  else{
+    toast('Checking the photo’s location…','fa-location-crosshairs');
+    let pos=await exifGPS(file).catch(()=>null),how='photo';
+    if(!pos){how='device';pos=await getPos().catch(()=>null)}
+    if(!pos){proofErr[key]='No location found. Turn on location for this site, or take the photo with location tagging on. Proof must be taken at the job.';render();return}
+    const d=dist(pos,is);
+    if(d>100){proofErr[key]=`This photo was taken ${fmtKm(d)} from the job. It must be within 100 m, so it can’t be used.`;render();return}
+    p={img:await blobToURL(await shrink(file,900,.72)),t:now(),lat:pos.lat,lng:pos.lng,demo:false,d,how};
+  }
+  is[kind]=p;ev(is,kind,`${kind==='before'?'Before':'After'} photo added${p.demo?' (sample, demo)':`, ${Math.round(p.d)} m from the job`}`,'contractor');
+  saveOps();render();toast(kind==='before'?'Before photo added':'After photo added','fa-camera');
+}
+
+/* ---------- citizen view: city progress on the complaint page ---------- */
+function cityBoxHTML(c){
+  const is=issueOf(c);if(!is||(is.status==='new'&&!is.reopenCount))return'';
+  const k=is.contractorId?kName(is.contractorId):'',n=demandN(is)-1;
+  const steps=[['Assigned',!!is.contractorId],['Accepted',['accepted','in_progress','submitted','verified_fixed'].includes(is.status)],['Work done',['submitted','verified_fixed'].includes(is.status)],['Verified',is.status==='verified_fixed']];
+  let h,p,act='';const late=overdueDays(is)>0;
+  switch(is.status){
+    case'assigned':h=`Assigned to ${k}, due ${fmtDs(dueOf(is))}`;p=late?`It’s ${plural(overdueDays(is),'day')} late, so it moves up the city’s queue every day it stays open.`:'The city picked a contractor for this. You don’t need to follow up while it’s on time.';break;
+    case'accepted':h=`${k} accepted the job`;p=late?`It was due on ${fmtDs(dueOf(is))} and is now late, so its priority keeps rising.`:`They’re due to fix it by ${fmtDs(dueOf(is))}.`;break;
+    case'in_progress':h='Work has started';p=`${k} took a before photo on site on ${fmtDs(is.before?.t||now())}. Due ${fmtDs(dueOf(is))}.`;break;
+    case'submitted':h='Marked fixed. Is it really fixed?';p=is.citizenConfirmed?'Thanks for confirming. It’s verified once the city approves the photos.':'Compare the photos, or go and look. Confirm it, or reopen it if it isn’t fixed.';
+      act=`${baHTML(is)}${is.citizenConfirmed?'':`<div class="row"><button class="btn primary lg" data-act="o-cit-ok"><i class="fa-solid fa-circle-check"></i>Yes, it’s fixed</button><button class="btn lg" data-act="o-cit-no"><i class="fa-solid fa-rotate-left"></i>No, reopen it</button></div>`}`;break;
+    case'reopened':h=`Reopened and sent back to ${k||'the contractor'}`;p='You said it wasn’t fixed, so it’s back with the same contractor at higher priority.';break;
+    case'verified_fixed':h='Verified fixed';p=`The city approved the photos${is.citizenConfirmed?' and a resident confirmed':' and nobody disputed it for 72 hours'}.`;act=baHTML(is);break;
+    default:h='Back in the city queue';p='The contractor declined, so the city will assign someone else.';
+  }
+  return`<section class="citybox" aria-labelledby="cbh"><p class="eyebrow">City progress <span class="ex">Prototype</span></p><h2 id="cbh">${esc(h)}</h2><p>${esc(p)}</p>
+    <ol class="cbsteps">${steps.map(([l,d])=>`<li class="${d?'done':''}">${l}</li>`).join('')}</ol>${act}
+    <p class="hint">${n>0?`Merged with ${plural(n,'other report')} of the same problem nearby · `:''}Issue <span class="mono">${is.id}</span> · sample City Console, not a live government system.</p></section>`;
+}
+
+/* ---------- actions ---------- */
+async function opsAct(a,el){
+  const id=el.dataset.id,is=id&&getIssue(id),c=cur();
+  switch(a){
+    case'o-role':setRole(el.dataset.r);break;
+    case'o-demo':closeRole();demoStart();break;
+    case'o-reset':closeRole();resetOps();opsPick.clear();kpiPrev={};render();frameMap();toast('Demo data reset','fa-rotate');break;
+    case'o-clear':clearSampleOps();opsPick.clear();if(detail&&!getIssue(detail))detail=null;render();frameMap();toast('Sample data cleared. Only real reports are left','fa-broom');break;
+    case'o-open':opsOpen(id);break;
+    case'o-close':opsClose();break;
+    case'o-sort':oSort=oSort.k===el.dataset.k?{k:oSort.k,dir:-oSort.dir}:{k:el.dataset.k,dir:-1};flipQueue();$(`.qsort[data-k="${el.dataset.k}"]`)?.focus();break;
+    case'o-fclear':of={corp:'',ward:'',cat:'',st:'open',band:''};render();frameMap();break;
+    case'o-heat':opsHeat=!opsHeat;el.setAttribute('aria-pressed',String(opsHeat));syncHeat();break;
+    case'o-wreset':OPS.weights={...W_DEFAULT};saveOps();$('#weights').innerHTML=weightsHTML();flipQueue();break;
+    case'o-assign':openAssign([id]);break;
+    case'o-assign-bulk':openAssign([...opsPick]);break;
+    case'o-pick-none':opsPick.clear();flipQueue();$('#bulk').outerHTML=bulkHTML();break;
+    case'o-do-assign':doAssign(el.dataset.ids.split(','));break;
+    case'o-approve':is.cityApproved=true;ev(is,'approve','City approved the before and after photos','city');settleAll();saveOps();flipRender();toast(is.status==='verified_fixed'?'Approved and verified fixed':'Approved. Waiting for a resident to confirm','fa-circle-check');break;
+    case'o-sendback':reopenIssue(is,'City sent it back: the photos don’t show a proper fix');saveOps();flipRender();toast('Sent back to the contractor','fa-rotate-left');break;
+    case'o-ff':is.submittedAt-=VERIFY_MS;ev(is,'demo','Demo: skipped ahead 72 hours','city');settleAll();saveOps();flipRender();break;
+    case'o-csv':opsCSV();break;
+    case'o-print':opsPrint();break;
+    case'o-ktab':kTab=el.dataset.k;render();frameMap();panel.querySelector('.ktabs [aria-selected="true"]')?.focus();break;
+    case'o-job':go('contractor',id);break;
+    case'o-job-back':{const j=getIssue(detail),t=j&&Object.keys(KTABS).find(t=>KTABS[t][2].includes(j.status));if(t)kTab=t;go('contractor');break}
+    case'o-accept':is.status='accepted';is.acceptedAt=now();ev(is,'accept',`Accepted by ${kName(KID)}`,'contractor');saveOps();render();A($('#jact'),{scale:[.97,1]},SPRING);toast('Job accepted');break;
+    case'o-decline':kDecline=id;render();$('#k-reason')?.focus();break;
+    case'o-decline-no':kDecline=null;render();break;
+    case'o-decline-yes':{const r=$('#k-reason')?.value||'No reason given';kDecline=null;
+      Object.assign(is,{status:'new',contractorId:null,slaDue:null,assignedAt:null,cost:null});ev(is,'decline',`Declined by ${kName(KID)}: ${r}. Back in the city queue`,'contractor');saveOps();toast('Declined. The city will reassign it');go('contractor');break}
+    case'o-pf-sample':await proofPhoto(is,el.dataset.k,'sample');break;
+    case'o-start':if(!is.before)return toast('Add the before photo first','fa-camera');is.status='in_progress';ev(is,'start','Work started','contractor');saveOps();render();toast('Work started');break;
+    case'o-submit':if(!is.after)return toast('Add the after photo first','fa-camera');is.status='submitted';is.submittedAt=now();is.cityApproved=false;is.citizenConfirmed=false;ev(is,'submit','Submitted as fixed, awaiting verification','contractor');saveOps();kTab='sub';render();confetti($('#jact'));toast('Submitted. Awaiting verification');break;
+    case'o-cit-ok':{const x=issueOf(c);if(!x)break;x.citizenConfirmed=true;ev(x,'confirm','A resident confirmed it’s fixed');c.events.push({t:now(),k:'confirm',x:'You confirmed the fix'});saveOps();save();settleAll();render();
+      if(x.status==='verified_fixed'){confetti(panel.querySelector('.citybox'));toast('Verified fixed. Thanks for closing the loop')}else toast('Thanks. It’s verified once the city approves');break}
+    case'o-cit-no':{const x=issueOf(c);if(!x)break;reopenIssue(x,'A resident said it isn’t fixed. Reopened and sent back to the same contractor');c.events.push({t:now(),k:'reopened',x:'You said it isn’t fixed. Reopened with higher priority'});saveOps();save();render();toast('Reopened and sent back with higher priority','fa-rotate-left');break}
+  }
+}
+function setRole(r){
+  closeRole();LS.set('uo-role',r);
+  go(ROLES[r].v);
+  toast(`Viewing as ${ROLES[r].l.toLowerCase()}${r==='citizen'?'':' (demo)'}`,ROLES[r].ic);
+}
+function syncRole(){
+  const r=ROLES[roleOf(view)],b=$('#roleBtn');if(!b)return;
+  b.querySelector('[data-ri]').className=`fa-solid ${r.ic}`;b.querySelector('.rl').textContent=r.l;b.dataset.role=roleOf(view);
+}
+function roleMenuHTML(){
+  const cur=roleOf(view);
+  return`<p class="eyebrow">View as</p>${Object.entries(ROLES).map(([k,r])=>`<button class="ropt" data-act="o-role" data-r="${k}" aria-pressed="${cur===k}"><span class="av sm" aria-hidden="true"><i class="fa-solid ${r.ic}"></i></span><span><b>${r.l}</b><small>${esc(typeof r.who==='function'?r.who():r.who)}</small><small>${r.sub}</small></span>${cur===k?'<i class="fa-solid fa-check" aria-hidden="true"></i>':''}</button>`).join('')}
+    <hr><button class="ropt act" data-act="o-demo"><span class="av sm" aria-hidden="true"><i class="fa-solid fa-play"></i></span><span><b>Run the 60-second demo</b><small>One complaint, from report to verified fix</small></span></button>
+    <button class="ropt act" data-act="o-reset"><span class="av sm" aria-hidden="true"><i class="fa-solid fa-rotate"></i></span><span><b>Reset demo data</b><small>Reload the sample issues</small></span></button>
+    <p class="hint">City and contractor views are a prototype with sample data. Not a live government system.</p>`;
+}
+function openRole(){const m=$('#roleMenu');m.innerHTML=roleMenuHTML();m.hidden=false;$('#roleBtn').setAttribute('aria-expanded','true');A(m,{opacity:[0,1],y:[-6,0]},{duration:.18});m.querySelector('.ropt')?.focus()}
+function closeRole(focus){const m=$('#roleMenu');if(!m||m.hidden)return;m.hidden=true;$('#roleBtn').setAttribute('aria-expanded','false');if(focus)$('#roleBtn').focus()}
+$('#roleBtn').addEventListener('click',e=>{e.stopPropagation();$('#roleMenu').hidden?openRole():closeRole()});
+document.addEventListener('click',e=>{if(!e.target.closest('.rolewrap'))closeRole()},true);
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape')return;
+  if(!$('#roleMenu').hidden)return closeRole(true);
+  if(view==='city'&&detail&&$('#overlay').hidden&&!demo)opsClose();
+},true);
+panel.addEventListener('input',e=>{
+  const t=e.target;
+  if(t.matches('.ba-r'))t.parentElement.style.setProperty('--p',t.value+'%');
+  if(t.dataset.w){OPS.weights[t.dataset.w]=+t.value;$('#wo-'+t.dataset.w).textContent='×'+(+t.value).toFixed(1);clearTimeout(opsAct.wt);opsAct.wt=setTimeout(saveOps,250);flipQueue();
+    const r=$('[data-act="o-wreset"]');if(r)r.disabled=!Object.keys(W_DEFAULT).some(k=>OPS.weights[k]!==W_DEFAULT[k])}
+});
+panel.addEventListener('change',e=>{
+  const t=e.target;
+  if(t.dataset.of){of[t.dataset.of]=t.value;if(t.dataset.of==='corp')of.ward='';const id=t.id;render();frameMap();$('#'+id)?.focus()}
+  if(t.dataset.pick){t.checked?opsPick.add(t.dataset.pick):opsPick.delete(t.dataset.pick);$('#bulk').outerHTML=bulkHTML()}
+  if(t.id==='k-prof'){KID=t.value;LS.set('uo-kid',KID);kTab='new';render();frameMap();$('#k-prof')?.focus()}
+  if(t.dataset.pf){const is=getIssue(t.dataset.id);if(is&&t.files[0])proofPhoto(is,t.dataset.pf,t.files[0])}
+});
+
+/* ---------- guided 60-second demo ---------- */
+const DEMO_SNAP='uo-demo-snap';
+let demo=null;
+const DEMO_SITE={lat:12.93384,lng:77.62976};   // ~6 m from the sample Koramangala school-gate pothole, so it merges
+function demoWait(ms){
+  return new Promise(res=>{const tick=()=>{if(!demo||demo.fast)return res();if(!demo.paused){demo.el+=100;ms-=100}
+    const b=$('#dm-prog');if(b)b.style.transform=`scaleX(${Math.min(1,demo.el/demo.len)})`;if(ms<=0)return res();demo.t=setTimeout(tick,100)};tick()});
+}
+function spot(sel){
+  const s=$('#dm-spot');if(!s)return;
+  const el=typeof sel==='string'?$(sel):sel;demo.target=el||null;
+  if(!el){s.hidden=true;return}
+  const r=el.getBoundingClientRect();if(r.top<70||r.bottom>innerHeight-150)el.scrollIntoView({block:'center',behavior:RM.matches?'auto':'smooth'});
+  s.hidden=false;placeSpot();
+}
+function placeSpot(){
+  if(!demo)return;const s=$('#dm-spot'),el=demo.target;
+  if(s&&el&&el.isConnected){const r=el.getBoundingClientRect(),p=8;Object.assign(s.style,{left:r.left-p+'px',top:r.top-p+'px',width:r.width+2*p+'px',height:r.height+2*p+'px'})}
+  demo.raf=requestAnimationFrame(placeSpot);
+}
+function caption(n,title,text){
+  const c=$('#dm-cap');if(!c)return;
+  c.querySelector('.dmn').textContent=`Step ${n} of 5 · ${['Citizen','City official','City official','Contractor','Citizen'][n-1]}`;
+  c.querySelector('h2').textContent=title;c.querySelector('.dmtext>p:last-child').textContent=text;
+  A(c.querySelector('.dmtext'),{opacity:[0,1],y:[6,0]},{duration:.25});
+}
+const DEMO_STEPS=[
+  async w=>{
+    caption(1,'A resident reports a pothole outside a school','They pin it on the map, add a photo and send it to the right department in one tap.');
+    const t=now(),c={id:newId(),cat:'pothole',title:'Pothole outside the school gate',desc:'Children walk around it into traffic every morning.',sev:'danger',lat:DEMO_SITE.lat,lng:DEMO_SITE.lng,
+      area:'80 Feet Road, Koramangala 4th Block',landmark:'outside the school gate',corp:'south',hasPhoto:false,createdAt:t,filedAt:t,ref:'',status:'filed',issueId:null,demo:true,
+      events:[{t,k:'created',x:'Reported in UrbOasis'},{t,k:'filed',x:'Sent to GBA'}]};
+    if(S.list.some(x=>x.sample)){S.list=S.list.filter(x=>!x.sample)}
+    S.list.unshift(c);save();demo.cid=c.id;
+    go('done',c.id);await w(500);spot('.done-hero');await w(6500);
+  },
+  async w=>{
+    const cid=demo.cid,c=S.list.find(x=>x.id===cid),R0=rankMap(),target=OPS.issues.find(i=>i.cat==='pothole'&&i.status!=='verified_fixed'&&dist(i,DEMO_SITE)<50);
+    demo.iid=target?.id;
+    caption(2,'It lands in the City Console','Same problem, same spot: UrbOasis checks for reports of it within 50 m.');
+    go('city');await w(600);
+    if(target){spot(`.qrow[data-is="${target.id}"]`);await w(2600);}
+    const is=linkComplaint(c);save();demo.iid=is.id;const before=R0[is.id];
+    flipQueue();await w(700);spot(`.qrow[data-is="${is.id}"]`);
+    const R1=rankMap();
+    caption(2,`Merged with ${plural(is.reporters.length-1,'report')}. It jumps from #${before||'new'} to #${R1[is.id]}`,`A resident says it’s a danger to life, and it’s outside a school, so its priority score rises to ${score(is)}.`);
+    await w(3600);opsOpen(is.id);await w(400);spot('#drawer .why');await w(3200);
+  },
+  async w=>{
+    const is=getIssue(demo.iid);
+    caption(3,'The official assigns the best-matched contractor','Ranked by specialisation, workload, distance, on-time record, reopen rate and rating.');
+    openAssign([is.id]);await w(500);spot('.bestpick');await w(4200);
+    spot('[data-act="o-do-assign"]');await w(1400);
+    demo.kid=$('input[name="as-k"]:checked')?.value;doAssign([is.id]);await w(400);spot('#drawer .dact');await w(2400);
+  },
+  async w=>{
+    const is=getIssue(demo.iid);KID=demo.kid||is.contractorId;
+    caption(4,`${kName(KID)} gets the job on their phone`,'They accept it, then prove the fix with before and after photos taken within 100 m of the site.');
+    kTab='new';go('contractor',is.id);await w(500);spot('#jact');await w(2400);
+    opsAct('o-accept',{dataset:{id:is.id}});spot('#jact');await w(1600);
+    caption(4,'Before photo, on site, then work starts','Location and time are recorded. Photos taken away from the site are blocked.');
+    await proofPhoto(is,'before','sample');spot('#jact');await w(1800);
+    opsAct('o-start',{dataset:{id:is.id}});spot('#jact');await w(1300);
+    await proofPhoto(is,'after','sample');spot('#jact');await w(1600);
+    opsAct('o-submit',{dataset:{id:is.id}});spot('#jact');
+    caption(4,'Submitted, awaiting verification','A contractor can’t close their own job. The city and residents check it.');await w(2200);
+  },
+  async w=>{
+    const is=getIssue(demo.iid);
+    caption(5,'The city approves the photos','Verified fixed needs the city’s approval and a resident’s confirmation (or 72 hours with no dispute).');
+    go('city',is.id);await w(500);spot('#drawer .dact');await w(1800);
+    opsAct('o-approve',{dataset:{id:is.id}});await w(1200);
+    caption(5,'The resident confirms it’s fixed','Their complaint page shows the before and after photos. If it isn’t fixed, one tap reopens it.');
+    go('complaints',demo.cid);openBox=new Set();await w(500);spot('.citybox');await w(2600);
+    act('o-cit-ok',panel.querySelector('[data-act="o-cit-ok"]')||{dataset:{}});await w(2000);
+    caption(5,'Verified. The numbers update','Open issues, days to fix and the contractor leaderboard all move. Then the demo restores your data.');
+    go('city');await w(500);spot('#okpis');await w(2400);spot('#lboard');await w(2600);
+  },
+];
+async function demoStart(ret){
+  if(demo)return;
+  closeOverlay();
+  LS.set(DEMO_SNAP,{uo2:localStorage.getItem('uo2'),ops:localStorage.getItem(OPS_KEY),kid:KID,ret:ret||(location.hash==='#demo'?'#city':location.hash)||'#home'});
+  demo={i:0,paused:false,fast:false,el:0,len:1};
+  const ui=document.createElement('div');ui.id='demoui';
+  ui.innerHTML=`<div class="dm-spot" id="dm-spot" hidden aria-hidden="true"></div>
+    <div class="dm-cap" id="dm-cap" role="dialog" aria-label="Guided demo" aria-live="polite"><div class="dmtext"><p class="dmn eyebrow"></p><h2></h2><p></p></div>
+      <div class="dm-bar"><span id="dm-prog"></span></div>
+      <div class="row dm-ctl"><button class="btn sm" id="dm-pause" data-dm="pause"><i class="fa-solid fa-pause"></i>Pause</button><button class="btn sm" data-dm="skip"><i class="fa-solid fa-forward-step"></i>Skip step</button><span class="grow"></span><button class="btn sm quiet" data-dm="exit"><i class="fa-solid fa-xmark"></i>Exit demo</button></div></div>`;
+  document.body.appendChild(ui);document.body.classList.add('demo-on');
+  ui.addEventListener('click',e=>{const b=e.target.closest('[data-dm]');if(!b)return;const k=b.dataset.dm;
+    if(k==='pause'){demo.paused=!demo.paused;b.innerHTML=demo.paused?'<i class="fa-solid fa-play"></i>Play':'<i class="fa-solid fa-pause"></i>Pause'}
+    if(k==='skip'){demo.fast=true}
+    if(k==='exit'){demo.exit=true;demo.fast=true}});
+  A($('#dm-cap'),{opacity:[0,1],y:[20,0]},{duration:.3});
+  placeSpot();
+  const LEN=[7,13,9,14,15].map(s=>s*1000);
+  for(let i=0;i<DEMO_STEPS.length&&demo&&!demo.exit;i++){
+    demo.i=i;demo.fast=false;demo.el=0;demo.len=LEN[i];
+    try{await DEMO_STEPS[i](demoWait)}catch(err){console.warn('demo step',i+1,err)}
+    if(demo&&demo.fast&&!demo.exit){/* skipped: the step already ran its state changes without waiting */}
+  }
+  demoEnd();
+}
+function demoRestore(s){
+  for(const[k,v]of[['uo2',s.uo2],[OPS_KEY,s.ops]]){try{v==null?localStorage.removeItem(k):localStorage.setItem(k,v)}catch{}}
+  KID=s.kid||'k1';LS.set('uo-kid',KID);reloadShared();localStorage.removeItem(DEMO_SNAP);syncOut('ops');
+}
+function demoEnd(){
+  if(!demo)return;
+  clearTimeout(demo.t);cancelAnimationFrame(demo.raf);demo=null;
+  $('#demoui')?.remove();document.body.classList.remove('demo-on');closeOverlay();
+  const s=LS.get(DEMO_SNAP,null);if(s)demoRestore(s);
+  opsPick.clear();kpiPrev={};kDecline=null;
+  history.replaceState(null,'',s?.ret||'#home');route();go(view,detail,routeAnchor);
+  toast('Demo finished. Your data is back as it was','fa-rotate-left');
+}
+/* An interrupted demo (tab closed or reloaded) leaves a snapshot; restore it before anything else reads the data. */
+(()=>{const s=LS.get(DEMO_SNAP,null);if(s)demoRestore(s)})();
+
 /* ============ Routing & boot ============ */
-let routeAnchor=null;
+let routeAnchor=null,demoPending=false;
 function route(){
   const h=location.hash.slice(1);detail=null;routeAnchor=null;
   if(h.startsWith('s=')){
@@ -2191,17 +3248,23 @@ function route(){
   else if(h==='how'){view='home';routeAnchor='how'}
   else if(h==='join'||h==='sample'){view='societies';routeAnchor=h}
   else if(h==='guide')view='departments';   // old links
-  else if(['home','report','complaints','departments','societies','monthly','board'].includes(h))view=h;
+  else if(h.startsWith('city-')){view='city';detail=h.slice(5)}
+  else if(h.startsWith('job-')){view='contractor';detail=h.slice(4)}
+  else if(h==='demo'){view='home';demoPending=true}
+  else if(['home','report','complaints','departments','societies','monthly','board','city','contractor'].includes(h))view=h;
   else view='home';
 }
-addEventListener('hashchange',()=>{route();go(view,detail,routeAnchor)});
+addEventListener('hashchange',()=>{route();go(view,detail,routeAnchor);if(demoPending){demoPending=false;setTimeout(()=>demoStart('#city'),400)}});
 (async function boot(){
   if(new URLSearchParams(location.search).has('verify'))document.documentElement.classList.add('show-verify');
   route();
   if(D.hasPhoto)draftPhoto=await idb.get('draft');if(D.hasPhoto&&!draftPhoto)D.hasPhoto=false;
   await Promise.race([motionReady,new Promise(r=>setTimeout(r,700))]);
+  linkMine();settleAll();
   const v=view;view='';go(v,detail,routeAnchor);
   Board.init();
+  if(demoPending){demoPending=false;setTimeout(()=>demoStart('#city'),700)}
+  setInterval(()=>{if(settleAll()&&!demo)remoteRender()},60000);
 })();
 </script>
 </body>
