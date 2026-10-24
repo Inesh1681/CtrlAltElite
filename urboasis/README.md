@@ -8,8 +8,10 @@ when to follow up, when to escalate and when to file an RTI, with each document 
 
 - **Report in four steps:** category (English + Kannada), pin on the map (tap, GPS, place search, or
   the GPS tag inside a photo), landmark and photo, then a generated complaint with a strength score.
-- **Files it with the right desk:** helpline number, call link, a pre-written X post tagging the
-  agency where one exists, and a field for the official complaint number.
+- **Sends it for you, in one tap:** "Send it for me" opens the department's official WhatsApp, email,
+  X or complaint form with the complaint filled in. Only channels verified on the department's own
+  website are used (see `CONTACTS`). Follow-ups and escalations go the same way. An optional
+  "Let the UrbOasis team file it" mode is behind `CONFIG.conciergeFiling`.
 - **Tracks every complaint against a fix window** per category, and moves it through
   *Not filed → Waiting → Follow up → Escalate → RTI → Fixed*.
 - **Writes the documents:** follow-up, escalation letter addressed to the right officer, X post, and
@@ -38,8 +40,8 @@ Everything that still needs checking against official sources is listed in [TODO
 
 ## Before going public
 
-- Check the helplines and X handles in the `AG` object at the top of the script against each agency's
-  official site. The GBA restructuring in 2025 may change channels.
+- Re-check every channel in `CONTACTS` (each has a `source` and `verified` flag) against the department's
+  own site. The GBA restructuring in 2025 may change channels.
 - Fix windows (`days` in `CATS`) are guidelines, not official service levels. The page says so.
 - Address search and lookup use the public Nominatim API (OpenStreetMap). Its usage policy allows
   light use only, so put a geocoder you control behind it if traffic grows.

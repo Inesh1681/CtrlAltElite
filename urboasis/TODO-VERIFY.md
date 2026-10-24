@@ -2,14 +2,24 @@
 
 Open `index.html?verify` or `pitch.html?verify` to see every spot outlined on the page.
 
-## Contacts (`CONTACTS` in index.html; all `verified:false`)
-- [ ] GBA helpline **1533** and the **Sahaaya 2.0** app still accept complaints after the 2025 restructuring
-- [ ] BWSSB helpline **1916**
-- [ ] BESCOM helpline **1912** and the **@NammaBESCOM** X handle
-- [ ] Traffic Police: a real **non-emergency** helpline (none is shown now; 112 is used only as the emergency number). Confirm **@blrcitytraffic**
-- [ ] Any **WhatsApp** numbers. The "Send on WhatsApp" button appears only for a contact with `whatsapp` set **and** `verified:true`
-- [ ] Officer titles used in letters: `escTitle`, `escHint`, `pioOffice` for each department
+## Contacts (`CONTACTS` in index.html). Only `verified:true` channels appear on the site.
+Verified on the departments' own websites on 24 Oct 2026. Re-check before the final:
+- [ ] GBA phone **1533**: seen on bbmp.gov.in ("GBA - Greater Bengaluru Authority") via search index; the site refused direct connections
+- [ ] BWSSB phone **1916** and online complaint form `bwssb.karnataka.gov.in/258/lodge-complaint/kn`
+- [ ] BESCOM phone **1912**, WhatsApp **9449844640**, email **helpline@bescom.co.in** (Contact Us page shows no "last updated" date)
+- [ ] Traffic Police WhatsApp **9480801800**, X **@blrcitytraffic**, online complaint form `btp.karnataka.gov.in/complaint/kn`
+
+Not verified, so hidden. Fill in from an official source to switch on one-tap sending:
+- [ ] **GBA:** complaint WhatsApp, complaint email, X handle, Sahaaya 2.0 web link. Without one of these, GBA complaints fall back to "copy and call 1533"
+- [ ] **BWSSB:** WhatsApp (8762228888 appears in Deccan Herald notices, not on BWSSB's site), email, X
+- [ ] **BESCOM:** X @NammaBESCOM (not linked from BESCOM's site), online complaint form URL
+- [ ] **Traffic Police:** a non-emergency helpline, email
+- [ ] **City corporation emails** for CC (`CORP_CONTACTS`): all five
+- [ ] Officer titles used in letters (`escTitle`, `escHint`, `pioOffice`) for each department
 - [ ] RTI fee (**Rs 10**) and accepted payment modes in Karnataka
+
+## Concierge filing
+- [ ] `CONFIG.conciergeFiling` is **off**. Switch it on only when someone can file requests from `LEAD`'s inbox within 24 hours
 
 ## City corporations
 - [ ] Official names of the five corporations (`CORPS`)

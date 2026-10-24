@@ -269,8 +269,8 @@ footer .wrap{display:grid;gap:8px}
     <div class="stack" style="gap:22px">
       <p class="eyebrow">Civic tech · Bengaluru · SDG 11</p>
       <h1>Getting a complaint filed is easy. Getting it fixed is the hard part.</h1>
-      <p class="lede">UrbOasis is the follow-through layer for civic complaints. It routes each problem to the right department, writes the complaint, and tells citizens and housing societies exactly when and how to follow up, escalate and file an RTI.</p>
-      <p class="oneliner">Report it to the right desk, then follow up on schedule until it’s fixed.</p>
+      <p class="lede">UrbOasis is the follow-through layer for civic complaints. It routes each problem to the right department and city corporation, sends the complaint in one tap through the department’s official channel, and chases it with follow-ups, escalation letters and RTI applications until it’s fixed.</p>
+      <p class="oneliner">You report it once. UrbOasis routes it, sends it and chases it until it’s fixed.</p>
       <div class="row"><a class="btn primary" href="index.html#report"><i class="fa-solid fa-play"></i>Try a report (2 min)</a><a class="btn" href="#pitch">Jump to the pitch</a></div>
     </div>
     <div class="stack">
@@ -301,7 +301,7 @@ footer .wrap{display:grid;gap:8px}
   </div>
   <div class="roots">
     <div class="card"><i class="fa-solid fa-sitemap"></i><h3>Fragmented ownership</h3><p>Roads, garbage and streetlights sit with GBA, water and sewage with BWSSB, power with BESCOM, signals with Traffic Police. BBMP’s 2025 split into GBA and five city corporations added more confusion.</p></div>
-    <div class="card"><i class="fa-solid fa-hourglass-half"></i><h3>No follow-through</h3><p>Helplines take complaints, but nobody tells the citizen when a complaint is overdue, who to escalate to, or what to write. Most people give up after one call.</p></div>
+    <div class="card"><i class="fa-solid fa-hourglass-half"></i><h3>No follow-through</h3><p>Helplines take complaints, but nobody tells the citizen when a complaint is overdue, who to escalate to, or what to write. Most people give up after one try.</p></div>
     <div class="card"><i class="fa-solid fa-eye-slash"></i><h3>No shared evidence</h3><p>Every complaint lives alone. Nobody can show that a ward’s potholes take three weeks, so there’s no pressure to improve.</p></div>
   </div>
 </div></section>
@@ -320,7 +320,7 @@ footer .wrap{display:grid;gap:8px}
 <section class="alt" id="innovation"><div class="wrap">
   <div class="shead"><p class="eyebrow">Innovation</p><h2>Built for follow-through, not just filing</h2><p>Existing channels are built to receive complaints. UrbOasis is built to get them resolved: a rules-based escalation engine that knows each department’s chain and the citizen’s legal tools.</p></div>
   <div class="tscroll"><table class="cmp">
-    <thead><tr><th>Capability</th><th>Official helpline / app</th><th>Posting on social media</th><th>Civic reporting portals</th><th class="us">UrbOasis</th></tr></thead>
+    <thead><tr><th>Capability</th><th>Official helplines and apps</th><th>Posting on social media</th><th>Civic reporting portals</th><th class="us">UrbOasis</th></tr></thead>
     <tbody id="cmp"></tbody>
   </table></div>
   <p class="note" style="margin-top:10px"><i class="fa-solid fa-circle-check" style="color:var(--go)"></i> yes   <i class="fa-solid fa-circle-half-stroke" style="color:var(--wait)"></i> partly   <i class="fa-regular fa-circle" style="color:var(--muted)"></i> no. Based on how each channel typically works.</p>
@@ -338,7 +338,7 @@ footer .wrap{display:grid;gap:8px}
   </div>
 
   <div class="pillars">
-    <div class="card"><i class="fa-solid fa-route"></i><h3>Smart routing</h3><p>Maps 11 problem types to the right department and its helpline, and handles BBMP’s handover to GBA.</p></div>
+    <div class="card"><i class="fa-solid fa-route"></i><h3>Routes and sends</h3><p>Maps 11 problem types to the right department and city corporation, then sends it in one tap through a channel published on the department’s own site.</p></div>
     <div class="card"><i class="fa-solid fa-scale-balanced"></i><h3>Legal escalation</h3><p>Turns the RTI Act’s 30-day reply into a one-tap application with the five questions that get a written answer.</p></div>
     <div class="card"><i class="fa-solid fa-users"></i><h3>Collective pressure</h3><p>A public community board where residents vote, one vote per Google account, plus co-sign links and society reports. One complaint becomes a ranked list officials can see.</p></div>
     <div class="card"><i class="fa-solid fa-lock"></i><h3>Private by design</h3><p>No account and no server. Photos are re-saved without location metadata. Built with the DPDP Act 2023 in mind.</p></div>
@@ -372,15 +372,15 @@ footer .wrap{display:grid;gap:8px}
     <div class="card"><span class="status next">Next</span><h3>Shared society boards</h3><p>Accounts and a hosted database (Firebase or Supabase) so a whole society shares one list. A known, low-risk build.</p></div>
   </div>
   <div class="panel" data-panel="ops" hidden>
-    <div class="card"><span class="status done">Built</span><h3>Department directory</h3><p>Helplines, escalation officers and RTI offices for four departments, stored in one config block that takes minutes to update.</p></div>
+    <div class="card"><span class="status done">Built</span><h3>Department directory</h3><p>Official send channels, escalation officers and RTI offices for four departments, each with its source and a verified flag, stored in one config block that takes minutes to update.</p></div>
     <div class="card"><span class="status done">Built</span><h3>Self-serve onboarding</h3><p>Residents report a problem in about two minutes with no sign-up. Societies request a pilot from the site.</p></div>
     <div class="card"><span class="status next">Next</span><h3>Pilot playbook</h3><p>Set up each society in one call, import its open complaints, and train one committee member.</p></div>
-    <div class="card"><span class="status next">Next</span><h3>Directory upkeep</h3><p>A monthly check of helplines as GBA restructures. One person-hour a month.</p></div>
+    <div class="card"><span class="status next">Next</span><h3>Directory upkeep</h3><p>A monthly check of each department’s published channels as GBA restructures. Unverified channels stay hidden. One person-hour a month.</p></div>
   </div>
   <div class="panel" data-panel="fin" hidden>
     <div class="calc card">
       <div class="controls">
-        <div><h3>Revenue calculator</h3><p class="muted" style="font-size:15px;margin-top:4px">Housing societies and RWAs pay a monthly subscription. Drag to test the assumptions.</p></div>
+        <div><h3>Revenue calculator</h3><p class="muted" style="font-size:15px;margin-top:4px">Residents use UrbOasis free. Revenue comes only from housing societies and RWAs. Drag to test the assumptions.</p></div>
         <div class="fl"><div class="daylabel"><span>Paying societies</span><b id="c-socn">100</b></div><input type="range" id="c-soc" min="10" max="1000" step="10" value="100" aria-label="Paying societies"></div>
         <div class="fl"><div class="daylabel"><span>Price per society per month</span><b id="c-pricen">₹999</b></div><input type="range" id="c-price" min="299" max="2999" step="100" value="999" aria-label="Price per month"></div>
         <p class="formula">ARR = <span id="f-n">100</span> societies × <span id="f-p">₹999</span> × 12 months</p>
@@ -435,9 +435,9 @@ footer .wrap{display:grid;gap:8px}
       <p class="lede">UrbOasis gives every resident and housing society a clear path from “that’s broken” to “it’s fixed”, and turns their complaints into evidence that holds departments to account.</p>
       <dl class="canvas">
         <div><dt>Problem</dt><dd>Complaints reach the wrong department and nobody follows up, so they quietly die.</dd></div>
-        <div><dt>Solution</dt><dd>Automatic routing plus a follow-up, escalation and RTI engine with ready-made letters.</dd></div>
-        <div><dt>Customer</dt><dd>Free for residents. Paid by housing societies and RWAs that chase civic problems every month.</dd></div>
-        <div><dt>Model</dt><dd>₹999 per society per month. Federations and ward dashboards on custom pricing.</dd></div>
+        <div><dt>Solution</dt><dd>Automatic routing, one-tap sending through each department’s official channel, and a follow-up, escalation and RTI engine that chases it.</dd></div>
+        <div><dt>Customer</dt><dd>Residents, who report and vote, and the housing societies and RWAs that chase civic problems every month.</dd></div>
+        <div><dt>Model</dt><dd>Free for residents (drives adoption and data). Societies and RWAs pay: a free 3-month pilot, then ₹999 per society per month, or custom pricing for federations.</dd></div>
         <div><dt>Edge</dt><dd>Built for follow-through rather than filing. Once society boards launch, pooled fix times by ward and department become evidence that is hard to get today.</dd></div>
         <div><dt>Impact</dt><dd>SDG 11 and 16: safer streets, basic services that work, and more accountable local government.</dd></div>
       </dl>
@@ -498,10 +498,10 @@ drawSDG();
 /* ---------- Problem funnel ---------- */
 const STAGES=[
   {t:'Problem noticed',l:'Starts here',cause:'A resident sees a pothole every day but doesn’t know who handles it, or assumes someone already complained.',fix:'One public page explains who fixes what. Reporting takes about two minutes with no sign-up.'},
-  {t:'Complaint reaches a department',l:'Wrong desk',cause:'With four departments and BBMP’s 2025 restructuring, many complaints go to the wrong office and are bounced or ignored.',fix:'UrbOasis picks the department from the problem type and gives the right helpline, app and handle.'},
+  {t:'Complaint reaches a department',l:'Wrong desk',cause:'With four departments and BBMP’s 2025 restructuring, many complaints go to the wrong office and are bounced or ignored.',fix:'UrbOasis picks the department and city corporation from the problem and pin, then sends the complaint in one tap through their official WhatsApp, email or form.'},
   {t:'Complaint is actionable',l:'Too vague',cause:'“Pothole on Hosur Road” gives a crew nothing to go on. Without a pin, landmark or photo, complaints get closed as “not found”.',fix:'An exact pin, a landmark prompt, a photo and a complaint strength check produce a complaint a crew can act on.'},
   {t:'Someone follows up',l:'Drop-off',cause:'Nobody tells the citizen when a complaint is overdue, so it quietly expires. This is where most complaints die.',fix:'Each category has a fix window. Once it passes, UrbOasis says “follow up today” and gives the exact message, quoting the complaint number.'},
-  {t:'Escalated when ignored',l:'Rarely happens',cause:'Few people know who is above the helpline, or that RTI exists. Writing a formal letter feels like too much work.',fix:'Escalation letters to the named officer, then a ready RTI application under Section 6(1), with a 30-day reply required.'},
+  {t:'Escalated when ignored',l:'Rarely happens',cause:'Few people know who is above the complaint desk, or that RTI exists. Writing a formal letter feels like too much work.',fix:'Escalation letters to the named officer, then a ready RTI application under Section 6(1), with a 30-day reply required.'},
   {t:'Fixed, and stays fixed',l:'The goal',cause:'Even when fixed, nobody records how long it took, so departments face no pressure to do better.',fix:'Days-to-fix is recorded for every complaint and rolls up into society reports and, soon, ward scorecards.'},
 ];
 let stageSel=3;
@@ -515,6 +515,7 @@ drawStages();
 
 /* ---------- Comparison ---------- */
 const CMP=[
+  ['Sends the complaint for you (one tap)','p','p','p','y'],
   ['Tells you which department handles it','p','n','p','y'],
   ['Writes the complaint for you','n','n','p','y'],
   ['Exact location, landmark and photo','p','p','y','y'],
@@ -541,11 +542,11 @@ function simulate(){
   let tone,pill,h,p,doc;
   if(fixed){tone='go';pill='Fixed';h=`Fixed in ${d} day${d===1?'':'s'}`;p=d<=w?`Within the ${w}-day window. UrbOasis records this as an on-time fix for ${a.s}.`:`${d-w} days late. The delay is recorded in the complaint history and the society’s monthly report.`;doc=null}
   else if(d<fu){tone='wait';pill='Waiting for fix';h=`Day ${d} of ${w}. Nothing to do yet`;p=`Problems like this are usually fixed within ${w} day${w>1?'s':''}. UrbOasis will prompt a follow-up on day ${fu}.`;doc=null}
-  else if(d<es){tone='stop';pill='Time to follow up';h='Follow up today';p=`It’s past the ${w}-day window. ${a.phone?`Call ${a.phone}`:`Post to @${a.x}`} quoting the complaint number, or send this message:`;doc=`Follow-up on complaint no. 10/2026/123456\n\nIssue: ${name}\nThis was reported ${d} days ago and is still not fixed. Please tell me the current status and the date by which it will be resolved.`}
-  else if(d<rti){tone='stop';pill='Time to escalate';h='Escalate it';p=`A follow-up didn’t work. Write to ${a.esc}, and post publicly with the pre-written message.`;doc=`To: ${a.esc.replace(/^the /,'The ')}\nSubject: Unresolved complaint 10/2026/123456\n\nI filed this complaint ${d} days ago about: ${name}.\nIt is still unresolved, and my follow-up on day ${fu} did not get it fixed.\n\nI request you to direct the concerned staff to inspect and fix it, and to let me know the action taken.`}
+  else if(d<es){tone='stop';pill='Time to follow up';h='Follow up today';p=`It’s past the ${w}-day window. UrbOasis sends this follow-up for you in one tap, quoting the complaint number:`;doc=`Follow-up on complaint no. 10/2026/123456\n\nIssue: ${name}\nThis was reported ${d} days ago and is still not fixed. Please tell me the current status and the date by which it will be resolved.`}
+  else if(d<rti){tone='stop';pill='Time to escalate';h='Escalate it';p=`A follow-up didn’t work. UrbOasis sends an escalation letter to ${a.esc} in one tap:`;doc=`To: ${a.esc.replace(/^the /,'The ')}\nSubject: Unresolved complaint 10/2026/123456\n\nI filed this complaint ${d} days ago about: ${name}.\nIt is still unresolved, and my follow-up on day ${fu} did not get it fixed.\n\nI request you to direct the concerned staff to inspect and fix it, and to let me know the action taken.`}
   else{tone='stop';pill='Time for an RTI';h='File an RTI application';p=`Three weeks after escalating, it’s still open. Under the RTI Act, ${a.s} must reply in writing within 30 days.`;doc=`Application under Section 6(1) of the RTI Act, 2005\n\nPlease provide:\n1. The current status of complaint no. 10/2026/123456 and the action taken, with dates.\n2. The name and designation of the officer it was assigned to.\n3. Copies of any inspection report or work order.\n4. The time limit prescribed for this category of complaint.\n5. Reasons recorded for any delay.\n\nFee: Rs 10`}
   $('#s-out').className=`out t-${tone}`;
-  $('#s-out').innerHTML=`<span class="pill">${pill}</span><h3 style="font-size:22px">${h}</h3><p>${esc(p)}</p>${doc?`<pre>${esc(doc)}</pre>`:`<p class="note">Goes to <b style="color:var(--ink)">${a.s}</b> · ${a.phone?`helpline <span class="mono">${a.phone}</span>`:`@${a.x} on X`}</p>`}`;
+  $('#s-out').innerHTML=`<span class="pill">${pill}</span><h3 style="font-size:22px">${h}</h3><p>${esc(p)}</p>${doc?`<pre>${esc(doc)}</pre>`:`<p class="note">Goes to <b style="color:var(--ink)">${a.s}</b> · sent in one tap</p>`}`;
 }
 ['s-cat','s-day','s-fixed'].forEach(id=>$('#'+id).addEventListener('input',simulate));
 $('#s-day').value=9;simulate();

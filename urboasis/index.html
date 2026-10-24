@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>UrbOasis Bengaluru</title>
-<meta name="description" content="Get potholes, garbage and broken streetlights fixed in Bengaluru. UrbOasis tells you who to contact, writes the complaint, and tells you what to do if nothing happens.">
+<meta name="description" content="Get potholes, garbage and broken streetlights fixed in Bengaluru. UrbOasis routes your complaint to the right department, sends it in one tap, and chases it until it’s fixed.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23167a5b'/%3E%3Cpath d='M16 7a6 6 0 0 0-6 6c0 4.5 6 12 6 12s6-7.5 6-12a6 6 0 0 0-6-6zm0 8.2a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4z' fill='%23fff'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -395,6 +395,16 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
 [data-verify]{} /* TODO-VERIFY marker; add ?verify to the URL to highlight */
 .show-verify [data-verify]{outline:2px dashed #e0a100;outline-offset:2px}
 
+/* ---------- where it goes ---------- */
+.strip{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stripitem{display:flex;gap:var(--s3);align-items:center;min-height:64px;padding:14px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--bg);text-decoration:none;color:inherit}
+.stripitem i{width:38px;height:38px;flex:none;display:grid;place-items:center;border-radius:11px;background:var(--accent-soft);color:var(--accent-ink)}
+.stripitem b{display:block;font-size:15px}
+.stripitem small{display:block;font-size:var(--fs-xs);color:var(--muted)}
+.pathsteps{margin:0;padding-left:20px;display:grid;gap:6px;font-size:var(--fs-sm)}
+@media (max-width:900px){.strip{grid-template-columns:1fr 1fr}}
+@media (max-width:420px){.strip{grid-template-columns:1fr}}
+
 /* ---------- community board ---------- */
 .icard{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:var(--s3);align-items:center;padding:var(--s3) var(--s3) var(--s3) var(--s4);border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);transition:box-shadow .15s,border-color .15s}
 .icard:hover,.icard.hl{box-shadow:var(--sh-1);border-color:color-mix(in srgb,var(--accent) 40%,var(--line))}
@@ -469,7 +479,7 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
     <a class="brand" href="#home" data-go="home"><span class="mark" aria-hidden="true"><i class="fa-solid fa-location-dot"></i></span><span><b>UrbOasis</b><small>Bengaluru · <span lang="kn">ನಮ್ಮ ಬೆಂಗಳೂರು</span></small></span></a>
     <nav class="links" aria-label="Main">
       <a class="nl" href="#how" data-go="home" data-anchor="how">How it works</a>
-      <a class="nl" href="#guide" data-go="guide">Who to contact</a>
+      <a class="nl" href="#departments" data-go="departments">Where it goes</a>
       <a class="nl" href="#board" data-go="board">Community board</a>
       <a class="nl" href="#societies" data-go="societies">For societies</a>
       <a class="nl" href="#complaints" data-go="complaints">My complaints<span class="badge" data-badge hidden></span></a>
@@ -481,7 +491,7 @@ details.box>div{padding:0 2px var(--s5);display:grid;gap:14px}
   <div class="menu" id="menu" hidden>
     <nav class="wrap" aria-label="Main">
       <a class="nl" href="#how" data-go="home" data-anchor="how">How it works</a>
-      <a class="nl" href="#guide" data-go="guide">Who to contact</a>
+      <a class="nl" href="#departments" data-go="departments">Where it goes</a>
       <a class="nl" href="#board" data-go="board">Community board</a>
       <a class="nl" href="#societies" data-go="societies">For societies</a>
       <a class="nl" href="#complaints" data-go="complaints">My complaints<span class="badge" data-badge hidden></span></a>
@@ -525,38 +535,62 @@ const FIREBASE={apiKey:'AIzaSyBCuF90lbHuC335OxADvchi4NylTZ0gB2U',authDomain:'urb
 
 const EMERGENCY='112';   // National emergency number. Never used as a department helpline.
 
-/* Every department contact in one place. verified:false means TODO-VERIFY.
-   whatsapp: only set a number you have confirmed on an official source; the WhatsApp send button appears only when verified is true. */
+/* Switches you control. */
+const CONFIG={
+  conciergeFiling:false,   // true: show "Let the UrbOasis team file it". Requests go to LEAD's inbox; you file within 24 hours.
+};
+
+/* Every department contact in one place. Each channel has a value, where it came from, and whether it is verified.
+   ONLY verified channels are shown or used anywhere on the site; unverified ones stay hidden (TODO-VERIFY).
+   Checked on the departments' own websites on 24 Oct 2026. Re-check before launch. */
+const ch=(value,source,verified=false)=>({value,source,verified});
 const CONTACTS={
-  gba:{name:'Greater Bengaluru Authority',short:'GBA',ic:'fa-building-columns',
-    phone:'1533',whatsapp:null,x:null,app:'Sahaaya 2.0',
-    channel:'Call 1533 or file it in the Sahaaya 2.0 app.',
+  gba:{name:'Greater Bengaluru Authority',short:'GBA',ic:'fa-building-columns',app:'Sahaaya 2.0',
+    channels:{
+      phone:ch('1533','GBA website bbmp.gov.in ("GBA - Greater Bengaluru Authority"): "Call us: Toll Free - 1533". Seen via search index; the site refused direct connections, so re-check.',true),
+      whatsapp:ch(null,'TODO-VERIFY: no WhatsApp on GBA’s own site. Third-party sites list conflicting numbers.'),
+      email:ch(null,'TODO-VERIFY: no complaint inbox published. comm@bbmp.gov.in is the Commissioner’s office, so it is not used.'),
+      x:ch(null,'TODO-VERIFY'),
+      form:ch(null,'TODO-VERIFY: official Sahaaya 2.0 web link')},
     escTitle:'Assistant Executive Engineer (ward)',                 // TODO-VERIFY officer title
     escHint:'the Assistant Executive Engineer of your ward',          // TODO-VERIFY
-    pioOffice:'Office of the Assistant Executive Engineer (ward)',    // TODO-VERIFY RTI office
-    source:'BBMP Sahaaya helpline 1533, as widely published before the 2025 restructuring',verified:false},  // TODO-VERIFY
-  bwssb:{name:'Bangalore Water Supply and Sewerage Board',short:'BWSSB',ic:'fa-droplet',
-    phone:'1916',whatsapp:null,x:null,app:null,
-    channel:'Call the BWSSB helpline 1916.',
+    pioOffice:'Office of the Assistant Executive Engineer (ward)'},   // TODO-VERIFY RTI office
+  bwssb:{name:'Bangalore Water Supply and Sewerage Board',short:'BWSSB',ic:'fa-droplet',app:null,
+    channels:{
+      phone:ch('1916','bwssb.karnataka.gov.in home page: "Helpline numbers: Call center-1916"',true),
+      whatsapp:ch(null,'TODO-VERIFY: 8762228888 appears in Deccan Herald notices but not on BWSSB’s own site'),
+      email:ch(null,'TODO-VERIFY'),
+      x:ch(null,'TODO-VERIFY'),
+      form:ch('https://bwssb.karnataka.gov.in/258/lodge-complaint/kn','bwssb.karnataka.gov.in "Lodge complaint" link',true)},
     escTitle:'Assistant Executive Engineer, service station',          // TODO-VERIFY
     escHint:'the Assistant Executive Engineer of your BWSSB service station',
-    pioOffice:'Service station or sub-division office',                // TODO-VERIFY
-    source:'BWSSB helpline 1916, as widely published',verified:false},  // TODO-VERIFY
-  bescom:{name:'Bangalore Electricity Supply Company',short:'BESCOM',ic:'fa-bolt',
-    phone:'1912',whatsapp:null,x:'NammaBESCOM',app:null,
-    channel:'Call the BESCOM helpline 1912, or post to @NammaBESCOM on X.',
+    pioOffice:'Service station or sub-division office'},                // TODO-VERIFY
+  bescom:{name:'Bangalore Electricity Supply Company',short:'BESCOM',ic:'fa-bolt',app:'BESCOM Mithra',
+    channels:{
+      phone:ch('1912','bescom.karnataka.gov.in Contact Us: "24x7 Helpline- 1912"',true),
+      whatsapp:ch('919449844640','bescom.karnataka.gov.in Contact Us: "Whatsapp - 9449844640"',true),
+      email:ch('helpline@bescom.co.in','bescom.karnataka.gov.in Contact Us: "helpline@bescom.co.in"',true),
+      x:ch('NammaBESCOM','TODO-VERIFY: not linked from BESCOM’s own site'),
+      form:ch(null,'TODO-VERIFY: BESCOM online complaint registration URL')},
     escTitle:'Assistant Executive Engineer (O&M), sub-division',       // TODO-VERIFY
     escHint:'the Assistant Executive Engineer (O&M) of your BESCOM sub-division',
-    pioOffice:'Operations and Maintenance sub-division office',         // TODO-VERIFY
-    source:'BESCOM helpline 1912 and @NammaBESCOM, as widely published',verified:false},  // TODO-VERIFY
-  btp:{name:'Bengaluru Traffic Police',short:'Traffic Police',ic:'fa-traffic-light',
-    phone:null,whatsapp:null,x:'blrcitytraffic',app:null,             // TODO-VERIFY non-emergency traffic helpline
-    channel:'Post to @blrcitytraffic on X with the location and a photo.',
+    pioOffice:'Operations and Maintenance sub-division office'},        // TODO-VERIFY
+  btp:{name:'Bengaluru Traffic Police',short:'Traffic Police',ic:'fa-traffic-light',app:null,
+    channels:{
+      phone:ch(null,'TODO-VERIFY: no non-emergency helpline on btp.karnataka.gov.in'),
+      whatsapp:ch('919480801800','btp.karnataka.gov.in header WhatsApp link (wa.me/919480801800)',true),
+      email:ch(null,'TODO-VERIFY'),
+      x:ch('blrcitytraffic','btp.karnataka.gov.in embeds "Tweets by blrcitytraffic"',true),
+      form:ch('https://btp.karnataka.gov.in/complaint/kn','btp.karnataka.gov.in "File a complaint" link',true)},
     escTitle:'Police Inspector, jurisdictional traffic police station',  // TODO-VERIFY
     escHint:'the Inspector of the jurisdictional traffic police station',
-    pioOffice:'Jurisdictional traffic police station',                   // TODO-VERIFY
-    source:'@blrcitytraffic on X',verified:false},                       // TODO-VERIFY
+    pioOffice:'Jurisdictional traffic police station'},                  // TODO-VERIFY
 };
+/* a.phone, a.whatsapp, a.email, a.x, a.form return the value only when verified, so nothing unverified can leak into the UI. */
+for(const a of Object.values(CONTACTS))for(const k of ['phone','whatsapp','email','x','form'])
+  Object.defineProperty(a,k,{get(){const c=a.channels[k];return c&&c.verified&&c.value?c.value:null}});
+/* City corporation inboxes, for CC on emails. All TODO-VERIFY; none is used until verified. */
+const CORP_CONTACTS={central:{email:ch(null,'TODO-VERIFY')},north:{email:ch(null,'TODO-VERIFY')},south:{email:ch(null,'TODO-VERIFY')},east:{email:ch(null,'TODO-VERIFY')},west:{email:ch(null,'TODO-VERIFY')}};
 
 /* The five city corporations under GBA. TODO-VERIFY exact official names. */
 const CORPS={central:'Bengaluru Central City Corporation',north:'Bengaluru North City Corporation',south:'Bengaluru South City Corporation',east:'Bengaluru East City Corporation',west:'Bengaluru West City Corporation'};
@@ -663,11 +697,11 @@ async function shrink(file,max=1600,q=.8){
 const SILK={filedAgo:12,followDay:7,fixedDay:9};
 function examples(){const t=now(),f=t-SILK.filedAgo*DAY;return[
   {id:'UO-EX-0001',sample:true,cat:'pothole',title:'Deep pothole before the Silk Board signal',desc:'About a metre wide and 15 cm deep. Two-wheelers swerve into the next lane to avoid it.',sev:'hazard',lat:12.9172,lng:77.6226,area:'Hosur Road, Silk Board Junction',landmark:'opposite the Silk Board metro station',corp:'south',hasPhoto:false,createdAt:f,filedAt:f,fixedAt:f+SILK.fixedDay*DAY,ref:'EX-482193',status:'fixed',
-    events:[{t:f,k:'created',x:'Reported in UrbOasis'},{t:f,k:'filed',x:'Sent to GBA on helpline 1533 · EX-482193'},{t:f+SILK.followDay*DAY,k:'followup',x:'Day 7: overdue, so followed up quoting EX-482193'},{t:f+SILK.fixedDay*DAY,k:'fixed',x:'Day 9: crew filled the pothole'}]},
+    events:[{t:f,k:'created',x:'Reported in UrbOasis'},{t:f,k:'filed',x:'Sent to GBA · EX-482193'},{t:f+SILK.followDay*DAY,k:'followup',x:'Day 7: overdue, so followed up quoting EX-482193'},{t:f+SILK.fixedDay*DAY,k:'fixed',x:'Day 9: crew filled the pothole'}]},
   {id:'UO-EX-0002',sample:true,cat:'sewage',title:'Manhole overflowing onto the street',desc:'Sewage has been flowing across the road for over a week. It smells and the footpath is unusable.',sev:'hazard',lat:12.9116,lng:77.6389,area:'27th Main, HSR Layout',landmark:'near the bus stop',corp:'',hasPhoto:false,createdAt:t-11*DAY,filedAt:t-11*DAY,ref:'EX-488102',status:'filed',
-    events:[{t:t-11*DAY,k:'created',x:'Reported in UrbOasis'},{t:t-11*DAY,k:'filed',x:'Sent to BWSSB on helpline 1916 · EX-488102'},{t:t-9*DAY,k:'followup',x:'Day 2: overdue, so followed up quoting EX-488102'}]},
+    events:[{t:t-11*DAY,k:'created',x:'Reported in UrbOasis'},{t:t-11*DAY,k:'filed',x:'Sent to BWSSB · EX-488102'},{t:t-9*DAY,k:'followup',x:'Day 2: overdue, so followed up quoting EX-488102'}]},
   {id:'UO-EX-0003',sample:true,cat:'streetlight',title:'Three streetlights out on a dark stretch',desc:'Poles 14 to 16 near the bus stop are off. The footpath is pitch dark after 7 pm.',sev:'hazard',lat:12.9784,lng:77.6408,area:'100 Feet Road, Indiranagar',landmark:'bus stop near Indiranagar metro',corp:'east',hasPhoto:false,createdAt:t-1*DAY,filedAt:t-1*DAY,ref:'EX-488810',status:'filed',
-    events:[{t:t-1*DAY,k:'created',x:'Reported in UrbOasis'},{t:t-1*DAY,k:'filed',x:'Sent to GBA in the Sahaaya 2.0 app · EX-488810'}]},
+    events:[{t:t-1*DAY,k:'created',x:'Reported in UrbOasis'},{t:t-1*DAY,k:'filed',x:'Sent to GBA · EX-488810'}]},
   {id:'UO-EX-0004',sample:true,cat:'water',title:'Water main leaking onto the footpath',desc:'Clean water running from under the slab since this morning.',sev:'low',lat:12.925,lng:77.5938,area:'11th Main, Jayanagar 4th Block',landmark:'outside the Jayanagar shopping complex',hasPhoto:false,createdAt:t-3*36e5,filedAt:null,ref:'',status:'draft',
     events:[{t:t-3*36e5,k:'created',x:'Reported in UrbOasis'}]},
 ]}
@@ -687,7 +721,7 @@ let S=migrate(LS.get('uo2',null));
 if(S.showEx&&!S.list.length)S.list=examples();
 function save(){if(!LS.set('uo2',{v:SCHEMA,list:S.list.filter(c=>!c.sample),profile:S.profile,showEx:S.showEx}))toast('This browser is blocking storage, so changes will be lost when you close the tab','fa-triangle-exclamation')}
 const mine=()=>S.list.filter(c=>!c.sample);
-const blankDraft=()=>({step:0,cat:'',title:'',desc:'',sev:'hazard',lat:null,lng:null,area:'',landmark:'',areaAuto:true,corp:'',corpAuto:true,hasPhoto:false,exif:null,text:'',textEdited:false,ref:'',filed:false,cosign:false,post:true,publicId:null});
+const blankDraft=()=>({step:0,cat:'',title:'',desc:'',sev:'hazard',lat:null,lng:null,area:'',landmark:'',areaAuto:true,corp:'',corpAuto:true,hasPhoto:false,exif:null,text:'',textEdited:false,ref:'',filed:false,cosign:false,post:true,publicId:null,sentVia:'',concierge:false});
 let D=Object.assign(blankDraft(),LS.get('uo2-draft',{}));
 const saveDraft=()=>LS.set('uo2-draft',D);
 let openBox=new Set(), lastQ='', draftPhoto=null, view='home', detail=null, filter='all', docTab={}, pendingDel=null, results=null, leadSent=false, fieldErr=null;
@@ -730,13 +764,13 @@ const contactOf=c=>CONTACTS[CATS[c.cat].ag];
 /* Who the letter is addressed to: the city corporation for GBA work when known, otherwise the department. */
 const orgFor=c=>CATS[c.cat].ag==='gba'&&CORPS[c.corp]?CORPS[c.corp]:contactOf(c).name;
 const deptLabel=c=>CATS[c.cat].ag==='gba'&&CORPS[c.corp]?`${CORPS[c.corp].replace('Bengaluru ','')} (GBA)`:contactOf(c).short;
-function howToSend(a){return a.phone?`call ${a.phone}`:a.x?`post to @${a.x} on X`:'contact them'}
+function howToSend(a){return channelsFor(a).length?'one tap from your complaint page':a.phone?`call ${a.phone}`:'use their app'}
 function nextStep(c,st){
   const cat=CATS[c.cat],a=contactOf(c),n=days(filedOn(c));
   switch(st){
-    case'file':return{h:`Send it to ${deptLabel(c)}`,p:`${a.channel} Then type in the complaint number they give you, so every follow-up can quote it.`,doc:'complaint'};
-    case'followup':return{h:'Follow up today',p:`It has been ${plural(n,'day')} since you sent it, past the usual ${plural(cat.days,'day')}. Contact ${a.short} again quoting your complaint number. Your follow-up message is ready.`,doc:'followup'};
-    case'escalate':return{h:'Escalate it',p:`You followed up on ${fmtD(last(c,'followup'))} and it is still not fixed. Send the escalation letter to ${a.escHint}.`,doc:'escalate'};
+    case'file':return{h:`Send it to ${deptLabel(c)}`,p:channelsFor(a).length?`One tap sends it to ${a.short} with everything filled in. Then add the complaint number they give you, so every follow-up can quote it.`:`Copy it and send it through ${a.short}’s helpline or app, then add the complaint number they give you.`,doc:'complaint'};
+    case'followup':return{h:'Follow up today',p:`It has been ${plural(n,'day')} since you sent it, past the usual ${plural(cat.days,'day')}. Send the follow-up below. It quotes your complaint number.`,doc:'followup'};
+    case'escalate':return{h:'Escalate it',p:`You followed up on ${fmtD(last(c,'followup'))} and it is still not fixed. Send the escalation letter below, addressed to ${a.escHint}.`,doc:'escalate'};
     case'rti':return{h:'File an RTI application',p:`Three weeks after escalating, it is still open. An RTI application means ${a.short} must reply in writing within 30 days.`,doc:'rti'};
     case'fixed':return{h:`Fixed in ${plural(fixDays(c),'day')}`,p:'Check that it stays fixed. If the problem comes back, reopen this complaint so your history and complaint number carry over.',doc:null};
     default:{
@@ -1104,18 +1138,18 @@ function homeHTML(){
   return `<div>
   <section class="wrap hero">
     <div class="stack">
-      <p class="eyebrow" data-a="hero">Free for everyone in Bengaluru</p>
+      <p class="eyebrow" data-a="hero">Free for every Bengaluru resident, no sign-up</p>
       <h1 data-a="hero">Get potholes, garbage and broken streetlights fixed.</h1>
-      <p class="lede" data-a="hero">UrbOasis tells you which department to contact, writes the complaint for you, and tells you exactly what to do if nothing happens.</p>
+      <p class="lede" data-a="hero">UrbOasis routes your complaint to the right department, sends it in one tap, and chases it until it’s fixed.</p>
       <div class="row" data-a="hero"><a class="btn primary lg" href="#report" data-go="report"><i class="fa-solid fa-plus"></i>Report a problem</a><a class="link" href="#how" data-go="home" data-anchor="how">How it works<i class="fa-solid fa-arrow-down"></i></a></div>
       ${act.length?`<a class="link" href="#complaints" data-go="complaints" data-a="hero"><i class="fa-solid fa-bell"></i>${plural(act.length,'complaint')} need${act.length===1?'s':''} your action</a>`:''}
-      <div class="trust" data-a="hero"><span><i class="fa-solid fa-circle-check"></i>About 2 minutes</span><span><i class="fa-solid fa-circle-check"></i>No sign-up</span><span><i class="fa-solid fa-circle-check"></i>Saved only on your device</span></div>
+      <div class="trust" data-a="hero"><span><i class="fa-solid fa-circle-check"></i>About 2 minutes</span><span><i class="fa-solid fa-circle-check"></i>Sent for you in one tap</span><span><i class="fa-solid fa-circle-check"></i>Saved only on your device</span></div>
     </div>
     <div class="demo" aria-label="An example of a tracked complaint">
       <div class="row" style="justify-content:space-between"><span class="ex">Example</span><span class="pill t-fixed" id="demoChip">Fixed in ${SILK.fixedDay} days</span></div>
       <div class="row" style="gap:14px;flex-wrap:nowrap"><span class="cic t-fixed"><i class="fa-solid ${CATS.pothole.ic}" aria-hidden="true"></i></span><div><b>${esc(ex.title)}</b><p class="small muted">${esc(ex.area)}</p></div></div>
       <ul class="tl" id="demoTl">
-        <li><div><time>Day 0 · ${fmtDs(f)}</time>Reported here and sent to GBA on helpline 1533</div></li>
+        <li><div><time>Day 0 · ${fmtDs(f)}</time>Reported here and sent to GBA</div></li>
         <li><div><time>Day ${SILK.followDay} · ${fmtDs(f+SILK.followDay*DAY)}</time>Overdue. UrbOasis gave the follow-up message, sent quoting the complaint number</div></li>
         <li><div><time>Day ${SILK.fixedDay} · ${fmtDs(f+SILK.fixedDay*DAY)}</time>Crew filled the pothole</div></li>
       </ul>
@@ -1126,9 +1160,9 @@ function homeHTML(){
     <div class="shead reveal"><p class="eyebrow">How it works</p><h2>Four steps from “that’s broken” to “it’s fixed”</h2></div>
     <ol class="steps reveal-kids">
       <li><h3>Tell us what and where</h3><p>Pick the type of problem and drop a pin on the map. Add a photo if you can.</p></li>
-      <li><h3>We find the right department</h3><p>GBA and your city corporation, BWSSB, BESCOM or Traffic Police. We write the complaint for you.</p></li>
-      <li><h3>You send it to them</h3><p>Call their helpline or use their app, and note the complaint number they give you.</p><p class="note">You send it yourself, so it goes on the department’s official record.</p></li>
-      <li><h3>We tell you what to do next</h3><p>If it isn’t fixed in time, we tell you when to follow up, when to escalate, and when to file an RTI.</p></li>
+      <li><h3>We route it</h3><p>We work out the department and your city corporation, and write the complaint for you.</p></li>
+      <li><h3>We send it, in one tap</h3><p>Tap “Send it for me” and the department’s official WhatsApp or email opens with everything filled in.</p><p class="note">It goes from your own number or email, so it lands on the department’s record.</p></li>
+      <li><h3>We chase it</h3><p>If it isn’t fixed in time, we send the follow-up, then the escalation letter, then an RTI application.</p></li>
     </ol>
   </div></section>
 
@@ -1140,11 +1174,8 @@ function homeHTML(){
   ${proofHTML()}
 
   <section class="band alt"><div class="wrap">
-    <div class="shead reveal"><p class="eyebrow">Who to contact</p><h2>Four departments fix almost everything</h2><p>Sending a complaint to the wrong one is the most common reason it goes nowhere. UrbOasis picks the right one for you.</p></div>
-    <div class="agrid reveal-kids">${Object.entries(CONTACTS).map(([k,a])=>`<div class="acard"><div class="ah"><i class="fa-solid ${a.ic}" aria-hidden="true"></i><div><h3>${a.short}</h3><span class="small muted">${a.name}</span></div></div>
-      ${a.phone?`<span class="phone" data-verify>${a.phone}</span>`:`<span class="small" data-verify><i class="fa-brands fa-x-twitter"></i> @${a.x}</span>`}
-      <p class="small muted">Handles: ${Object.values(CATS).filter(c=>c.ag===k).map(c=>c.n.toLowerCase()).join('; ')}</p></div>`).join('')}</div>
-    <p style="margin-top:var(--s4)"><a class="link" href="#guide" data-go="guide">Full guide to who fixes what<i class="fa-solid fa-arrow-right"></i></a></p>
+    <div class="row" style="justify-content:space-between;align-items:flex-end;gap:var(--s4);margin-bottom:var(--s5)"><div class="shead reveal" style="margin:0"><p class="eyebrow">Where your complaint goes</p><h2>We route it to the right department</h2><p>You don’t need to know who fixes what.</p></div><a class="link" href="#departments" data-go="departments">See where each problem goes<i class="fa-solid fa-arrow-right"></i></a></div>
+    <div class="strip reveal-kids">${Object.entries(CONTACTS).map(([k,a])=>`<a class="stripitem lift" href="#departments" data-go="departments"><i class="fa-solid ${a.ic}" aria-hidden="true"></i><span><b>${a.short}</b><small>${{gba:'Roads, garbage, lights',bwssb:'Water and sewage',bescom:'Power and wires',btp:'Signals and road safety'}[k]}</small></span></a>`).join('')}</div>
   </div></section>
 
   ${boardTeaserHTML()}
@@ -1155,9 +1186,9 @@ function homeHTML(){
     <div class="shead reveal"><p class="eyebrow">Questions</p><h2>Common questions</h2></div>
     <div class="faq">
       <details><summary>Is this a government website?</summary><div><p>No. UrbOasis is a free, independent tool. It helps you send your complaint to the right government department and keep track of it, but it is not run by any department.</p></div></details>
-      <details><summary>Does UrbOasis send my complaint for me?</summary><div><p>No. UrbOasis writes the complaint and tells you exactly where to send it. You then call the helpline or use the department’s app. That way your complaint is on their official record and you get a complaint number.</p></div></details>
-      <details><summary>What is a complaint number and why does it matter?</summary><div><p>When you file a complaint, the department gives you a number by SMS, in their app, or on the call. Type it into UrbOasis. Every follow-up and escalation quotes that number, so nobody can say they never received your complaint.</p></div></details>
-      <details><summary>What if nothing gets fixed?</summary><div><p>Each type of problem has a usual time to fix, for example a week for a pothole. If that passes, UrbOasis tells you to follow up and gives you the message. If that doesn’t work, it gives you an escalation letter for a senior officer. As a last step, it prepares an RTI application, which the department must answer in writing within 30 days.</p></div></details>
+      <details><summary>Does UrbOasis send my complaint for me?</summary><div><p>Yes, in one tap. UrbOasis writes the complaint, addresses it to the right department, and opens their official WhatsApp, email or complaint form with everything filled in. You just press send. Because it goes from your own number or email, it’s on the department’s official record and you get a complaint number back.</p><p>We only use channels published on each department’s own website. Where we haven’t confirmed one yet, we give you the message to paste into their app or read out on a call.</p></div></details>
+      <details><summary>What is a complaint number and why does it matter?</summary><div><p>When you file a complaint, the department gives you a number by SMS, email or in their app. Add it to UrbOasis. Every follow-up and escalation quotes that number, so nobody can say they never received your complaint.</p></div></details>
+      <details><summary>What if nothing gets fixed?</summary><div><p>Each type of problem has a usual time to fix, for example a week for a pothole. If that passes, UrbOasis sends the follow-up for you in one tap. If that doesn’t work, it sends an escalation letter to a senior officer. As a last step, it prepares an RTI application, which the department must answer in writing within 30 days.</p></div></details>
       <details><summary>Where is my information stored?</summary><div><p>Only in this browser on this device. There is no account and nothing is sent to us. To move your complaints to another phone, use <b>Backup</b> on the My complaints page.</p></div></details>
       <details><summary>Is it an emergency?</summary><div><p>For a live electric wire, an open manhole, a fallen tree blocking a road or a gas smell, call <b>${EMERGENCY}</b> first. Report it here afterwards so there is a written record.</p></div></details>
     </div>
@@ -1193,15 +1224,47 @@ function senderFields(){return`<div class="two"><label class="fl">Your name<inpu
   <label class="fl">Phone number<input id="p-phone" type="tel" data-p="phone" value="${esc(S.profile.phone)}" autocomplete="tel" inputmode="tel"></label></div>
   <label class="fl">Ward <span class="opt">Optional, if you know it</span><input id="p-ward" data-p="ward" value="${esc(S.profile.ward)}"></label>`}
 const box=(id,title,inner,meta='')=>`<details class="box" data-box="${id}" ${openBox.has(id)?'open':''}><summary>${title}${meta?` <span class="cnt">${meta}</span>`:''}</summary><div>${inner}</div></details>`;
-function sendTools(c,big){
-  const a=contactOf(c),wa=a.whatsapp&&a.verified;
-  const primary=a.phone?`<a class="btn primary ${big?'xl':'lg'} block" href="tel:${a.phone}"><i class="fa-solid fa-phone"></i>Call ${a.phone}</a>`
-    :`<a class="btn primary ${big?'xl':'lg'} block" target="_blank" rel="noopener" href="https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet(c))}"><i class="fa-brands fa-x-twitter"></i>Post to @${a.x}</a>`;
-  return `${primary}<div class="row sub">
-    <button class="btn" data-act="readaloud"><i class="fa-solid fa-bullhorn"></i>What to say on the call</button>
-    <button class="btn" data-act="copydoc-k" data-k="complaint"><i class="fa-regular fa-copy"></i>Copy complaint</button>
-    ${wa?`<a class="btn" target="_blank" rel="noopener" href="https://wa.me/${a.whatsapp}?text=${encodeURIComponent(docs(c).complaint)}"><i class="fa-brands fa-whatsapp"></i>Send on WhatsApp</a>`:''}
-  </div>`;
+const CH_META={whatsapp:{l:'WhatsApp',ic:'fa-brands fa-whatsapp'},email:{l:'email',ic:'fa-solid fa-envelope'},x:{l:'X',ic:'fa-brands fa-x-twitter'},form:{l:'their online form',ic:'fa-solid fa-globe'}};
+const channelsFor=a=>['whatsapp','email','x','form'].filter(k=>a[k]);
+function sendSummary(a){const l=channelsFor(a).map(k=>CH_META[k].l);return l.length?`Sent by ${l.length>1?l.slice(0,-1).join(', ')+' or '+l[l.length-1]:l[0]}`:'One-tap sending not available yet'}
+const corpEmail=c=>{const x=CATS[c.cat].ag==='gba'&&CORP_CONTACTS[c.corp];return x&&x.email.verified&&x.email.value?x.email.value:null};
+const msgFor=(c,k)=>view==='report'&&k==='complaint'?(D.textEdited?D.text:complaintText(c)):docs(c)[k];
+function subjectFor(c,k){return `${{complaint:'Complaint',followup:'Follow-up',escalate:'Escalation'}[k]||'Complaint'}${c.ref&&k!=='complaint'?` (${c.ref})`:''}: ${c.title}, ${c.area}`}
+function sendHref(c,k,chn){
+  const a=contactOf(c),body=msgFor(c,k);
+  if(chn==='whatsapp')return`https://wa.me/${a.whatsapp}?text=${encodeURIComponent(body)}`;
+  if(chn==='email'){const cc=corpEmail(c);return`mailto:${a.email}?${cc?`cc=${encodeURIComponent(cc)}&`:''}subject=${encodeURIComponent(subjectFor(c,k))}&body=${encodeURIComponent(body)}`}
+  if(chn==='x')return`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweet(c))}`;
+  return a.form;
+}
+const hintFor=(chn,a)=>chn==='whatsapp'?`Opens WhatsApp to ${a.short} with your message written. Just tap send.`
+  :chn==='email'?`Opens your email with ${a.short}’s address, subject and message filled in. Just tap send.`
+  :chn==='x'?`Opens X with a public post tagging @${a.x}. Just tap post.`
+  :`Copies your message and opens ${a.short}’s official complaint form. Paste it in and submit.`;
+function sendHTML(c,k,big){
+  const a=contactOf(c),dept=deptLabel(c);
+  if(k==='rti')return`<button class="btn primary ${big?'xl':'lg'} block" data-act="print-k" data-k="rti"><i class="fa-solid fa-print"></i>Print the RTI application</button>
+    <p class="hint">RTI applications go by post or by hand with the fee, so they can’t be sent by WhatsApp or email. Print it and send it to the office named at the top.</p>`;
+  const chs=channelsFor(a);
+  const btn=(chn,primary)=>`<button class="btn${primary?` primary ${big?'xl':'lg'} block`:''}" data-act="send" data-ch="${chn}" data-k="${k}"><i class="${CH_META[chn].ic}" aria-hidden="true"></i>${primary?(chn==='form'?'Copy it and open their form':'Send it for me'):`Send by ${CH_META[chn].l}`}</button>`;
+  let out=chs.length?`${btn(chs[0],true)}<p class="hint">${hintFor(chs[0],a)}</p>${chs.length>1?`<div class="row sub">${chs.slice(1).map(x=>btn(x,false)).join('')}</div>`:''}`
+    :`<div class="alert t-wait"><b>One-tap sending isn’t available for ${esc(dept)} yet</b><span>We only send through channels published on the department’s own website, and ${esc(a.short)} doesn’t publish a WhatsApp number or email for complaints we could confirm. Copy the message and ${a.phone?`call ${a.phone}`:'use their app'}${a.phone&&a.app?` or use the ${a.app} app`:''}.</span><div class="row"><button class="btn" data-act="copydoc-k" data-k="${k}"><i class="fa-regular fa-copy"></i>Copy the message</button></div></div>`;
+  if(CONFIG.conciergeFiling&&k==='complaint')out+=conciergeHTML(c);
+  if(a.phone&&chs.length)out+=`<p class="small muted">Prefer to call? <a class="link" style="min-height:0" href="tel:${a.phone}">${a.phone}</a> · <button class="link" style="min-height:0" data-act="readaloud">What to say on the call</button></p>`;
+  return out;
+}
+function conciergeHTML(c){
+  const p=S.profile;
+  return`<details class="box" data-box="concierge" ${openBox.has('concierge')?'open':''}><summary>Or let the UrbOasis team file it</summary><div>
+    <p class="hint">Send it to us and we’ll file it with ${esc(deptLabel(c))} within 24 hours, then send you the complaint number by SMS or WhatsApp. Add it here when it arrives.</p>
+    ${p.name&&p.phone?`<p class="small">We’ll contact you as <b>${esc(p.name)}</b> on <b>${esc(p.phone)}</b>.</p>`:senderFields()}
+    <div><button class="btn" data-act="concierge"><i class="fa-solid fa-paper-plane"></i>Send it to the UrbOasis team</button></div></div></details>`;
+}
+let sentPending={};
+function pendingHTML(c){
+  const sp=sentPending[c.id];if(!sp)return'';
+  const kk={complaint:'filed',followup:'followup',escalate:'escalated'}[sp.k];
+  return`<div class="alert t-act" role="status"><b>Did it go through?</b><span>Once you’ve pressed send in ${CH_META[sp.chn].l}, confirm it here so UrbOasis can start counting.</span><div class="row"><button class="btn primary" data-act="logsent" data-k="${kk}"><i class="fa-solid fa-check"></i>Yes, I sent it</button></div></div>`;
 }
 function detailHTML(c){
   const st=stage(c),s=status(c),cat=CATS[c.cat],a=contactOf(c),ns=nextStep(c,st),D2=docs(c);
@@ -1212,12 +1275,12 @@ function detailHTML(c){
   const sent={complaint:c.status==='draft'?['filed','I’ve sent it']:null,followup:st!=='fixed'?['followup','I sent this']:null,escalate:st!=='fixed'?['escalated','I sent this']:null,x:null,rti:st!=='fixed'?['rti','I filed this']:null}[k];
   const refForm=`<form class="search" data-form="ref"><label class="sr" for="d-ref">Complaint number</label><input id="d-ref" value="${esc(c.ref)}" placeholder="e.g. 10/2026/123456"><button class="btn">Save</button></form>`;
   let action='';
-  if(st==='file')action=`${sendTools(c,true)}<div class="fl" style="margin-top:var(--s2)">Then type the complaint number they give you${refForm}</div>`;
-  else if(ns.doc)action=`<button class="btn primary xl block" data-act="copydoc-k" data-k="${ns.doc}"><i class="fa-regular fa-copy"></i>Copy the ${DOCS.find(d=>d[0]===ns.doc)[1].toLowerCase()}</button>
-    <div class="row sub"><button class="btn" data-act="opendoc" data-k="${ns.doc}"><i class="fa-solid fa-file-lines"></i>Read or edit it first</button>${sent&&k===ns.doc?`<button class="btn" data-act="logsent" data-k="${sent[0]}"><i class="fa-solid fa-check"></i>${sent[1]}</button>`:`<button class="btn" data-act="logsent" data-k="${{followup:'followup',escalate:'escalated',rti:'rti'}[ns.doc]}"><i class="fa-solid fa-check"></i>I’ve sent it</button>`}</div>`;
+  if(st==='file')action=`${sendHTML(c,'complaint',true)}${pendingHTML(c)}<div class="fl" style="margin-top:var(--s2)">Then add the complaint number when it arrives (by SMS, email or their app)${refForm}</div>`;
+  else if(ns.doc)action=`${sendHTML(c,ns.doc,true)}${pendingHTML(c)}
+    <div class="row sub"><button class="btn" data-act="opendoc" data-k="${ns.doc}"><i class="fa-solid fa-file-lines"></i>Read or edit it first</button><button class="btn" data-act="logsent" data-k="${{followup:'followup',escalate:'escalated',rti:'rti'}[ns.doc]}"><i class="fa-solid fa-check"></i>${ns.doc==='rti'?'I’ve filed it':'I’ve sent it'}</button></div>`;
   else if(st==='fixed')action=`<button class="btn lg" data-act="reopen"><i class="fa-solid fa-rotate-left"></i>It’s broken again</button>`;
   else action=`<button class="btn primary xl block" data-act="fixed"><i class="fa-solid fa-circle-check"></i>It’s been fixed</button><div class="row sub"><button class="btn" data-act="ics"><i class="fa-regular fa-calendar"></i>Remind me on ${fmtDs(nextDue(c))}</button></div>`;
-  const docsInner=`<p class="hint">Ready-made messages for every stage. Copy one and send it to the department.</p>
+  const docsInner=`<p class="hint">Ready-made messages for every stage. Read or edit one here, then send it from the box above.</p>
     <div class="doctabs" role="tablist" aria-label="Messages">${DOCS.map(([dk,l])=>`<button role="tab" aria-selected="${dk===k}" data-act="doctab" data-k="${dk}">${l}${dk===ns.doc?'<span class="rec" aria-label="recommended now"></span>':''}</button>`).join('')}<span class="ind" aria-hidden="true"></span></div>
     <label class="sr" for="d-doc">Message text</label><textarea class="doc" id="d-doc" rows="${k==='x'?5:k==='rti'?16:11}">${esc(D2[k])}</textarea>
     <div class="row">
@@ -1242,7 +1305,7 @@ function detailHTML(c){
       ${!c.sample&&(pub(c)||Board.canVote)?box('community','Community board',pub(c)?`<p><b>${plural(pub(c).votes,'resident')}</b> ${pub(c).votes===1?'wants':'want'} this fixed. Your follow-up and escalation letters quote this, with a link.</p><div class="row"><button class="btn" data-act="issue" data-id="${esc(c.publicId)}"><i class="fa-solid fa-arrow-up"></i>Open on the board</button></div>`:`<p class="hint">Post it so neighbours can vote. More votes rank it higher on a public list officials can see. Only the problem and location are shared, never your name or number.</p><div><button class="btn" data-act="post-board"><i class="fa-solid fa-arrow-up"></i>Post to the community board</button></div>`,pub(c)?plural(pub(c).votes,'vote'):''):''}
       ${box('map','Map and directions',`<div class="mapslot short" data-mapslot></div><a class="btn" target="_blank" rel="noopener" href="${gmaps(c.lat,c.lng)}"><i class="fa-solid fa-diamond-turn-right"></i>Directions</a>`)}
       ${box('info','Complaint details',`<dl class="facts">
-        <dt>Department</dt><dd>${esc(orgFor(c))}${a.phone?` · <span class="mono">${a.phone}</span>`:''}</dd>
+        <dt>Department</dt><dd>${esc(orgFor(c))}<br><span class="small muted">${sendSummary(a)}</span></dd>
         <dt>Complaint no.</dt><dd>${refForm}</dd>
         <dt>Sent</dt><dd>${c.filedAt?`${fmtD(c.filedAt)} (${n?`${plural(n,'day')} ago`:'today'})`:'Not yet'}</dd>
         <dt>Usually fixed in</dt><dd>${plural(cat.days,'day')}</dd>
@@ -1296,7 +1359,7 @@ function reportHTML(){
   const qs=[['What’s the problem?','Choose the closest match. This decides which department gets your complaint.'],
     ['Where is it?','Put the pin exactly on the spot so the repair crew can find it.'],
     ['Check your complaint','We wrote this from your answers. You can change anything.'],
-    [`Send it to ${D.cat?deptLabel(draftC):'the department'}`,'Then save it, and UrbOasis keeps track of it for you.']];
+    [`Send it to ${D.cat?deptLabel(draftC):'the department'}`,'One tap and it’s on its way. Then UrbOasis keeps track of it for you.']];
   const fe=id=>fieldErr&&fieldErr.id===id?`<p class="ferr" id="${id}-err"><i class="fa-solid fa-circle-exclamation" aria-hidden="true"></i>${esc(fieldErr.m)}</p>`:'';
   const inv=id=>fieldErr&&fieldErr.id===id?`aria-invalid="true" aria-describedby="${id}-err"`:'';
   const nav=(next,back=true)=>`<div class="wnav">${back?'<button class="btn lg" data-act="back-step"><i class="fa-solid fa-arrow-left"></i>Back</button>':''}${next?`<button class="btn primary lg" data-act="next-step">${next}<i class="fa-solid fa-arrow-right"></i></button>`:''}</div>`;
@@ -1340,18 +1403,18 @@ function reportHTML(){
   }else if(D.step===2){
     const cat=CATS[D.cat],st=strength(D,draftPhoto||D.hasPhoto),miss=st.filter(x=>!x[1]);
     if(!D.textEdited)D.text=complaintText(draftC);
-    body=`<div class="agency"><i class="fa-solid ${ag.ic}" aria-hidden="true"></i><div><p class="small muted">This goes to</p><h3>${esc(orgFor(draftC))}</h3><p class="small muted">${ag.phone?`Helpline <b class="mono" style="color:var(--ink)">${ag.phone}</b> · `:''}usually fixed within ${plural(cat.days,'day')}</p></div></div>
+    body=`<div class="agency"><i class="fa-solid ${ag.ic}" aria-hidden="true"></i><div><p class="small muted">This goes to</p><h3>${esc(orgFor(draftC))}</h3><p class="small muted">${sendSummary(ag)} · usually fixed within ${plural(cat.days,'day')}</p></div></div>
     <label class="fl" for="f-text"><span class="row" style="justify-content:space-between">Your complaint${D.textEdited?'<button type="button" class="link" data-act="regen">Undo my changes</button>':''}</span></label><textarea class="doc" id="f-text" data-f="text" rows="14">${esc(D.text)}</textarea>
     ${miss.length?`<div class="meter"><h3>Make it stronger <span class="muted small" style="font-weight:400">(optional)</span></h3><ul>${miss.map(([l])=>`<li class="no"><i class="fa-regular fa-circle" aria-hidden="true"></i>${l}</li>`).join('')}</ul><p class="hint">Go back to add these, or continue as it is.</p></div>`:'<div class="meter"><ul><li><i class="fa-solid fa-circle-check" style="color:var(--st-fixed)" aria-hidden="true"></i>Looks complete: pin, landmark, photo and details.</li></ul></div>'}
     ${nav('Continue')}`;
   }else{
     const cat=CATS[D.cat];
     const ask=!S.profile.asked;
-    body=`${ask?`<section class="sender" aria-labelledby="sender-h"><h3 id="sender-h">First, who’s complaining?</h3><p class="hint">Helplines ask for your name and phone number to register a complaint and call you back. We’ll add them to every letter. They stay on this device.</p>
+    body=`${ask?`<section class="sender" aria-labelledby="sender-h"><h3 id="sender-h">First, who’s complaining?</h3><p class="hint">Departments need your name and phone number to register a complaint and call you back. We’ll add them to every message. They stay on this device.</p>
       ${senderFields()}<div class="row"><button class="btn primary" data-act="sender-save">Save my details</button><button class="btn quiet" data-act="sender-skip">Skip for now</button></div></section>`:''}
-    <div class="important"><i class="fa-solid fa-circle-info" aria-hidden="true"></i><span><b>UrbOasis can’t send complaints for you.</b> Sending it yourself puts it on ${ag.short}’s official record and gets you a complaint number.</span></div>
-    ${sendTools(draftC,false)}
-    <label class="fl" for="f-ref">Complaint number they gave you <span class="opt">It arrives by SMS, in their app, or on the call. You can add it later.</span></label><input id="f-ref" data-f="ref" value="${esc(D.ref)}" placeholder="e.g. 10/2026/123456">
+    <section class="stack" style="gap:var(--s3)" aria-label="Send">${sendHTML(draftC,'complaint',true)}</section>
+    ${D.sentVia?`<div class="alert t-fixed" role="status"><b><i class="fa-solid fa-check" aria-hidden="true"></i> Opened ${CH_META[D.sentVia].l}</b><span>Once you’ve pressed send there, it’s with ${ag.short} and on their record. Add the complaint number below when it arrives.</span></div>`:''}
+    <label class="fl" for="f-ref">Complaint number <span class="opt">It arrives by SMS, email or in their app. You can add it later.</span></label><input id="f-ref" data-f="ref" value="${esc(D.ref)}" placeholder="e.g. 10/2026/123456">
     <label class="check"><input type="checkbox" id="f-filed" data-f="filed" ${D.filed||D.ref?'checked':''}><span>I’ve sent it to ${ag.short}. Start counting the ${cat.days}-day fix time.</span></label>
     ${Board.canVote&&!D.publicId?`<label class="check"><input type="checkbox" id="f-post" data-f="post" ${D.post?'checked':''}><span>Post it on the community board so neighbours can vote. Only the problem and location are shared, never your name or number.${Board.user?'':' You’ll be asked to sign in with Google.'}</span></label>`:''}
     ${D.publicId?`<p class="hint"><i class="fa-solid fa-link" aria-hidden="true"></i> Linked to a community board issue${(x=>x?` with ${plural(x.votes,'vote')}`:'')(Board.get(D.publicId))}.</p>`:''}
@@ -1368,31 +1431,33 @@ function reportHTML(){
   <div id="stepbody"><div class="q"><h1 style="font-size:var(--fs-2xl)" tabindex="-1" id="qh">${qs[D.step][0]}</h1><p>${qs[D.step][1]}</p></div>
   <div class="pbody stack" style="gap:var(--s5);padding-top:var(--s5)">${body}</div></div></div>`;
 }
-function guideHTML(){
+function departmentsHTML(){
+  const short={gba:'Roads, garbage, streetlights, footpaths, trees, stagnant water, stray dogs',bwssb:'Water supply, leaks and sewage',bescom:'Power cuts and loose or hanging wires',btp:'Traffic signals and road safety'};
   return `<div class="wrap">
-  <div class="phead"><p class="eyebrow">Guide</p><h1>Who to contact in Bengaluru</h1><p>Four departments handle almost every street problem. Here’s who does what, how to reach them, and who to go to if they don’t act.</p></div>
+  <div class="phead"><p class="eyebrow">Where your complaint goes</p><h1>You don’t need to know who fixes what. UrbOasis routes it for you.</h1><p>Pick the problem and drop a pin. We work out the department and the city corporation, write the complaint, send it in one tap, and chase it until it’s fixed.</p></div>
   <div class="pbody stack" style="gap:var(--s7)">
-  <div class="agrid">${Object.entries(CONTACTS).map(([k,a])=>`<div class="acard">
-    <div class="ah"><i class="fa-solid ${a.ic}" aria-hidden="true"></i><div><h3>${a.name}</h3><span class="small muted">${a.short}</span></div></div>
-    <div class="row" style="justify-content:space-between" data-verify>${a.phone?`<span class="phone">${a.phone}</span>`:''}${a.x?`<a class="link" target="_blank" rel="noopener" href="https://x.com/${a.x}">@${a.x}</a>`:''}</div>
-    <p class="small">${esc(a.channel)}</p>
-    <ul>${Object.values(CATS).filter(c=>c.ag===k).map(c=>`<li><span><i class="fa-solid ${c.ic} muted" style="width:18px" aria-hidden="true"></i> ${c.n}</span><span>~${plural(c.days,'day')}</span></li>`).join('')}</ul>
-    <p class="small muted" data-verify><b style="color:var(--ink)">If they don’t act:</b> write to ${a.escHint}.</p></div>`).join('')}</div>
+  <div class="agrid">${Object.entries(CONTACTS).map(([k,a])=>{const cats=Object.values(CATS).filter(c=>c.ag===k),lo=Math.min(...cats.map(c=>c.days)),hi=Math.max(...cats.map(c=>c.days));
+    return`<div class="acard">
+    <div class="ah"><i class="fa-solid ${a.ic}" aria-hidden="true"></i><div><h3>${a.name}</h3><span class="small muted">${a.short} · ${short[k]}</span></div></div>
+    <ul>${cats.map(c=>`<li><span><i class="fa-solid ${c.ic} muted" style="width:18px" aria-hidden="true"></i> ${c.n}</span><span>~${plural(c.days,'day')}</span></li>`).join('')}</ul>
+    <div class="stack" style="gap:var(--s2)"><p class="eyebrow">If it isn’t fixed</p>
+      <ol class="pathsteps" data-verify><li>Not fixed in ${lo===hi?plural(lo,'day'):`its usual time (${lo} to ${hi} days, depending on the problem)`}? We send a follow-up quoting your complaint number.</li><li>A week later, we escalate to ${a.escHint}.</li><li>Three weeks after that, we prepare an RTI application.</li></ol></div>
+    <p class="small muted"><i class="fa-solid fa-paper-plane" aria-hidden="true"></i> ${sendSummary(a)}</p></div>`}).join('')}</div>
   <div class="stack"><h2>GBA and the five city corporations</h2><div class="prose" data-verify>
-    <p>Since 2025, the work BBMP used to do is split between the Greater Bengaluru Authority and five city corporations: ${Object.values(CORPS).join(', ')}. UrbOasis guesses the corporation from your pin and lets you correct it.</p></div></div>
-  <div class="stack"><h2>Tips for getting it fixed faster</h2><ol class="tips">
-    <li><b>Always get the complaint number.</b> Without it, a follow-up starts from zero.</li>
-    <li><b>Give a landmark, not just a road.</b> “Opposite the bakery, next to pole 14” gets a crew to the spot. “Hosur Road” doesn’t.</li>
-    <li><b>Attach a photo</b> with something for scale. It makes a complaint harder to close as “not found”.</li>
-    <li><b>Follow up once, then escalate.</b> One follow-up after the fix time, then a written escalation, works better than calling every day.</li>
-    <li><b>Ask neighbours to complain too.</b> Several complaints about one spot get noticed.</li>
-    <li><b>Use RTI as the last step.</b> The department must reply in writing within 30 days.</li>
+    <p>Since 2025, the Greater Bengaluru Authority oversees five city corporations. UrbOasis detects which one your pin falls under and addresses your complaint to it. If we get it wrong, you can change it.</p></div>
+    <div class="chips">${Object.values(CORPS).map(n=>`<span class="chip" style="cursor:default">${n.replace('Bengaluru ','')}</span>`).join('')}</div></div>
+  <div class="stack"><h2>What makes a complaint get fixed</h2><ol class="tips">
+    <li><b>The complaint number.</b> UrbOasis asks for it and quotes it in every follow-up, so nobody can say they never got it.</li>
+    <li><b>A landmark, not just a road.</b> “Opposite the bakery, next to pole 14” gets a crew to the spot. “Hosur Road” doesn’t.</li>
+    <li><b>A photo</b> with something for scale. It makes a complaint harder to close as “not found”.</li>
+    <li><b>One follow-up, then an escalation.</b> UrbOasis times both for you. That works better than calling every day.</li>
+    <li><b>Neighbours complaining too.</b> Several complaints about one spot get noticed. Share yours, or vote on the community board.</li>
   </ol></div>
-  <div class="stack"><h2>Please note</h2><div class="prose">
-    <p>Helpline numbers are being re-checked after the 2025 restructuring. If a number doesn’t connect, check the department’s official website.</p>
-    <p>For emergencies (live wires, open manholes, accidents) call ${EMERGENCY}. It is not a complaint line.</p>
-    <p>The fix times shown are our guide to a reasonable wait, not official deadlines.</p>
-  </div></div>
+  <details class="box" data-box="callself" ${openBox.has('callself')?'open':''} style="border-top:1px solid var(--line)"><summary>Prefer to call yourself?</summary><div>
+    <p class="hint">Only numbers published on each department’s own website are listed.</p>
+    <dl class="facts">${Object.values(CONTACTS).map(a=>`<dt>${a.short}</dt><dd>${a.phone?`<a class="link" style="min-height:0" href="tel:${a.phone}">${a.phone}</a>`:'<span class="muted">No confirmed helpline</span>'}${a.app?` <span class="muted">· ${a.app} app</span>`:''}</dd>`).join('')}</dl>
+    <p class="hint">For emergencies such as live wires, open manholes or accidents, call ${EMERGENCY}. It is not a complaint line.</p></div></details>
+  <div class="prose"><p>UrbOasis is independent and not connected to any of these departments. Fix times are our guide to a reasonable wait, not official deadlines.</p></div>
   </div></div>`;
 }
 function reportDoc(list,org,compact){
@@ -1454,7 +1519,7 @@ function societiesHTML(){
     <div class="shead reveal"><p class="eyebrow">What your committee gets</p><h2>Track it, escalate it, report it</h2><p>Some of this works today. The rest is what we’re building with pilot societies.</p></div>
     <div class="agrid reveal-kids">${[
       ['fa-list-check','Shared tracking','pilot','Residents report into one society list. The committee sees every open problem, its complaint number and how overdue it is.'],
-      ['fa-bell','Escalation on autopilot','now','Each complaint says when to follow up, escalate and file an RTI, with the letter ready and signed for your RWA.'],
+      ['fa-bell','Escalation on autopilot','now','Each complaint is sent, followed up and escalated in one tap at the right time, signed for your RWA, with an RTI application ready if needed.'],
       ['fa-file-lines','Monthly ward-office report','now','Every open, overdue and fixed complaint by department, printable for the ward office or your AGM.'],
     ].map(([ic,t,s,d])=>`<div class="acard"><div class="ah"><i class="fa-solid ${ic}" aria-hidden="true"></i><h3>${t}</h3></div><p class="small muted">${d}</p><span class="tag ${s}">${s==='now'?'Available now':'In the pilot'}</span></div>`).join('')}</div>
   </div></section>
@@ -1480,7 +1545,7 @@ function societiesHTML(){
       <details><summary>What happens to our data?</summary><div><p>Today everything stays on the devices of the people using UrbOasis. When shared tracking launches, your society’s complaints will be stored with your committee’s consent, visible only to your society, and deleted on request.</p></div></details>
       <details><summary>Who in the society uses it?</summary><div><p>Usually the secretary or a civic-affairs member runs it. During the pilot, we set it up for one committee member. With shared tracking, any resident you invite can add problems.</p></div></details>
       <details><summary>Can we cancel?</summary><div><p>The pilot is free with no commitment. Paid plans are planned as month to month, so you can stop at the end of any month.</p></div></details>
-      <details><summary>Does UrbOasis file complaints for us?</summary><div><p>No. Your committee files through the official helpline or app, so the complaint is on the department’s record. UrbOasis tracks it and prepares every follow-up.</p></div></details>
+      <details><summary>Does UrbOasis file complaints for us?</summary><div><p>Yes, in one tap. UrbOasis prepares each complaint and opens the department’s official WhatsApp, email or form with everything filled in, so it goes from your committee’s own number or email and lands on the department’s record. Follow-ups and escalations go the same way.</p></div></details>
     </div>
   </div></section>
 
@@ -1587,7 +1652,7 @@ function render(){
   const holder=$('#mapholder');$('#park').appendChild(holder);
   let c=detail&&S.list.find(x=>x.id===detail);
   if(['complaints','done'].includes(view)&&detail&&!c){detail=null;if(view==='done')view='complaints'}
-  panel.innerHTML=view==='report'?reportHTML():view==='guide'?guideHTML():view==='board'?boardHTML():view==='issue'?issueHTML(Board.get(detail)):view==='societies'?societiesHTML():view==='monthly'?monthlyHTML()
+  panel.innerHTML=view==='report'?reportHTML():view==='departments'?departmentsHTML():view==='board'?boardHTML():view==='issue'?issueHTML(Board.get(detail)):view==='societies'?societiesHTML():view==='monthly'?monthlyHTML()
     :view==='done'?doneHTML(c):view==='complaints'?(c?detailHTML(c):trackerHTML()):homeHTML();
   $$('.nl[data-go]').forEach(t=>{if(t.dataset.go===view&&!t.dataset.anchor)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current')});
   const act=mine().filter(needsYou).length;
@@ -1683,8 +1748,9 @@ async function act(a,el){
     case'copydoc-k':copy(view==='report'?(D.textEdited?D.text:complaintText(draftC())):docs(c)[el.dataset.k],'Copied. Paste it or read it out');break;
     case'printdoc':printText(`${DOCS.find(d=>d[0]===(docTab[c.id]||nextStep(c,stage(c)).doc||'complaint'))[1]} · ${c.id}`,$('#d-doc').value);break;
     case'logsent':{const k=el.dataset.k,a2=contactOf(c);
-      if(k==='filed'){c.status='filed';c.filedAt=now();logEvent(c,'filed',`Sent to ${deptLabel(c)}${c.ref?` · ${c.ref}`:''}`)}
-      else if(k==='followup')logEvent(c,'followup','Sent a follow-up');
+      const via=sentPending[c.id]?.chn;delete sentPending[c.id];
+      if(k==='filed'){c.status='filed';c.filedAt=now();logEvent(c,'filed',`Sent to ${deptLabel(c)}${via?` by ${CH_META[via].l}`:''}${c.ref?` · ${c.ref}`:''}`)}
+      else if(k==='followup')logEvent(c,'followup',`Sent a follow-up${via?` by ${CH_META[via].l}`:''}`);
       else if(k==='escalated'){c.status='escalated';logEvent(c,'escalated',`Escalated to ${a2.escHint}`)}
       else if(k==='rti')logEvent(c,'rti','Filed an RTI application');
       delete docTab[c.id];render();afterView(false);toast('Logged. The clock has been updated');break}
@@ -1705,6 +1771,20 @@ async function act(a,el){
       download('urboasis-complaints.csv','text/csv',rows.map(r=>r.map(q).join(',')).join('\n'));break}
     case'print-monthly':$('#printdoc').innerHTML=$('#paper').outerHTML;window.print();break;
     case'lead-again':leadSent=false;render();break;
+    case'send':{const cc=view==='report'?draftC():c,k=el.dataset.k,chn=el.dataset.ch,href=sendHref(cc,k,chn);
+      if(chn==='form'){window.open(href,'_blank','noopener');copy(msgFor(cc,k),'Copied. Paste it into their form')}
+      else if(chn==='email')location.href=href;else window.open(href,'_blank','noopener');
+      if(view==='report'){D.filed=true;D.sentVia=chn;saveDraft();render()}else{sentPending[c.id]={k,chn};render()}
+      break}
+    case'print-k':printText(`${DOCS.find(d=>d[0]===el.dataset.k)[1]} · ${c.id}`,docs(c)[el.dataset.k]);break;
+    case'concierge':{const cc=view==='report'?draftC():c,p=S.profile;
+      if(!p.name.trim()||!p.phone.trim()){openBox.add('concierge');render();$('#p-'+(p.name.trim()?'phone':'name'))?.focus();return toast('Add your name and phone so we can send you the complaint number','fa-circle-info')}
+      p.asked=true;save();
+      const text=`Please file this complaint for me.\nDepartment: ${orgFor(cc)}\nName: ${p.name}\nPhone: ${p.phone}\n\n${msgFor(cc,'complaint')}`;
+      if(LEAD.whatsapp)window.open(`https://wa.me/${LEAD.whatsapp}?text=${encodeURIComponent(text)}`,'_blank','noopener');
+      else if(LEAD.email)location.href=`mailto:${LEAD.email}?subject=${encodeURIComponent('Please file: '+cc.title)}&body=${encodeURIComponent(text)}`;else copy(text);
+      if(view==='report'){D.concierge=true;saveDraft()}else{logEvent(c,'concierge','Sent to the UrbOasis team to file')}
+      toast('Sent to the UrbOasis team. We’ll file it within 24 hours');break}
     case'issue':go('issue',el.dataset.id);break;
     case'vote':await doVote(el.dataset.id);break;
     case'board-signin':if(await Board.signIn())toast('Signed in. You can vote now');render();break;
@@ -1766,7 +1846,8 @@ async function saveComplaint(){
   const c={id:newId(),cat:D.cat,title:D.title.trim(),desc:D.desc.trim(),sev:D.sev,lat:D.lat,lng:D.lng,area:D.area.trim(),landmark:D.landmark.trim(),corp:D.corp||'',
     hasPhoto:!!draftPhoto,createdAt:t,filedAt:filed?t:null,ref:D.ref.trim(),status:filed?'filed':'draft',text:D.textEdited?D.text:'',
     events:[{t,k:'created',x:D.cosign?'Reported in UrbOasis from a neighbour’s link':'Reported in UrbOasis'}]};
-  if(filed)c.events.push({t,k:'filed',x:`Sent to ${deptLabel(c)}${c.ref?` · ${c.ref}`:''}`});
+  if(filed)c.events.push({t,k:'filed',x:`Sent to ${deptLabel(c)}${D.sentVia?` by ${CH_META[D.sentVia].l}`:''}${c.ref?` · ${c.ref}`:''}`});
+  if(D.concierge)c.events.push({t,k:'concierge',x:'Sent to the UrbOasis team to file'});
   if(draftPhoto){try{await idb.set(c.id,draftPhoto)}catch{c.hasPhoto=false;toast('The photo couldn’t be stored on this device','fa-circle-info')}}
   if(S.list.some(x=>x.sample)){S.list=S.list.filter(x=>!x.sample);S.showEx=false}
   c.publicId=D.publicId||null;
@@ -1911,7 +1992,8 @@ function route(){
   else if(h.startsWith('i-')){view='issue';detail=h.slice(2)}
   else if(h==='how'){view='home';routeAnchor='how'}
   else if(h==='join'||h==='sample'){view='societies';routeAnchor=h}
-  else if(['home','report','complaints','guide','societies','monthly','board'].includes(h))view=h;
+  else if(h==='guide')view='departments';   // old links
+  else if(['home','report','complaints','departments','societies','monthly','board'].includes(h))view=h;
   else view='home';
 }
 addEventListener('hashchange',()=>{route();go(view,detail,routeAnchor)});
