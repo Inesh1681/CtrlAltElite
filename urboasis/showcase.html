@@ -115,21 +115,36 @@ button{font:inherit;color:inherit}
 .scrollcue i{animation:bob 1.8s ease-in-out infinite}
 @keyframes bob{50%{transform:translateY(6px)}}
 
+/* ambient sparks in the hero */
+.sparks{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.sparks i{position:absolute;left:var(--x);bottom:-10px;width:var(--s);height:var(--s);border-radius:50%;background:var(--c);box-shadow:0 0 12px var(--c);opacity:0;animation:rise 11s linear infinite;animation-delay:var(--d)}
+@keyframes rise{10%{opacity:.9}80%{opacity:.6}100%{transform:translateY(-105svh);opacity:0}}
+/* word-by-word statement */
+.words .w{display:inline-block;opacity:.12;transform:translateY(10px);transition:opacity .5s ease,transform .5s ease}
+.words.in .w{opacity:1;transform:none}
+/* numbers strip */
+.nums{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px;width:100%;max-width:1100px}
+.nums div{display:grid;gap:4px;justify-items:center;padding:18px 8px;border-radius:18px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.nums b{font:900 clamp(30px,3.4vw,46px)/1 var(--f);letter-spacing:-.03em;background:linear-gradient(180deg,#fff,#c4b5fd);-webkit-background-clip:text;background-clip:text;color:transparent;font-variant-numeric:tabular-nums}
+.nums span{font-size:13px;color:var(--hero-muted);text-align:center}
 /* problem */
 .toggle{display:inline-flex;padding:5px;border-radius:14px;background:var(--soft);border:1px solid var(--line)}
 .toggle button{appearance:none;border:0;background:transparent;min-height:44px;padding:0 18px;border-radius:10px;font:700 15px var(--f);cursor:pointer;color:var(--muted)}
 .toggle button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--sh)}
 .breaks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:28px}
-.brk{position:relative;display:grid;gap:12px;align-content:start;padding:22px;border-radius:20px;border:1px solid var(--line);background:var(--card);min-height:270px;transition:border-color .35s,background .35s}
+.brk{position:relative;display:grid;gap:12px;align-content:start;padding:22px;border-radius:20px;border:1px solid var(--line);background:var(--card);min-height:210px;transition:border-color .35s,background .35s;transform-style:preserve-3d}
+.brk.flip{animation:flip .5s ease-in-out}
+@keyframes flip{50%{transform:perspective(800px) rotateY(90deg)}}
 .brk .n{font:700 13px var(--mono);color:var(--muted)}
 .brk i.ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:19px;background:var(--rose-s);color:var(--rose);transition:background .35s,color .35s}
 .brk h3{font-size:18px}
-.brk p{font-size:15px;color:var(--muted)}
+.brk p{font-size:16px;color:var(--muted);font-weight:500}
+.brk .fix{color:var(--green);font-weight:650}
 .brk .fix{display:none}
-.breaks.with .brk{border-color:color-mix(in srgb,var(--green) 40%,var(--line))}
-.breaks.with .brk i.ic{background:var(--green-s);color:var(--green)}
-.breaks.with .brk .bad{display:none}
-.breaks.with .brk .fix{display:block}
+.brk.w{border-color:color-mix(in srgb,var(--green) 45%,var(--line));background:color-mix(in srgb,var(--green) 4%,var(--card))}
+.brk.w i.ic{background:var(--green-s);color:var(--green)}
+.brk.w .bad{display:none}
+.brk.w .fix{display:block}
 .verdict{margin-top:28px;font-size:clamp(20px,2.4vw,30px);font-weight:800;letter-spacing:-.02em;max-width:900px}
 .verdict span{color:var(--rose)} .verdict.with span{color:var(--green)}
 
@@ -161,6 +176,26 @@ button{font:inherit;color:inherit}
 .pov li>i{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:15px;background:var(--s);color:var(--c)}
 .pov li b{display:block;font-size:17px}
 .pov li span{color:var(--muted);font-size:15.5px}
+.pov.show .phone .sbody>*,.pov.show .lui>*{animation:pop .45s cubic-bezier(.2,.8,.2,1) both}
+.pov.show .phone .sbody>*:nth-child(1),.pov.show .lui>*:nth-child(1){animation-delay:0.12s}
+.pov.show .phone .sbody>*:nth-child(2),.pov.show .lui>*:nth-child(2){animation-delay:0.24s}
+.pov.show .phone .sbody>*:nth-child(3),.pov.show .lui>*:nth-child(3){animation-delay:0.36s}
+.pov.show .phone .sbody>*:nth-child(4),.pov.show .lui>*:nth-child(4){animation-delay:0.48s}
+.pov.show .phone .sbody>*:nth-child(5),.pov.show .lui>*:nth-child(5){animation-delay:0.60s}
+.pov.show .phone .sbody>*:nth-child(6),.pov.show .lui>*:nth-child(6){animation-delay:0.72s}
+.pov.show .phone .sbody>*:nth-child(7),.pov.show .lui>*:nth-child(7){animation-delay:0.84s}
+.pov.show .phone .sbody>*:nth-child(8),.pov.show .lui>*:nth-child(8){animation-delay:0.96s}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97)}}
+.pov.show li{animation:slidein .5s cubic-bezier(.2,.8,.2,1) both}
+.pov.show li:nth-child(1){animation-delay:0.1s}
+.pov.show li:nth-child(2){animation-delay:0.2s}
+.pov.show li:nth-child(3){animation-delay:0.3s}
+.pov.show li:nth-child(4){animation-delay:0.4s}
+@keyframes slidein{from{opacity:0;transform:translateX(-18px)}}
+.pov-tab{position:relative;overflow:hidden}
+.pov-tab .tick{position:absolute;left:0;bottom:0;height:3px;width:100%;background:var(--c);transform-origin:left;transform:scaleX(0)}
+.pov-tab.run .tick{animation:tick 6s linear forwards}
+@keyframes tick{to{transform:scaleX(1)}}
 .pov .quote{margin-top:22px;padding:18px 20px;border-left:4px solid var(--c);background:var(--s);border-radius:0 14px 14px 0;font-weight:650}
 .c-cit{--c:var(--vio);--s:var(--vio-s)} .c-city{--c:var(--cyan);--s:var(--cyan-s)} .c-con{--c:var(--amber);--s:var(--amber-s)}
 /* device mockups */
@@ -252,7 +287,12 @@ button{font:inherit;color:inherit}
 
 /* trust gates */
 .gates{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;position:relative}
-.gate{display:grid;gap:10px;align-content:start;padding:24px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
+.gate{position:relative;z-index:1;display:grid;gap:10px;align-content:start;padding:24px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
+.gline{position:absolute;left:4%;right:4%;top:46px;height:3px;border-radius:2px;background:linear-gradient(90deg,var(--amber),var(--cyan),var(--vio),var(--green));transform-origin:left;transform:scaleX(0);transition:transform 1.6s cubic-bezier(.6,0,.2,1) .3s;z-index:0}
+.gates.in .gline{transform:scaleX(1)}
+.gates.in .gate .k{animation:pulse 2.4s ease-in-out infinite}
+.gates.in .gate:nth-child(3) .k{animation-delay:.4s}.gates.in .gate:nth-child(4) .k{animation-delay:.8s}.gates.in .gate:nth-child(5) .k{animation-delay:1.2s}
+@keyframes pulse{50%{transform:scale(1.12)}}
 .gate .k{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:18px}
 .gate h3{font-size:18px}
 .gate p{font-size:15px;color:var(--muted)}
@@ -292,8 +332,12 @@ button{font:inherit;color:inherit}
 .note{font-size:13.5px;color:var(--muted)}
 .flywheel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px}
 .flywheel div{display:grid;gap:6px;padding:18px;border-radius:16px;background:var(--card);border:1px solid var(--line);position:relative}
-.flywheel b{font-size:15.5px}
-.flywheel p{font-size:14px;color:var(--muted)}
+.flywheel div{justify-items:center;text-align:center}
+.flywheel i{font-size:22px;color:var(--vio)}
+.flywheel b{font-size:16px}
+.flywheel.in div{animation:glow 4s ease-in-out infinite}
+.flywheel.in div:nth-child(2){animation-delay:1s}.flywheel.in div:nth-child(3){animation-delay:2s}.flywheel.in div:nth-child(4){animation-delay:3s}
+@keyframes glow{0%,20%,100%{box-shadow:none;border-color:var(--line)}10%{box-shadow:0 0 0 4px var(--vio-s);border-color:var(--vio)}}
 .flywheel div:not(:last-child)::after{content:"\f061";font:900 14px "Font Awesome 6 Free";position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--vio);z-index:1}
 
 /* comparison */
@@ -311,6 +355,9 @@ button{font:inherit;color:inherit}
 .built{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
 .built .card{display:grid;gap:10px;align-content:start}
 .built .card p{font-size:15px;color:var(--muted)}
+.built .card{position:relative}
+.built .bi{position:absolute;right:22px;top:22px;font-size:26px;color:var(--vio);opacity:.25;transition:opacity .3s,transform .3s}
+.built .card:hover .bi{opacity:.7;transform:scale(1.15) rotate(-6deg)}
 .stackline{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
 .stackline span{font:600 13.5px var(--f);padding:8px 12px;border-radius:10px;background:var(--card);border:1px solid var(--line)}
 .stackline i{color:var(--vio);margin-right:6px}
@@ -333,7 +380,9 @@ button{font:inherit;color:inherit}
 .win::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--c)}
 .win .crit{font:700 12.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
 .win h3{font-size:21px}
-.win p{font-size:15px;color:var(--muted)}
+.win .wi{font-size:28px;color:var(--c);transition:transform .4s cubic-bezier(.3,1.6,.5,1)}
+.win:hover .wi{transform:scale(1.2) rotate(-8deg)}
+.win{transition:transform .25s,box-shadow .25s}.win:hover{transform:translateY(-4px);box-shadow:var(--sh)}
 
 /* close */
 .close{background:var(--hero-bg);color:var(--hero-ink);text-align:center;overflow:hidden;min-height:90svh;display:grid;align-items:center}
@@ -361,6 +410,7 @@ html.present .presenthint{opacity:1}
   .road2{grid-template-columns:repeat(3,minmax(0,1fr))}
   .flywheel div::after{display:none}
 }
+@media (max-width:1100px){.nums{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media (max-width:900px){
   .hero .wrap,.pov,.play,.proofgrid,.calc{grid-template-columns:minmax(0,1fr)}
   .tiers,.built,.wins,.asks{grid-template-columns:minmax(0,1fr)}
@@ -384,6 +434,10 @@ html.present .presenthint{opacity:1}
   html{scroll-behavior:auto}
   .reveal,.stagger>*{opacity:1;transform:none;transition:none}
   .scrollcue i{animation:none}
+  .sparks{display:none}
+  .words .w{opacity:1;transform:none}
+  .pov.show *,.gates.in .k,.flywheel.in div{animation:none!important}
+  .gline{transition:none}
   *{transition-duration:.01ms!important}
 }
 @media print{.top,.dots,.bar,.presenthint,.scrollcue{display:none}.reveal,.stagger>*{opacity:1;transform:none}.slide{break-inside:avoid}}
@@ -403,11 +457,12 @@ html.present .presenthint{opacity:1}
 <main>
 <!-- 1 HERO -->
 <section class="slide hero" id="s-hero" data-title="UrbOasis" data-dark>
+  <div class="sparks" aria-hidden="true"><i style="--x:8%;--d:0s;--s:4px;--c:#c084fc"></i><i style="--x:18%;--d:3s;--s:3px;--c:#22d3ee"></i><i style="--x:31%;--d:6s;--s:5px;--c:#c084fc"></i><i style="--x:44%;--d:1.5s;--s:3px;--c:#34d399"></i><i style="--x:57%;--d:4.5s;--s:4px;--c:#22d3ee"></i><i style="--x:66%;--d:7.5s;--s:3px;--c:#c084fc"></i><i style="--x:78%;--d:2.5s;--s:5px;--c:#fbbf24"></i><i style="--x:90%;--d:5.5s;--s:3px;--c:#22d3ee"></i><i style="--x:96%;--d:8.5s;--s:4px;--c:#c084fc"></i></div>
   <div class="wrap">
     <div class="hstack">
       <p class="eyebrow" style="color:#c084fc"><b style="background:rgba(192,132,252,.15)">BLR</b>Civic tech · Bengaluru · SDG 11</p>
       <h1>Filing a complaint is easy. <em>Getting it fixed</em> is the hard part.</h1>
-      <p class="lede">UrbOasis closes the loop. Residents report once. The city sees one ranked queue instead of a pile of duplicates. Contractors prove the fix on site. And the resident has the final word.</p>
+      <p class="lede">Report once. The city ranks it. A contractor proves the fix. You confirm it.</p>
       <div class="row"><a class="btn go" href="index.html#demo"><i class="fa-solid fa-play" aria-hidden="true"></i>Watch the 60-second loop</a><a class="btn ghost" href="index.html#report"><i class="fa-solid fa-plus" aria-hidden="true"></i>Report a problem, live</a></div>
       <div class="chips"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i>Working app, live today</span><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i>Official channels, each verified on the department’s site</span><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i>₹0 server cost</span></div>
     </div>
@@ -432,16 +487,16 @@ html.present .presenthint{opacity:1}
 <section class="slide" id="s-problem" data-title="The problem">
   <div class="wrap">
     <div class="shead reveal"><p class="eyebrow"><b>01</b>The problem</p><h2>A complaint gets filed. Then it disappears.</h2>
-      <p class="lede">Civic complaints don’t fail at reporting. They fail at the five points after it. Flip the switch to see what changes.</p></div>
+      <p class="lede">Five places where complaints die. Flip the switch.</p></div>
     <div class="toggle reveal" role="group" aria-label="Compare"><button type="button" aria-pressed="true" data-mode="without">Today</button><button type="button" aria-pressed="false" data-mode="with">With UrbOasis</button></div>
     <div class="breaks stagger" id="breaks">
-      <div class="brk"><span class="n">1 · ROUTING</span><i class="ic fa-solid fa-sitemap" aria-hidden="true"></i><h3>Wrong desk</h3><p class="bad">Roads, garbage and lights sit with the city corporation, water with BWSSB, power with BESCOM, signals with Traffic Police. Residents guess.</p><p class="fix">11 problem types map to the right department and corporation automatically, and send through its official channel in one tap.</p></div>
-      <div class="brk"><span class="n">2 · DUPLICATES</span><i class="ic fa-solid fa-clone" aria-hidden="true"></i><h3>A hundred tickets for one pothole</h3><p class="bad">Every neighbour files separately. The city sees noise, not a signal.</p><p class="fix">Reports of the same problem within 50 m merge into one issue. More reports raise its priority instead of the pile.</p></div>
-      <div class="brk"><span class="n">3 · PRIORITY</span><i class="ic fa-solid fa-ranking-star" aria-hidden="true"></i><h3>First come, first served</h3><p class="bad">A sparking wire outside a school waits behind a faded road marking.</p><p class="fix">A transparent 0–100 score: severity, public demand, overdue days, location risk and category. Officials can see why it ranks where it does.</p></div>
-      <div class="brk"><span class="n">4 · FOLLOW-UP</span><i class="ic fa-solid fa-hourglass-half" aria-hidden="true"></i><h3>Nobody chases it</h3><p class="bad">Fix windows pass quietly. Residents give up.</p><p class="fix">Every complaint runs on a clock: follow-up, escalation to the named officer, then a one-tap RTI application.</p></div>
-      <div class="brk"><span class="n">5 · CLOSURE</span><i class="ic fa-solid fa-eye-slash" aria-hidden="true"></i><h3>“Closed” isn’t “fixed”</h3><p class="bad">Tickets get closed without anyone checking the street.</p><p class="fix">Verified fixed only with on-site before and after photos, city approval and the resident’s confirmation.</p></div>
+      <div class="brk"><span class="n">01</span><i class="ic fa-solid fa-sitemap" aria-hidden="true"></i><h3>Wrong desk</h3><p class="bad">4 departments, 5 corporations. Residents guess.</p><p class="fix">Routed automatically. Sent in one tap.</p></div>
+      <div class="brk"><span class="n">02</span><i class="ic fa-solid fa-clone" aria-hidden="true"></i><h3>Duplicates</h3><p class="bad">Every neighbour files a separate ticket.</p><p class="fix">Merged into one issue within 50 m.</p></div>
+      <div class="brk"><span class="n">03</span><i class="ic fa-solid fa-ranking-star" aria-hidden="true"></i><h3>No priority</h3><p class="bad">First come, first served.</p><p class="fix">Ranked 0–100 by risk, with a reason.</p></div>
+      <div class="brk"><span class="n">04</span><i class="ic fa-solid fa-hourglass-half" aria-hidden="true"></i><h3>No follow-up</h3><p class="bad">Deadlines pass quietly.</p><p class="fix">Follow-up, escalation, RTI on a clock.</p></div>
+      <div class="brk"><span class="n">05</span><i class="ic fa-solid fa-eye-slash" aria-hidden="true"></i><h3>Fake closure</h3><p class="bad">“Closed” without checking the street.</p><p class="fix">Photo proof and resident sign-off.</p></div>
     </div>
-    <p class="verdict reveal" id="verdict">Result today: <span>the loop never closes.</span></p>
+    <p class="verdict reveal" id="verdict">Today: <span>the loop never closes.</span></p>
   </div>
 </section>
 
@@ -449,11 +504,19 @@ html.present .presenthint{opacity:1}
 <section class="slide insight" id="s-insight" data-title="The insight" data-dark>
   <div class="wrap">
     <p class="eyebrow reveal" style="color:#c084fc"><b style="background:rgba(192,132,252,.15)">02</b>The insight</p>
-    <blockquote class="reveal">Every system is built to <em>receive</em> complaints. Nobody owns the <em>loop</em>.</blockquote>
+    <blockquote class="words" id="words">Every system is built to <em>receive</em> complaints. Nobody owns the <em>loop</em>.</blockquote>
     <div class="vs stagger">
-      <div class="old"><b>Everyone else</b><p>A better inbox: easier filing, one more portal, one more ticket number.</p></div>
+      <div class="old"><b>Everyone else</b><p>A better inbox.</p></div>
       <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
-      <div class="new"><b>UrbOasis</b><p>The follow-through layer: route, rank, assign, prove, verify. From “that’s broken” to “verified fixed”.</p></div>
+      <div class="new"><b>UrbOasis</b><p>A closed loop.</p></div>
+    </div>
+    <div class="nums stagger" aria-label="UrbOasis in numbers">
+      <div><b data-to="11">0</b><span>problem types</span></div>
+      <div><b data-to="4">0</b><span>departments routed</span></div>
+      <div><b data-to="5">0</b><span>city corporations</span></div>
+      <div><b data-to="50" data-suf=" m">0</b><span>duplicate merge radius</span></div>
+      <div><b data-to="100" data-suf=" m">0</b><span>photo proof radius</span></div>
+      <div><b data-to="72" data-suf=" h">0</b><span>to dispute a fix</span></div>
     </div>
   </div>
 </section>
@@ -463,18 +526,18 @@ html.present .presenthint{opacity:1}
   <div class="wrap">
     <div class="shead reveal"><p class="eyebrow"><b>03</b>One loop, three users</p><h2>Everyone who touches the problem, in one product.</h2></div>
     <div class="pov-tabs reveal" role="tablist" aria-label="Choose a point of view">
-      <button class="pov-tab c-cit" role="tab" id="t-cit" aria-controls="p-cit" aria-selected="true"><i class="fa-solid fa-user" aria-hidden="true"></i><b>Resident</b><small>Report once, see it fixed</small></button>
-      <button class="pov-tab c-city" role="tab" id="t-city" aria-controls="p-city" aria-selected="false"><i class="fa-solid fa-building-columns" aria-hidden="true"></i><b>City official</b><small>Fix the right thing first</small></button>
-      <button class="pov-tab c-con" role="tab" id="t-con" aria-controls="p-con" aria-selected="false"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i><b>Contractor</b><small>Get jobs, prove the work</small></button>
+      <button class="pov-tab c-cit" role="tab" id="t-cit" data-k="cit" aria-controls="p-cit" aria-selected="true"><i class="fa-solid fa-user" aria-hidden="true"></i><b>Resident</b><small>Report once, see it fixed</small><span class="tick" aria-hidden="true"></span></button>
+      <button class="pov-tab c-city" role="tab" id="t-city" data-k="city" aria-controls="p-city" aria-selected="false"><i class="fa-solid fa-building-columns" aria-hidden="true"></i><b>City official</b><small>Fix the right thing first</small><span class="tick" aria-hidden="true"></span></button>
+      <button class="pov-tab c-con" role="tab" id="t-con" data-k="con" aria-controls="p-con" aria-selected="false"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i><b>Contractor</b><small>Get jobs, prove the work</small><span class="tick" aria-hidden="true"></span></button>
     </div>
 
     <div class="pov c-cit reveal" role="tabpanel" id="p-cit" aria-labelledby="t-cit">
       <div><ul>
-        <li><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i><div><b>Report in about two minutes</b><span>Pick the problem (English and <span class="kn">ಕನ್ನಡ</span>), drop a pin or let the photo’s location do it. No account.</span></div></li>
-        <li><i class="fa-solid fa-paper-plane" aria-hidden="true"></i><div><b>Sent to the right department in one tap</b><span>Through its official WhatsApp, email or form, published on the department’s own site. It lands on the official record.</span></div></li>
-        <li><i class="fa-solid fa-bell" aria-hidden="true"></i><div><b>Chased for you</b><span>Ready-made follow-ups, escalation letters and an RTI application when it’s overdue.</span></div></li>
-        <li><i class="fa-solid fa-thumbs-up" aria-hidden="true"></i><div><b>The final say</b><span>See before and after photos. Confirm it’s fixed, or reopen it in one tap.</span></div></li>
-      </ul><p class="quote">The promise: report once, always know who has it and when it’s due, and decide yourself whether it’s really fixed.</p></div>
+        <li><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i><div><b>Report in 2 minutes</b><span>No account. English and <span class="kn">ಕನ್ನಡ</span>.</span></div></li>
+        <li><i class="fa-solid fa-paper-plane" aria-hidden="true"></i><div><b>One tap to the right department</b><span>Through its official channel.</span></div></li>
+        <li><i class="fa-solid fa-bell" aria-hidden="true"></i><div><b>Chased for you</b><span>Follow-ups, escalation, RTI.</span></div></li>
+        <li><i class="fa-solid fa-thumbs-up" aria-hidden="true"></i><div><b>The final say</b><span>Confirm the fix, or reopen it.</span></div></li>
+      </ul></div>
       <div class="phone" aria-hidden="true"><div class="screen"><div class="sbar"><span>9:41</span><span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-battery-three-quarters"></i></span></div><div class="sbody">
         <p class="m-h">What’s the problem?</p>
         <div class="m-grid"><div class="on"><i class="fa-solid fa-road-circle-exclamation"></i>Pothole</div><div><i class="fa-solid fa-trash-can"></i>Garbage</div><div><i class="fa-solid fa-lightbulb"></i>Light</div><div><i class="fa-solid fa-faucet-drip"></i>Water</div><div><i class="fa-solid fa-bolt"></i>Power</div><div><i class="fa-solid fa-tree"></i>Tree</div></div>
@@ -487,11 +550,11 @@ html.present .presenthint{opacity:1}
 
     <div class="pov c-city reveal" role="tabpanel" id="p-city" aria-labelledby="t-city" hidden>
       <div><ul>
-        <li><i class="fa-solid fa-layer-group" aria-hidden="true"></i><div><b>One issue, not a hundred tickets</b><span>Reports of the same category within 50 m merge, with every reporter kept anonymous.</span></div></li>
-        <li><i class="fa-solid fa-ranking-star" aria-hidden="true"></i><div><b>A ranked queue with reasons</b><span>A 0–100 priority score, a “why this rank” sentence, and weight sliders the city controls.</span></div></li>
-        <li><i class="fa-solid fa-user-check" aria-hidden="true"></i><div><b>Assign the best match</b><span>Contractors ranked by specialisation, workload, distance, on-time record, reopen rate and rating. Bulk assign with a deadline.</span></div></li>
-        <li><i class="fa-solid fa-chart-column" aria-hidden="true"></i><div><b>Accountability built in</b><span>Live KPIs, a contractor leaderboard that flags poor work, a ward scorecard, CSV and a printable report.</span></div></li>
-      </ul><p class="quote">The promise: show your ward exactly what was fixed first, and why.</p></div>
+        <li><i class="fa-solid fa-layer-group" aria-hidden="true"></i><div><b>One issue, not a hundred tickets</b><span>Duplicates merge automatically.</span></div></li>
+        <li><i class="fa-solid fa-ranking-star" aria-hidden="true"></i><div><b>A ranked queue with reasons</b><span>You control the weights.</span></div></li>
+        <li><i class="fa-solid fa-user-check" aria-hidden="true"></i><div><b>Assign the best match</b><span>By skill, workload, distance and record.</span></div></li>
+        <li><i class="fa-solid fa-chart-column" aria-hidden="true"></i><div><b>Accountability built in</b><span>Live KPIs, leaderboard, ward scorecard.</span></div></li>
+      </ul></div>
       <div class="laptop" aria-hidden="true"><div class="lscreen"><div class="lui">
         <div style="display:flex;justify-content:space-between"><b style="font-size:13px">What to fix first</b><span style="color:#fbbf24;font-size:10px">Prototype · sample data</span></div>
         <div class="lk"><div><small>Open</small><b>24</b></div><div><small>Critical</small><b style="color:#fb7185">2</b></div><div><small>SLA met</small><b>63%</b></div><div><small>Reopened</small><b>14%</b></div></div>
@@ -504,11 +567,11 @@ html.present .presenthint{opacity:1}
 
     <div class="pov c-con reveal" role="tabpanel" id="p-con" aria-labelledby="t-con" hidden>
       <div><ul>
-        <li><i class="fa-solid fa-inbox" aria-hidden="true"></i><div><b>Jobs on the phone</b><span>New, in progress, submitted, completed. Each with a deadline countdown, distance and cost. Tabs in English and <span class="kn">ಕನ್ನಡ</span>.</span></div></li>
-        <li><i class="fa-solid fa-circle-question" aria-hidden="true"></i><div><b>Context, not just an address</b><span>Directions, the city’s notes and why the job is a priority.</span></div></li>
-        <li><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i><div><b>Proof that can’t be faked from a desk</b><span>Before and after photos must be taken within 100 m of the site, checked by the photo’s location or the phone’s.</span></div></li>
-        <li><i class="fa-solid fa-trophy" aria-hidden="true"></i><div><b>Good work wins more work</b><span>On-time rate and reopen rate feed the best-match ranking.</span></div></li>
-      </ul><p class="quote">The promise: do it right first time and the next job comes to you.</p></div>
+        <li><i class="fa-solid fa-inbox" aria-hidden="true"></i><div><b>Jobs on the phone</b><span>Deadline, distance and cost on every card.</span></div></li>
+        <li><i class="fa-solid fa-route" aria-hidden="true"></i><div><b>Context, not just an address</b><span>Directions, notes and why it matters.</span></div></li>
+        <li><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i><div><b>Proof on site</b><span>Photos only count within 100 m.</span></div></li>
+        <li><i class="fa-solid fa-trophy" aria-hidden="true"></i><div><b>Good work wins more work</b><span>On-time and reopen rates shape ranking.</span></div></li>
+      </ul></div>
       <div class="phone" aria-hidden="true"><div class="screen"><div class="sbar"><span>9:41</span><span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-battery-three-quarters"></i></span></div><div class="sbody">
         <p class="m-h">Pothole outside the school gate</p>
         <div style="display:flex;gap:6px"><span class="m-pill" style="background:#ffedd5;color:#c2410c">71 High</span><span class="m-pill" style="background:#fef3c7;color:#92400e">7d 13h left</span></div>
@@ -525,7 +588,7 @@ html.present .presenthint{opacity:1}
 <section class="slide alt" id="s-score" data-title="Priority score">
   <div class="wrap">
     <div class="shead reveal"><p class="eyebrow"><b>04</b>For the city · try it</p><h2>Fix the most dangerous thing first. Show your working.</h2>
-      <p class="lede">The same formula the City Console uses. Change the inputs and watch the score, the band and the explanation update.</p></div>
+      <p class="lede">The real formula from the City Console. Play with it.</p></div>
     <div class="play reveal">
       <div class="controls card">
         <fieldset class="seg ctl"><legend>How serious is it?</legend>
@@ -545,7 +608,7 @@ html.present .presenthint{opacity:1}
         <div class="stack" id="stack" aria-hidden="true"></div>
         <div class="legend" id="slegend"></div>
         <div class="why"><b>Why this rank</b><span id="whytext"></span></div>
-        <p class="note" style="color:var(--hero-muted)">Bands: Critical 80+, High 60–79, Medium 40–59, Low under 40. Reopened issues get +10. Weights are adjustable in the console.</p>
+        <p class="note" style="color:var(--hero-muted)">Critical 80+ · High 60–79 · Medium 40–59 · Low</p>
       </div>
     </div>
   </div>
@@ -555,7 +618,7 @@ html.present .presenthint{opacity:1}
 <section class="slide" id="s-proof" data-title="Proof of fix">
   <div class="wrap">
     <div class="shead reveal"><p class="eyebrow"><b>05</b>For contractors · try it</p><h2>Proof from the site, or it doesn’t count.</h2>
-      <p class="lede">Before and after photos must be taken within 100 m of the job. Drag the crew away from the site and watch the app refuse the photo.</p></div>
+      <p class="lede">Photos only count within 100 m of the job. Drag the crew away.</p></div>
     <div class="proofgrid reveal">
       <div class="geo">
         <div class="geomap" aria-hidden="true">
@@ -573,7 +636,7 @@ html.present .presenthint{opacity:1}
           <span class="lbl" style="left:12px">BEFORE</span><span class="lbl" style="right:12px">AFTER</span>
           <input type="range" min="0" max="100" value="50" aria-label="Slide to compare before and after">
         </div>
-        <p class="note">This before and after view appears for the official approving the fix and for the resident who reported it. Illustration.</p>
+        <p class="note">Seen by the official and the resident. Illustration.</p>
       </div>
     </div>
   </div>
@@ -583,12 +646,12 @@ html.present .presenthint{opacity:1}
 <section class="slide alt" id="s-trust" data-title="Verified fixed">
   <div class="wrap">
     <div class="shead reveal"><p class="eyebrow"><b>06</b>Trust</p><h2>Nobody marks their own homework.</h2>
-      <p class="lede">A contractor can’t close their own job. “Verified fixed” needs independent sign-off, and a bad fix has consequences.</p></div>
-    <div class="gates stagger">
-      <div class="gate"><span class="k" style="background:var(--amber-s);color:var(--amber)"><i class="fa-solid fa-camera" aria-hidden="true"></i></span><span class="op">STEP 1</span><h3>Contractor submits proof</h3><p>Before and after photos, both within 100 m, time-stamped.</p></div>
-      <div class="gate"><span class="k" style="background:var(--cyan-s);color:var(--cyan)"><i class="fa-solid fa-stamp" aria-hidden="true"></i></span><span class="op">AND</span><h3>City approves</h3><p>The official checks the photos, or sends it back as not fixed.</p></div>
-      <div class="gate"><span class="k" style="background:var(--vio-s);color:var(--vio)"><i class="fa-solid fa-user-check" aria-hidden="true"></i></span><span class="op">AND</span><h3>A resident confirms</h3><p>Or 72 hours pass with no dispute from anyone who reported it.</p></div>
-      <div class="gate"><span class="k" style="background:var(--rose-s);color:var(--rose)"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i></span><span class="op">IF NOT</span><h3>Reopened</h3><p>Back to the same contractor at higher priority, and it counts against their reopen rate.</p></div>
+      <p class="lede">A contractor can’t close their own job.</p></div>
+    <div class="gates stagger" id="gates"><span class="gline" aria-hidden="true"></span>
+      <div class="gate"><span class="k" style="background:var(--amber-s);color:var(--amber)"><i class="fa-solid fa-camera" aria-hidden="true"></i></span><span class="op">STEP 1</span><h3>Proof</h3><p>Before and after, on site.</p></div>
+      <div class="gate"><span class="k" style="background:var(--cyan-s);color:var(--cyan)"><i class="fa-solid fa-stamp" aria-hidden="true"></i></span><span class="op">AND</span><h3>City approves</h3><p>Or sends it back.</p></div>
+      <div class="gate"><span class="k" style="background:var(--vio-s);color:var(--vio)"><i class="fa-solid fa-user-check" aria-hidden="true"></i></span><span class="op">AND</span><h3>Resident confirms</h3><p>Or 72 h, no dispute.</p></div>
+      <div class="gate"><span class="k" style="background:var(--rose-s);color:var(--rose)"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i></span><span class="op">IF NOT</span><h3>Reopened</h3><p>Same contractor, higher priority.</p></div>
     </div>
     <p class="eq reveal"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Verified fixed = <code>proof</code> + <code>city approval</code> + (<code>resident confirms</code> or <code>72 h, no dispute</code>)</p>
   </div>
@@ -598,7 +661,7 @@ html.present .presenthint{opacity:1}
 <section class="slide" id="s-sdg" data-title="SDG impact">
   <div class="wrap">
     <div class="shead reveal"><p class="eyebrow"><b>07</b>SDG alignment</p><h2>Built for SDG 11. Reinforces 16, 6 and 3.</h2>
-      <p class="lede">Tap a goal to see the specific UN targets, and exactly how UrbOasis moves them.</p></div>
+      <p class="lede">Tap a goal to see its UN targets.</p></div>
     <div class="sdgs stagger" id="sdgs"></div>
     <div class="targets" id="targets" aria-live="polite"></div>
   </div>
@@ -608,18 +671,18 @@ html.present .presenthint{opacity:1}
 <section class="slide alt" id="s-biz" data-title="Business model">
   <div class="wrap">
     <div class="shead reveal"><p class="eyebrow"><b>08</b>Business model</p><h2>Free for residents. Paid by the people who chase problems for a living.</h2>
-      <p class="lede">Residents bring the reports. Housing societies and RWAs already spend volunteer hours chasing the same pothole every month, so they pay. City corporations are the long-term buyer.</p></div>
+      <p class="lede">Residents bring the reports. Societies pay to get results. Cities buy the console.</p></div>
     <div class="tiers stagger">
-      <div class="tier"><span class="tag live">Live</span><h3>Residents</h3><p class="amt">Free</p><ul><li>Report, send and track</li><li>Follow-ups, escalation and RTI letters</li><li>Community board voting</li></ul><p class="note">Drives adoption and the data.</p></div>
-      <div class="tier feat"><span class="tag proto">Pilot first</span><h3>Housing societies and RWAs</h3><p class="amt">₹999<small> / month, proposed</small></p><ul><li>Free 3-month pilot</li><li>Shared board for the whole society</li><li>Monthly report for committee meetings</li><li>Every open complaint followed up</li></ul><p class="note">Price is a hypothesis, to be validated in the pilot.</p></div>
-      <div class="tier fut"><span class="tag next">Future</span><h3>City corporations (B2G)</h3><p class="amt">Pilot pricing</p><ul><li>City Console and Contractor app for one ward or zone</li><li>Priced per pilot</li><li>Scorecards for wards and contractors</li></ul><p class="note">No government contract or partnership exists today.</p></div>
+      <div class="tier"><span class="tag live">Live</span><h3>Residents</h3><p class="amt">Free</p><ul><li>Report, send, track</li><li>Community voting</li></ul></div>
+      <div class="tier feat"><span class="tag proto">Pilot first</span><h3>Housing societies and RWAs</h3><p class="amt">₹999<small> / month, proposed</small></p><ul><li>Free 3-month pilot</li><li>Shared board, monthly report</li></ul><p class="note">Price to be validated in the pilot.</p></div>
+      <div class="tier fut"><span class="tag next">Future</span><h3>City corporations (B2G)</h3><p class="amt">Pilot pricing</p><ul><li>Console + Contractor app per ward</li><li>Priced per pilot</li></ul><p class="note">No government contract today.</p></div>
     </div>
     <div class="calc card reveal">
       <div class="controls">
         <h3>Society revenue, your assumptions</h3>
         <div class="ctl"><label for="c-n">Paying societies <output id="o-n" for="c-n">100</output></label><input type="range" id="c-n" min="10" max="1000" step="10" value="100" style="accent-color:var(--vio)"></div>
         <div class="ctl"><label for="c-p">Price per society per month <output id="o-p" for="c-p">₹999</output></label><input type="range" id="c-p" min="299" max="2999" step="100" value="999" style="accent-color:var(--vio)"></div>
-        <p class="note">Running cost estimate: ₹2,000 + ₹13 per society per month (hosting, database, messaging). Excludes salaries, sales and support. Homes reached assumes about 150 per society. Illustrative only.</p>
+        <p class="note">Illustrative. Running cost ≈ ₹2,000 + ₹13 per society a month; ~150 homes per society.</p>
       </div>
       <div class="money" aria-live="polite">
         <div class="big"><span>Annual recurring revenue</span><b id="m-arr"></b></div>
@@ -630,10 +693,10 @@ html.present .presenthint{opacity:1}
       </div>
     </div>
     <div class="flywheel stagger">
-      <div><b>More residents report</b><p>Free, two minutes, no account.</p></div>
-      <div><b>Better data per ward</b><p>Merged issues, fix times, reopen rates.</p></div>
-      <div><b>Societies get results</b><p>And pay to keep their board.</p></div>
-      <div><b>Cities buy the console</b><p>Evidence of what works, ward by ward.</p></div>
+      <div><i class="fa-solid fa-user" aria-hidden="true"></i><b>Residents report</b></div>
+      <div><i class="fa-solid fa-database" aria-hidden="true"></i><b>Better ward data</b></div>
+      <div><i class="fa-solid fa-building" aria-hidden="true"></i><b>Societies pay</b></div>
+      <div><i class="fa-solid fa-building-columns" aria-hidden="true"></i><b>Cities buy in</b></div>
     </div>
   </div>
 </section>
@@ -642,7 +705,7 @@ html.present .presenthint{opacity:1}
 <section class="slide" id="s-edge" data-title="Why it’s different">
   <div class="wrap">
     <div class="shead reveal"><p class="eyebrow"><b>09</b>Innovation</p><h2>We don’t replace official channels. We make them close.</h2>
-      <p class="lede">Every complaint still goes through the official route, so it lands on the department’s record. UrbOasis adds everything that happens after.</p></div>
+      <p class="lede">Complaints still go through the official route. We add everything after.</p></div>
     <div class="tscroll reveal"><table class="cmp">
       <thead><tr><th scope="col">Capability</th><th scope="col">Official helplines and apps</th><th scope="col">Social media</th><th scope="col">Civic reporting portals</th><th scope="col" class="us">UrbOasis</th></tr></thead>
       <tbody id="cmp"></tbody></table></div>
@@ -654,14 +717,14 @@ html.present .presenthint{opacity:1}
 <section class="slide alt" id="s-built" data-title="Built and working">
   <div class="wrap">
     <div class="shead reveal"><p class="eyebrow"><b>10</b>Feasibility</p><h2>Not a slide deck. It runs today.</h2>
-      <p class="lede">Open it on your phone right now. Everything marked Live is built and tested. The prototype parts run end to end on sample data.</p></div>
+      <p class="lede">Open it on your phone right now.</p></div>
     <div class="built stagger">
-      <div class="card"><span class="tag live">Live</span><h3>Resident app</h3><p>Four-step reporting, automatic routing to 4 departments and 5 city corporations, photo location, one-tap sending, follow-up and RTI engine.</p></div>
-      <div class="card"><span class="tag live">Live</span><h3>Verified contact directory</h3><p>Every department channel carries its source and a verified flag. Unverified channels are hidden, never guessed.</p></div>
-      <div class="card"><span class="tag live">Live</span><h3>Community board</h3><p>Public issues ranked by votes, one vote per Google account, enforced by database rules.</p></div>
-      <div class="card"><span class="tag proto">Prototype</span><h3>City Console</h3><p>Merging, priority scoring, best-match assignment, leaderboard, ward scorecard, CSV and print. Sample data.</p></div>
-      <div class="card"><span class="tag proto">Prototype</span><h3>Contractor app</h3><p>Job tabs, accept or decline, 100 m geofenced photo proof, verification and reopening. Sample data.</p></div>
-      <div class="card"><span class="tag live">Live</span><h3>Private by design</h3><p>No account to report. Photos are re-saved without location metadata. Built with the DPDP Act 2023 in mind.</p></div>
+      <div class="card"><span class="tag live">Live</span><i class="bi fa-solid fa-mobile-screen" aria-hidden="true"></i><h3>Resident app</h3><p>Report, route, send, chase.</p></div>
+      <div class="card"><span class="tag live">Live</span><i class="bi fa-solid fa-address-book" aria-hidden="true"></i><h3>Verified contacts</h3><p>Every channel sourced. Unverified ones hidden.</p></div>
+      <div class="card"><span class="tag live">Live</span><i class="bi fa-solid fa-check-to-slot" aria-hidden="true"></i><h3>Community board</h3><p>One vote per Google account.</p></div>
+      <div class="card"><span class="tag proto">Prototype</span><i class="bi fa-solid fa-building-columns" aria-hidden="true"></i><h3>City Console</h3><p>Merge, rank, assign, verify.</p></div>
+      <div class="card"><span class="tag proto">Prototype</span><i class="bi fa-solid fa-helmet-safety" aria-hidden="true"></i><h3>Contractor app</h3><p>Geofenced photo proof.</p></div>
+      <div class="card"><span class="tag live">Live</span><i class="bi fa-solid fa-lock" aria-hidden="true"></i><h3>Private by design</h3><p>No account. Photo location stripped.</p></div>
     </div>
     <div class="stackline reveal"><span><i class="fa-solid fa-code" aria-hidden="true"></i>Static site, no build step</span><span><i class="fa-solid fa-map" aria-hidden="true"></i>OpenStreetMap, no API fees</span><span><i class="fa-solid fa-fire" aria-hidden="true"></i>Firebase for the shared board</span><span><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>Works on any phone browser</span><span><i class="fa-solid fa-indian-rupee-sign" aria-hidden="true"></i>₹0 server cost today</span></div>
   </div>
@@ -670,35 +733,35 @@ html.present .presenthint{opacity:1}
 <!-- 12 ROADMAP -->
 <section class="slide" id="s-road" data-title="Roadmap">
   <div class="wrap">
-    <div class="shead reveal"><p class="eyebrow"><b>11</b>Roadmap and impact</p><h2>From a working tool to a ward-level accountability network.</h2></div>
+    <div class="shead reveal"><p class="eyebrow"><b>11</b>Roadmap and impact</p><h2>From a working tool to ward-level accountability.</h2></div>
     <ol class="road2 stagger">
-      <li class="now"><span class="when">NOW</span><h3>Working product</h3><ul><li>Resident app live</li><li>Console and contractor prototype</li><li>Pilot sign-ups open</li></ul></li>
-      <li><span class="when">MONTHS 0–3</span><h3>Validate</h3><ul><li>10 RWA interviews</li><li>Free pilots with up to 20 societies</li></ul></li>
-      <li><span class="when">MONTHS 3–6</span><h3>Shared boards</h3><ul><li>Society accounts</li><li>WhatsApp reminders</li><li>First paid societies</li></ul></li>
-      <li><span class="when">MONTHS 6–12</span><h3>Scorecards</h3><ul><li>Ward fix-time scorecards</li><li>Full Kannada interface</li></ul></li>
-      <li><span class="when">AFTER</span><h3>B2G pilot</h3><ul><li>One ward, if a corporation agrees</li><li>Real contractors and SLAs</li></ul></li>
+      <li class="now"><span class="when">NOW</span><h3>Working product</h3></li>
+      <li><span class="when">0–3 MONTHS</span><h3>20 society pilots</h3></li>
+      <li><span class="when">3–6 MONTHS</span><h3>Shared boards, first paid</h3></li>
+      <li><span class="when">6–12 MONTHS</span><h3>Ward scorecards</h3></li>
+      <li><span class="when">AFTER</span><h3>One-ward city pilot</h3></li>
     </ol>
-    <h3 class="reveal" style="margin-top:44px">What a pilot will measure</h3><p class="note reveal" style="margin-top:6px">No results yet, so no numbers. These are the four we’ll report.</p>
+    <h3 class="reveal" style="margin-top:44px">What a pilot will measure</h3><p class="note reveal" style="margin-top:6px">No results yet, so no numbers.</p>
     <div class="metrics stagger">
-      <div><i class="fa-solid fa-stopwatch" aria-hidden="true"></i><b>Median days to fix</b><p>First report to verified fixed, against the same ward before the pilot.</p></div>
-      <div><i class="fa-solid fa-calendar-check" aria-hidden="true"></i><b>SLA compliance</b><p>Share fixed by the date the city set.</p></div>
-      <div><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><b>Reopen rate</b><p>“Fixed” issues residents reopen because the fix didn’t hold.</p></div>
-      <div><i class="fa-solid fa-layer-group" aria-hidden="true"></i><b>Duplicates merged</b><p>Repeat reports folded into one issue, so crews aren’t sent twice.</p></div>
+      <div><i class="fa-solid fa-stopwatch" aria-hidden="true"></i><b>Median days to fix</b></div>
+      <div><i class="fa-solid fa-calendar-check" aria-hidden="true"></i><b>SLA compliance</b></div>
+      <div><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><b>Reopen rate</b></div>
+      <div><i class="fa-solid fa-layer-group" aria-hidden="true"></i><b>Duplicates merged</b></div>
     </div>
   </div>
 </section>
 
 <!-- 13 WHY IT WINS -->
-<section class="slide alt" id="s-win" data-title="Why it wins">
+<section class="slide alt" id="s-win" data-title="At a glance">
   <div class="wrap">
-    <div class="shead reveal"><p class="eyebrow"><b>12</b>The case</p><h2>Why UrbOasis deserves to win.</h2></div>
+    <div class="shead reveal"><p class="eyebrow"><b>12</b>At a glance</p><h2>Six things that make it work.</h2></div>
     <div class="wins stagger">
-      <div class="win" style="--c:var(--vio)"><span class="crit">Impact</span><h3>It targets the step where complaints die</h3><p>Not reporting, but follow-through: routing, ranking, proof and verification. Directly on SDG 11 and 16.</p></div>
-      <div class="win" style="--c:var(--cyan)"><span class="crit">Innovation</span><h3>A closed loop with three users</h3><p>Duplicate merging, an explainable priority score, geofenced proof and resident sign-off, together in one product.</p></div>
-      <div class="win" style="--c:var(--green)"><span class="crit">Feasibility</span><h3>It works today</h3><p>A live app with verified official channels, a shared board on Firebase, and an end-to-end console prototype. ₹0 to run.</p></div>
-      <div class="win" style="--c:var(--amber)"><span class="crit">Viability</span><h3>Someone already pays for this pain</h3><p>Societies and RWAs chase civic problems every month. Free for residents keeps the data flowing.</p></div>
-      <div class="win" style="--c:var(--rose)"><span class="crit">Scalability</span><h3>Config, not code, per city</h3><p>Departments, channels and fix windows live in one config block. A new city is a new directory, not a rebuild.</p></div>
-      <div class="win" style="--c:var(--vio)"><span class="crit">Integrity</span><h3>Honest by design</h3><p>Unverified contacts are hidden, prototypes are labelled, and no number on this page is made up.</p></div>
+      <div class="win" style="--c:var(--vio)"><i class="wi fa-solid fa-bullseye" aria-hidden="true"></i><span class="crit">Impact</span><h3>Fixes the step where complaints die</h3></div>
+      <div class="win" style="--c:var(--cyan)"><i class="wi fa-solid fa-arrows-spin" aria-hidden="true"></i><span class="crit">Innovation</span><h3>One loop, three users</h3></div>
+      <div class="win" style="--c:var(--green)"><i class="wi fa-solid fa-circle-play" aria-hidden="true"></i><span class="crit">Feasibility</span><h3>Works today, ₹0 to run</h3></div>
+      <div class="win" style="--c:var(--amber)"><i class="wi fa-solid fa-indian-rupee-sign" aria-hidden="true"></i><span class="crit">Viability</span><h3>Societies already pay this cost in time</h3></div>
+      <div class="win" style="--c:var(--rose)"><i class="wi fa-solid fa-city" aria-hidden="true"></i><span class="crit">Scalability</span><h3>New city = new config, not new code</h3></div>
+      <div class="win" style="--c:var(--vio)"><i class="wi fa-solid fa-shield-halved" aria-hidden="true"></i><span class="crit">Integrity</span><h3>No made-up numbers, ever</h3></div>
     </div>
   </div>
 </section>
@@ -708,12 +771,12 @@ html.present .presenthint{opacity:1}
   <div class="wrap">
     <p class="eyebrow reveal" style="color:#c084fc"><b style="background:rgba(192,132,252,.15)">13</b>See it for yourself</p>
     <h2 class="reveal">Report it once. <em>See it fixed.</em> Prove it.</h2>
-    <p class="lede reveal">Sixty seconds, three users, one pothole: from a resident’s report to a verified fix, with the numbers updating live.</p>
+    <p class="lede reveal">60 seconds. Three users. One pothole, fixed.</p>
     <div class="row reveal" style="justify-content:center"><a class="btn go" href="index.html#demo"><i class="fa-solid fa-play" aria-hidden="true"></i>Run the 60-second demo</a><a class="btn ghost" href="index.html#city"><i class="fa-solid fa-building-columns" aria-hidden="true"></i>Open the City Console</a><a class="btn ghost" href="index.html#contractor"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i>Open the Contractor app</a></div>
     <div class="asks stagger">
-      <div><b>20 pilot societies</b><p>Housing societies or RWAs for a free 3-month pilot.</p></div>
-      <div><b>RWA federation introductions</b><p>Groups whose member societies could join and shape the ward scorecard.</p></div>
-      <div><b>One mentor</b><p>Govtech or B2B SaaS experience, an hour every two weeks.</p></div>
+      <div><b>20 pilot societies</b><p>Free 3-month pilot.</p></div>
+      <div><b>RWA introductions</b><p>Federations and civic groups.</p></div>
+      <div><b>One mentor</b><p>Govtech or B2B SaaS.</p></div>
     </div>
   </div>
 </section>
@@ -742,6 +805,11 @@ const dots=$$('#dots a');
 let cur=0;
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in')}}),{threshold:.15});
 $$('.reveal,.stagger').forEach(el=>io.observe(el));
+/* split the insight into words that light up in order */
+(function(){const q=$('#words');let n=0;const wrap=node=>{[...node.childNodes].forEach(c=>{if(c.nodeType===3){const f=document.createDocumentFragment();c.textContent.split(/(\s+)/).forEach(t=>{if(!t)return;if(/^\s+$/.test(t)){f.appendChild(document.createTextNode(t));return}const s=document.createElement('span');s.className='w';s.style.transitionDelay=(n++*.07)+'s';s.textContent=t;f.appendChild(s)});c.replaceWith(f)}else wrap(c)})};wrap(q);io.observe(q)})();
+/* count-ups for the numbers strip */
+new IntersectionObserver(([e],o)=>{if(!e.isIntersecting)return;o.disconnect();$$('.nums b').forEach((b,i)=>{const to=+b.dataset.to,suf=b.dataset.suf||'';if(RM){b.textContent=to+suf;return}
+  setTimeout(()=>{const t0=performance.now(),D=1200;const f=t=>{const p=Math.min(1,(t-t0)/D);b.textContent=Math.round(to*(1-Math.pow(1-p,3)))+suf;if(p<1)requestAnimationFrame(f)};requestAnimationFrame(f)},i*120)})},{threshold:.4}).observe($('.nums'));
 function onScroll(){
   const y=scrollY,h=document.documentElement.scrollHeight-innerHeight;
   $('#bar').style.transform=`scaleX(${h>0?y/h:0})`;
@@ -786,14 +854,22 @@ addEventListener('keydown',e=>{
 /* problem toggle */
 $$('.toggle button').forEach(b=>b.addEventListener('click',()=>{
   const w=b.dataset.mode==='with';$$('.toggle button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
-  $('#breaks').classList.toggle('with',w);const v=$('#verdict');v.classList.toggle('with',w);
-  v.innerHTML=w?'Result with UrbOasis: <span>every complaint has an owner, a rank, a deadline and proof.</span>':'Result today: <span>the loop never closes.</span>';
+  $$('#breaks .brk').forEach((c,i)=>{if(RM){c.classList.toggle('w',w);return}setTimeout(()=>{c.classList.remove('flip');void c.offsetWidth;c.classList.add('flip');setTimeout(()=>c.classList.toggle('w',w),250)},i*110)});
+  const v=$('#verdict');v.classList.toggle('with',w);
+  v.innerHTML=w?'With UrbOasis: <span>every complaint has an owner, a rank, a deadline and proof.</span>':'Today: <span>the loop never closes.</span>';
 }));
 
 /* point-of-view tabs (arrow keys move between tabs) */
 const tabs=$$('.pov-tab');
-function selTab(t){tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',String(on));x.tabIndex=on?0:-1;$('#'+x.getAttribute('aria-controls')).hidden=!on});const p=$('#'+t.getAttribute('aria-controls'));p.classList.add('in')}
-tabs.forEach((t,i)=>{t.addEventListener('click',()=>selTab(t));t.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];n.focus();selTab(n)}});t.tabIndex=i?-1:0});
+function selTab(t){tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',String(on));x.tabIndex=on?0:-1;const p=$('#'+x.getAttribute('aria-controls'));p.hidden=!on;p.classList.remove('show')});
+  const p=$('#'+t.getAttribute('aria-controls'));p.classList.add('in');void p.offsetWidth;p.classList.add('show');
+  tabs.forEach(x=>x.classList.remove('run'));if(povAuto){void t.offsetWidth;t.classList.add('run')}}
+/* tabs cycle on their own while the section is on screen, until someone picks one */
+let povAuto=!RM,povT=null,povSeen=false;
+const povNext=()=>{const i=tabs.findIndex(t=>t.getAttribute('aria-selected')==='true');selTab(tabs[(i+1)%tabs.length])};
+const povStop=()=>{povAuto=false;clearInterval(povT);tabs.forEach(x=>x.classList.remove('run'))};
+tabs.forEach((t,i)=>{t.addEventListener('click',()=>{povStop();selTab(t)});t.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();povStop();const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];n.focus();selTab(n)}});t.tabIndex=i?-1:0});
+new IntersectionObserver(([e])=>{if(e.isIntersecting){if(!povSeen){povSeen=true;selTab(tabs[0])}if(povAuto&&!povT)povT=setInterval(povNext,6000)}else{clearInterval(povT);povT=null}},{threshold:.35}).observe($('#s-users'));
 
 /* priority playground: same formula as the City Console (default weights) */
 const SEV_PTS={low:8,hazard:18,danger:30},FLAG_PTS={school:6,hospital:6,mainRoad:4,busStop:3},CAT_RISK={power:10,sewage:9,pothole:7,garbage:5,dogs:4};
@@ -831,6 +907,17 @@ function geo(){
 }
 $('#p-dist').addEventListener('input',geo);geo();
 $('#ba input').addEventListener('input',e=>$('#ba').style.setProperty('--p',e.target.value+'%'));
+/* gentle autoplay when each demo first scrolls into view; any touch hands control to the viewer */
+function tween(from,to,ms,step,done){const t0=performance.now();const f=t=>{const p=Math.min(1,(t-t0)/ms),e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2;step(from+(to-from)*e);if(p<1)requestAnimationFrame(f);else done&&done()};requestAnimationFrame(f)}
+function playOnce(el,fn){if(RM)return;let done=false;new IntersectionObserver(([e],o)=>{if(e.isIntersecting&&!done){done=true;o.disconnect();setTimeout(fn,400)}},{threshold:.45}).observe(el)}
+let geoUser=false,baUser=false,scoreUser=false;
+$('#p-dist').addEventListener('pointerdown',()=>geoUser=true);$('#ba input').addEventListener('pointerdown',()=>baUser=true);
+$('#s-score .controls').addEventListener('pointerdown',()=>scoreUser=true);
+playOnce($('#s-proof .geomap'),()=>{const set=v=>{if(geoUser)return;$('#p-dist').value=Math.round(v);geo()};
+  tween(20,260,1800,set,()=>setTimeout(()=>tween(260,30,1600,set),900))});
+playOnce($('#ba'),()=>{const set=v=>{if(baUser)return;$('#ba input').value=v;$('#ba').style.setProperty('--p',v+'%')};
+  tween(50,92,900,set,()=>tween(92,8,1400,set,()=>tween(8,50,900,set)))});
+playOnce($('#result'),()=>{const r=$('#p-rep');tween(1,12,1400,v=>{if(scoreUser)return;r.value=Math.round(v);P.rep=+r.value;$('#o-rep').textContent=P.rep;calc()})});
 
 /* SDG goals and targets (targets as numbered by the UN) */
 const SDG=[
