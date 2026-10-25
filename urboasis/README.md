@@ -8,10 +8,6 @@ when to follow up, when to escalate and when to file an RTI, with each document 
 
 - **Report in four steps:** category (English + Kannada), pin on the map (tap, GPS, place search, or
   the GPS tag inside a photo), landmark and photo, then a generated complaint with a strength score.
-- **Sends it for you, in one tap:** "Send it for me" opens the department's official WhatsApp, email,
-  X or complaint form with the complaint filled in. Only channels verified on the department's own
-  website are used (see `CONTACTS`). Follow-ups and escalations go the same way. An optional
-  "Let the UrbOasis team file it" mode is behind `CONFIG.conciergeFiling`.
 - **Tracks every complaint against a fix window** per category, and moves it through
   *Not filed → Waiting → Follow up → Escalate → RTI → Fixed*.
 - **Writes the documents:** follow-up, escalation letter addressed to the right officer, X post, and
