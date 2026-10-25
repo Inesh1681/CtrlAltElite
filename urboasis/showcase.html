@@ -1,0 +1,886 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>UrbOasis · Closing the civic loop</title>
+<meta name="description" content="UrbOasis closes the loop on civic complaints in Bengaluru: residents report once, the city sees one ranked queue, contractors prove the fix on site, and residents have the final say.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23167a5b'/%3E%3Cpath d='M16 7a6 6 0 0 0-6 6c0 4.5 6 12 6 12s6-7.5 6-12a6 6 0 0 0-6-6zm0 8.2a2.2 2.2 0 1 1 0-4.4 2.2 2.2 0 0 1 0 4.4z' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&family=Noto+Sans+Kannada:wght@500;700&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+/* A keynote you can scroll. Night-city palette from the app's map; one accent per meaning:
+   violet = the loop / UrbOasis, cyan = city, amber = contractor, green = verified fixed, rose = risk. */
+:root{
+  --bg:#f4f5f8; --bg2:#ffffff; --card:#ffffff; --ink:#111628; --muted:#5a6175; --line:#e1e4ec; --soft:#eef0f6;
+  --vio:#7c3aed; --cyan:#0e7490; --amber:#b45309; --green:#047857; --rose:#be123c;
+  --vio-s:#f1eaff; --cyan-s:#e3f5f9; --amber-s:#fdf1e2; --green-s:#e3f6ee; --rose-s:#fde8ec;
+  --hero-bg:#070b18; --hero-ink:#eef1ff; --hero-muted:#a7aecb;
+  --sh:0 1px 2px rgba(17,22,40,.05),0 12px 36px rgba(17,22,40,.08);
+  --f:'Public Sans',system-ui,-apple-system,'Segoe UI',sans-serif; --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace; --kn:'Noto Sans Kannada','Nirmala UI',sans-serif;
+  --sdg11:#fd9d24; --sdg16:#00689d; --sdg6:#26bde2; --sdg3:#4c9f38;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#080c18; --bg2:#0c1222; --card:#111a2e; --ink:#e9ecfb; --muted:#a3abc6; --line:#212b44; --soft:#16203a;
+  --vio:#c084fc; --cyan:#22d3ee; --amber:#fbbf24; --green:#34d399; --rose:#fb7185;
+  --vio-s:#241a42; --cyan-s:#0f2a36; --amber-s:#2f2412; --green-s:#0f2b24; --rose-s:#33141e;
+  --sh:0 1px 2px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.45); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#080c18; --bg2:#0c1222; --card:#111a2e; --ink:#e9ecfb; --muted:#a3abc6; --line:#212b44; --soft:#16203a;
+  --vio:#c084fc; --cyan:#22d3ee; --amber:#fbbf24; --green:#34d399; --rose:#fb7185;
+  --vio-s:#241a42; --cyan-s:#0f2a36; --amber-s:#2f2412; --green-s:#0f2b24; --rose-s:#33141e;
+  --sh:0 1px 2px rgba(0,0,0,.4),0 16px 40px rgba(0,0,0,.45); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:clip}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--f);-webkit-font-smoothing:antialiased;overflow-x:clip}
+h1,h2,h3{margin:0;line-height:1.08;letter-spacing:-.025em;text-wrap:balance}
+h2{font-size:clamp(32px,5vw,60px);font-weight:850}
+h3{font-size:20px;font-weight:750;letter-spacing:-.01em}
+p{margin:0}
+a{color:inherit}
+button{font:inherit;color:inherit}
+[hidden]{display:none!important}
+:focus-visible{outline:3px solid var(--vio);outline-offset:3px;border-radius:8px}
+.wrap{max-width:1200px;margin-inline:auto;padding-inline:max(24px,env(safe-area-inset-left,0px))}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kn{font-family:var(--kn)}
+.eyebrow{display:inline-flex;gap:10px;align-items:center;font:700 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--vio)}
+.eyebrow b{display:inline-grid;place-items:center;min-width:28px;height:28px;padding:0 6px;border-radius:8px;background:var(--vio-s);font-weight:700}
+.lede{font-size:clamp(18px,1.6vw,22px);color:var(--muted);max-width:62ch}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:52px;padding:0 24px;border-radius:14px;font:700 16px var(--f);text-decoration:none;cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--ink);white-space:nowrap;transition:transform .15s,box-shadow .2s}
+.btn:hover{transform:translateY(-1px);box-shadow:var(--sh)}
+.btn.go{background:linear-gradient(135deg,#7c3aed,#2563eb);border-color:transparent;color:#fff;box-shadow:0 10px 30px rgba(124,58,237,.35)}
+.btn.go:hover{box-shadow:0 14px 40px rgba(124,58,237,.5)}
+.btn.ghost{background:transparent;border-color:rgba(255,255,255,.22);color:var(--hero-ink)}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.card{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:26px;box-shadow:var(--sh)}
+.tag{justify-self:start;display:inline-flex;gap:6px;align-items:center;font:700 11.5px var(--f);letter-spacing:.06em;text-transform:uppercase;padding:5px 9px;border-radius:7px;white-space:nowrap}
+.tag.live{color:var(--green);background:var(--green-s)} .tag.proto{color:var(--amber);background:var(--amber-s)} .tag.next{color:var(--cyan);background:var(--cyan-s)}
+
+/* ---------- chrome ---------- */
+.top{position:fixed;inset:0 0 auto;z-index:40;display:flex;align-items:center;gap:12px;padding:12px max(18px,env(safe-area-inset-right,0px)) 12px max(18px,env(safe-area-inset-left,0px));transition:background .3s,border-color .3s;border-bottom:1px solid transparent}
+.top.solid{background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-color:var(--line)}
+.brand{display:flex;gap:10px;align-items:center;text-decoration:none;font-weight:850;font-size:18px;color:var(--hero-ink);margin-right:auto;min-height:44px}
+.top.solid .brand{color:var(--ink)}
+.brand i{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:#167a5b;color:#fff;font-size:15px}
+.tbtn{appearance:none;display:inline-flex;gap:8px;align-items:center;min-height:44px;padding:0 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--hero-ink);font:650 14px var(--f);cursor:pointer;text-decoration:none}
+.top.solid .tbtn{border-color:var(--line);background:var(--card);color:var(--ink)}
+.tbtn.icon{width:44px;padding:0;justify-content:center}
+.bar{position:fixed;left:0;top:0;height:3px;z-index:41;background:linear-gradient(90deg,#7c3aed,#22d3ee);transform-origin:left;transform:scaleX(0)}
+.dots{position:fixed;right:16px;top:50%;transform:translateY(-50%);z-index:39;display:grid;gap:10px}
+.dots a{display:block;width:10px;height:10px;border-radius:50%;background:var(--line);border:0;position:relative}
+.dots a.on{background:var(--vio);box-shadow:0 0 0 4px var(--vio-s)}
+.dots a span{position:absolute;right:20px;top:50%;transform:translateY(-50%);white-space:nowrap;font:600 12.5px var(--f);background:var(--card);color:var(--ink);padding:4px 9px;border-radius:7px;box-shadow:var(--sh);opacity:0;pointer-events:none;transition:opacity .15s}
+.dots a:hover span,.dots a:focus-visible span{opacity:1}
+.dots.dark a{background:rgba(255,255,255,.25)}
+
+/* ---------- slides ---------- */
+.slide{position:relative;padding-block:clamp(88px,11vh,140px);scroll-margin-top:0}
+.slide.alt{background:var(--bg2);border-block:1px solid var(--line)}
+.shead{display:grid;gap:18px;margin-bottom:48px;max-width:900px}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s cubic-bezier(.2,.7,.2,1)}
+.reveal.in{opacity:1;transform:none}
+.stagger>*{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1)}
+.stagger.in>*{opacity:1;transform:none}
+.stagger.in>*:nth-child(2){transition-delay:.08s}.stagger.in>*:nth-child(3){transition-delay:.16s}.stagger.in>*:nth-child(4){transition-delay:.24s}.stagger.in>*:nth-child(5){transition-delay:.32s}.stagger.in>*:nth-child(6){transition-delay:.4s}
+
+/* hero */
+.hero{min-height:100svh;display:grid;align-items:center;background:var(--hero-bg);color:var(--hero-ink);overflow:hidden;padding-top:96px;padding-bottom:72px}
+.hero::before{content:"";position:absolute;inset:0;background:
+  radial-gradient(60% 50% at 75% 40%,rgba(124,58,237,.35),transparent 70%),radial-gradient(40% 40% at 15% 85%,rgba(34,211,238,.18),transparent 70%),
+  repeating-linear-gradient(90deg,rgba(255,255,255,.035) 0 1px,transparent 1px 64px),repeating-linear-gradient(0deg,rgba(255,255,255,.035) 0 1px,transparent 1px 64px)}
+.hero .wrap{position:relative;display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:40px;align-items:center}
+.hero h1{font-size:clamp(38px,4.9vw,72px);font-weight:900;letter-spacing:-.04em}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,#c084fc,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .lede{color:var(--hero-muted)}
+.hero .chips{display:flex;flex-wrap:wrap;gap:8px}
+.hero .chips span{display:inline-flex;gap:8px;align-items:center;font:600 13.5px var(--f);padding:7px 12px;border-radius:999px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12)}
+.hero .chips i{color:#34d399}
+.hstack{display:grid;gap:28px}
+.loopviz{position:relative;width:100%;max-width:min(480px,62svh);aspect-ratio:1;justify-self:center}
+.loopviz svg{width:100%;height:100%;overflow:visible}
+.node{position:absolute;width:150px;transform:translate(-50%,-50%);display:grid;justify-items:center;gap:8px;text-align:center;font:650 14px/1.25 var(--f)}
+.node i{width:62px;height:62px;border-radius:50%;display:grid;place-items:center;font-size:22px;background:#0d1426;border:2px solid var(--c);color:var(--c);box-shadow:0 0 24px color-mix(in srgb,var(--c) 60%,transparent);transition:transform .3s}
+.node.lit i{transform:scale(1.14);box-shadow:0 0 44px var(--c)}
+.node small{display:block;font-weight:500;color:var(--hero-muted);font-size:12.5px}
+.loopcore{position:absolute;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none}
+.loopcore b{font:900 34px/1 var(--f);letter-spacing:-.03em}
+.loopcore span{font:600 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--hero-muted)}
+.scrollcue{position:absolute;left:50%;bottom:22px;transform:translateX(-50%);color:var(--hero-muted);font:600 12px var(--mono);letter-spacing:.12em;display:grid;justify-items:center;gap:6px;text-decoration:none}
+.scrollcue i{animation:bob 1.8s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(6px)}}
+
+/* problem */
+.toggle{display:inline-flex;padding:5px;border-radius:14px;background:var(--soft);border:1px solid var(--line)}
+.toggle button{appearance:none;border:0;background:transparent;min-height:44px;padding:0 18px;border-radius:10px;font:700 15px var(--f);cursor:pointer;color:var(--muted)}
+.toggle button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:var(--sh)}
+.breaks{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:28px}
+.brk{position:relative;display:grid;gap:12px;align-content:start;padding:22px;border-radius:20px;border:1px solid var(--line);background:var(--card);min-height:270px;transition:border-color .35s,background .35s}
+.brk .n{font:700 13px var(--mono);color:var(--muted)}
+.brk i.ic{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:19px;background:var(--rose-s);color:var(--rose);transition:background .35s,color .35s}
+.brk h3{font-size:18px}
+.brk p{font-size:15px;color:var(--muted)}
+.brk .fix{display:none}
+.breaks.with .brk{border-color:color-mix(in srgb,var(--green) 40%,var(--line))}
+.breaks.with .brk i.ic{background:var(--green-s);color:var(--green)}
+.breaks.with .brk .bad{display:none}
+.breaks.with .brk .fix{display:block}
+.verdict{margin-top:28px;font-size:clamp(20px,2.4vw,30px);font-weight:800;letter-spacing:-.02em;max-width:900px}
+.verdict span{color:var(--rose)} .verdict.with span{color:var(--green)}
+
+/* insight */
+.insight{background:var(--hero-bg);color:var(--hero-ink);overflow:hidden}
+.insight::before{content:"";position:absolute;inset:0;background:radial-gradient(50% 60% at 50% 50%,rgba(124,58,237,.25),transparent 70%)}
+.insight .wrap{position:relative;display:grid;gap:36px;justify-items:center;text-align:center}
+.insight blockquote{margin:0;font-size:clamp(30px,4.6vw,62px);font-weight:900;letter-spacing:-.035em;line-height:1.08;max-width:1000px}
+.insight blockquote em{font-style:normal;color:#c084fc}
+.insight .lede{color:var(--hero-muted);text-align:center}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;width:100%;max-width:900px}
+.vs>div{padding:22px;border-radius:20px;text-align:left}
+.vs .old{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1)}
+.vs .new{background:linear-gradient(135deg,rgba(124,58,237,.25),rgba(34,211,238,.12));border:1px solid rgba(192,132,252,.45)}
+.vs b{display:block;font-size:13px;font:700 12.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px;color:var(--hero-muted)}
+.vs p{font-size:18px;font-weight:650}
+.vs>i{font-size:22px;color:#c084fc}
+
+/* three users */
+.pov-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:28px}
+.pov-tab{appearance:none;display:grid;grid-template-columns:auto 1fr;gap:4px 14px;align-items:center;text-align:left;padding:18px;border-radius:18px;border:2px solid var(--line);background:var(--card);cursor:pointer;min-height:44px}
+.pov-tab i{grid-row:span 2;width:48px;height:48px;border-radius:14px;display:grid;place-items:center;font-size:19px;background:var(--s);color:var(--c)}
+.pov-tab b{font-size:18px}
+.pov-tab small{color:var(--muted);font-size:14px}
+.pov-tab[aria-selected="true"]{border-color:var(--c);box-shadow:0 0 0 4px var(--s)}
+.pov{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;align-items:center}
+.pov ul{list-style:none;margin:0;padding:0;display:grid;gap:16px}
+.pov li{display:grid;grid-template-columns:36px 1fr;gap:14px;align-items:start}
+.pov li>i{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;font-size:15px;background:var(--s);color:var(--c)}
+.pov li b{display:block;font-size:17px}
+.pov li span{color:var(--muted);font-size:15.5px}
+.pov .quote{margin-top:22px;padding:18px 20px;border-left:4px solid var(--c);background:var(--s);border-radius:0 14px 14px 0;font-weight:650}
+.c-cit{--c:var(--vio);--s:var(--vio-s)} .c-city{--c:var(--cyan);--s:var(--cyan-s)} .c-con{--c:var(--amber);--s:var(--amber-s)}
+/* device mockups */
+.phone{width:min(300px,100%);aspect-ratio:9/18.5;justify-self:center;border-radius:42px;padding:12px;background:#0b0f1c;box-shadow:0 30px 80px rgba(10,14,30,.35),inset 0 0 0 2px #2a3150}
+.screen{height:100%;border-radius:32px;overflow:hidden;background:#f6f7fb;color:#151a2c;display:grid;grid-template-rows:auto 1fr;font-size:12.5px}
+.sbar{display:flex;justify-content:space-between;padding:10px 18px 6px;font:600 11px var(--f)}
+.sbody{padding:6px 14px 14px;display:grid;gap:9px;align-content:start}
+.m-h{font:800 17px/1.2 var(--f);letter-spacing:-.01em}
+.m-card{background:#fff;border:1px solid #e3e6ef;border-radius:14px;padding:10px 12px;display:grid;gap:4px}
+.m-card b{font-size:13px}
+.m-card small{color:#5b627a;font-size:11px}
+.m-pill{justify-self:start;font:700 10px var(--f);padding:3px 8px;border-radius:99px}
+.m-btn{border-radius:12px;padding:10px;text-align:center;font:700 13px var(--f);background:#167a5b;color:#fff}
+.m-btn.alt{background:#fff;color:#151a2c;border:1px solid #e3e6ef}
+.m-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.m-grid div{background:#fff;border:1px solid #e3e6ef;border-radius:10px;padding:8px 4px;text-align:center;font-size:10px;font-weight:600}
+.m-grid i{display:block;font-size:15px;color:#167a5b;margin-bottom:3px}
+.m-grid .on{border-color:#167a5b;background:#e3f2ec}
+.m-photo{height:84px;border-radius:12px;background:linear-gradient(#2a3346,#161c27);position:relative;overflow:hidden}
+.m-photo::after{content:"";position:absolute;left:28%;right:28%;bottom:16px;height:18px;border-radius:50%;background:#030406}
+.laptop{justify-self:center;width:100%;max-width:560px}
+.lscreen{border-radius:16px 16px 4px 4px;padding:10px;background:#0b0f1c;box-shadow:0 30px 80px rgba(10,14,30,.35)}
+.lui{border-radius:8px;background:#0e1424;color:#e5e9ff;padding:12px;display:grid;gap:8px;font-size:11px}
+.lbase{height:14px;margin:0 -4%;border-radius:0 0 14px 14px;background:linear-gradient(#c9cdd8,#9aa0b0)}
+.lk{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.lk div{background:#141c31;border-radius:7px;padding:6px 8px}
+.lk b{display:block;font-size:15px}
+.lk small{color:#97a0c3;font-size:9px}
+.lrow{display:grid;grid-template-columns:18px 1fr 60px;gap:8px;align-items:center;background:#141c31;border-radius:7px;padding:6px 8px}
+.lrow small{color:#97a0c3;font-size:9px;display:block}
+.lsc{font:700 11px var(--mono);border-radius:6px;padding:2px 6px;text-align:center}
+.lsc.c{background:rgba(251,113,133,.18);color:#fb7185}.lsc.h{background:rgba(251,146,60,.18);color:#fb923c}.lsc.m{background:rgba(250,204,21,.16);color:#facc15}
+
+/* score playground */
+.play{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:stretch}
+.controls{display:grid;gap:18px}
+.ctl{display:grid;gap:8px}
+.ctl label,.ctl legend{font-weight:700;font-size:15px;display:flex;justify-content:space-between;gap:10px}
+.ctl label output{font-family:var(--mono);color:var(--cyan)}
+.ctl input[type=range]{width:100%;accent-color:var(--cyan);min-height:28px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;border:0;padding:0;margin:0}
+.seg legend{margin-bottom:8px;padding:0}
+.seg button,.flags button,.cats button{appearance:none;min-height:44px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font:650 14px var(--f);cursor:pointer;padding:0 10px}
+.seg button[aria-pressed="true"],.flags button[aria-pressed="true"],.cats button[aria-pressed="true"]{border-color:var(--cyan);background:var(--cyan-s);color:var(--ink)}
+.flags,.cats{display:flex;flex-wrap:wrap;gap:6px}
+.flags button i,.cats button i{margin-right:6px}
+.result{display:grid;gap:18px;align-content:start;background:var(--hero-bg);color:var(--hero-ink);border-radius:24px;padding:28px;position:relative;overflow:hidden}
+.result::before{content:"";position:absolute;inset:-40% -20% auto auto;width:70%;aspect-ratio:1;background:radial-gradient(closest-side,var(--bc,#22d3ee),transparent);opacity:.25;transition:background .4s}
+.ring{position:relative;width:200px;height:200px;justify-self:center}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:14}
+.ring .trk{stroke:rgba(255,255,255,.08)}
+.ring .val{stroke:var(--bc,#22d3ee);stroke-linecap:round;transition:stroke-dashoffset .6s cubic-bezier(.2,.8,.2,1),stroke .4s;filter:drop-shadow(0 0 8px var(--bc))}
+.ring .num{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring .num b{font:900 64px/1 var(--f);letter-spacing:-.04em}
+.ring .num span{font:700 13px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--bc)}
+.stack{display:flex;height:12px;border-radius:6px;overflow:hidden;background:rgba(255,255,255,.08)}
+.stack i{display:block;height:100%;transition:width .5s ease}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:13px;color:var(--hero-muted)}
+.legend span{display:inline-flex;gap:6px;align-items:center}
+.legend i{width:9px;height:9px;border-radius:3px}
+.why{position:relative;padding:14px 16px;border-radius:14px;background:rgba(255,255,255,.06);font-size:15.5px}
+.why b{display:block;font:700 12px var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--hero-muted);margin-bottom:4px}
+
+/* contractor proof */
+.proofgrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px}
+.geo{display:grid;gap:16px}
+.geomap{position:relative;aspect-ratio:4/3;border-radius:22px;overflow:hidden;background:#0a0f1f;border:1px solid var(--line)}
+.geomap svg{position:absolute;inset:0;width:100%;height:100%}
+.fence{position:absolute;left:50%;top:50%;width:46%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:2px dashed #34d399;background:rgba(52,211,153,.08)}
+.site{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:16px;height:16px;border-radius:50%;background:#fbbf24;box-shadow:0 0 18px #fbbf24}
+.me{position:absolute;top:50%;width:34px;height:34px;margin:-17px 0 0 -17px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#111;font-size:15px;box-shadow:0 4px 14px rgba(0,0,0,.45);transition:left .2s}
+.geolbl{position:absolute;left:12px;top:12px;font:700 12px var(--mono);letter-spacing:.08em;color:#a7aecb;background:rgba(0,0,0,.4);padding:5px 9px;border-radius:7px}
+.geostatus{display:flex;gap:12px;align-items:center;padding:14px 16px;border-radius:14px;font-weight:700;transition:background .3s,color .3s}
+.geostatus.ok{background:var(--green-s);color:var(--green)} .geostatus.no{background:var(--rose-s);color:var(--rose)}
+.ba{position:relative;aspect-ratio:4/3;border-radius:22px;overflow:hidden;background:#161c27;--p:50%;user-select:none}
+.ba>div{position:absolute;inset:0}
+.ba .bef{clip-path:inset(0 calc(100% - var(--p)) 0 0)}
+.ba::after{content:"";position:absolute;top:0;bottom:0;left:var(--p);width:3px;margin-left:-1.5px;background:#fff;box-shadow:0 0 10px rgba(0,0,0,.6);pointer-events:none}
+.ba input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
+.ba .lbl{position:absolute;bottom:12px;font:700 11.5px var(--mono);letter-spacing:.08em;color:#fff;background:rgba(0,0,0,.55);padding:5px 9px;border-radius:7px;pointer-events:none}
+.ba:has(input:focus-visible){outline:3px solid var(--vio);outline-offset:3px}
+.road{position:absolute;inset:auto 0 0;height:42%;background:#2b303b}
+.road::before{content:"";position:absolute;left:0;right:0;top:46%;border-top:4px dashed rgba(255,255,255,.45)}
+.hole{position:absolute;left:30%;right:30%;bottom:16%;height:22%;border-radius:50%;background:radial-gradient(#020305 40%,#0b0f16)}
+.patch{position:absolute;left:28%;right:28%;bottom:16%;height:20%;border-radius:12px;background:#3d4452;border:2px solid #5a6375}
+.sky{position:absolute;inset:0 0 42%;background:linear-gradient(#253049,#141a28)}
+.sky.after{background:linear-gradient(#3b5b86,#22344f)}
+
+/* trust gates */
+.gates{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;position:relative}
+.gate{display:grid;gap:10px;align-content:start;padding:24px;border-radius:20px;background:var(--card);border:1px solid var(--line)}
+.gate .k{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:18px}
+.gate h3{font-size:18px}
+.gate p{font-size:15px;color:var(--muted)}
+.gate .op{font:800 13px var(--mono);letter-spacing:.1em;color:var(--muted)}
+.eq{margin-top:26px;padding:22px 26px;border-radius:20px;background:var(--green-s);color:var(--green);font-size:clamp(18px,2vw,24px);font-weight:800;letter-spacing:-.01em}
+.eq code{font:700 .9em var(--mono)}
+
+/* SDG */
+.sdgs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.sdg{appearance:none;text-align:left;border:0;border-radius:20px;padding:22px;min-height:190px;display:grid;align-content:space-between;gap:16px;color:#fff;background:var(--c);cursor:pointer;position:relative;overflow:hidden;transition:transform .2s}
+.sdg:hover{transform:translateY(-3px)}
+.sdg[aria-pressed="true"]{box-shadow:0 0 0 4px var(--bg),0 0 0 7px var(--c)}
+.sdg .gn{font:900 64px/0.9 var(--f);letter-spacing:-.04em}
+.sdg b{font-size:17px;line-height:1.2}
+.sdg small{font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase;opacity:.85}
+.targets{margin-top:20px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.tgt{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;padding:18px;border-radius:16px;background:var(--card);border:1px solid var(--line)}
+.tgt .id{grid-row:span 2;font:800 15px var(--mono);color:var(--tc);padding-top:1px}
+.tgt b{font-size:15.5px}
+.tgt p{font-size:14.5px;color:var(--muted)}
+
+/* business */
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.tier{display:grid;gap:12px;align-content:start;padding:28px;border-radius:24px;background:var(--card);border:1px solid var(--line)}
+.tier.feat{border:2px solid var(--vio);box-shadow:0 0 0 5px var(--vio-s)}
+.tier.fut{border-style:dashed}
+.tier .amt{font:900 40px/1 var(--f);letter-spacing:-.03em}
+.tier .amt small{font-size:16px;font-weight:600;color:var(--muted);letter-spacing:0}
+.tier ul{margin:0;padding-left:20px;display:grid;gap:6px;color:var(--muted);font-size:15px}
+.calc{margin-top:22px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center}
+.money{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.money div{padding:18px;border-radius:16px;background:var(--soft)}
+.money div.big{grid-column:1/-1;background:linear-gradient(135deg,var(--vio-s),var(--cyan-s))}
+.money span{display:block;font-size:13.5px;color:var(--muted);font-weight:600}
+.money b{font:850 26px/1.2 var(--f);letter-spacing:-.02em}
+.money .big b{font-size:44px}
+.note{font-size:13.5px;color:var(--muted)}
+.flywheel{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px}
+.flywheel div{display:grid;gap:6px;padding:18px;border-radius:16px;background:var(--card);border:1px solid var(--line);position:relative}
+.flywheel b{font-size:15.5px}
+.flywheel p{font-size:14px;color:var(--muted)}
+.flywheel div:not(:last-child)::after{content:"\f061";font:900 14px "Font Awesome 6 Free";position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--vio);z-index:1}
+
+/* comparison */
+.tscroll{overflow-x:auto;border-radius:20px;border:1px solid var(--line);background:var(--card)}
+.cmp{width:100%;border-collapse:collapse;min-width:760px;font-size:15px}
+.cmp th,.cmp td{padding:14px 16px;border-bottom:1px solid var(--line);text-align:center}
+.cmp th:first-child,.cmp td:first-child{text-align:left;font-weight:600}
+.cmp thead th{font-size:13px;color:var(--muted);font-weight:700}
+.cmp .us{background:var(--vio-s);color:var(--ink)}
+.cmp thead .us{color:var(--vio);font-size:15px}
+.cmp tr:last-child td{border-bottom:0}
+.y{color:var(--green)} .p{color:var(--amber)} .n{color:var(--line);color:color-mix(in srgb,var(--muted) 45%,transparent)}
+
+/* built */
+.built{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.built .card{display:grid;gap:10px;align-content:start}
+.built .card p{font-size:15px;color:var(--muted)}
+.stackline{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+.stackline span{font:600 13.5px var(--f);padding:8px 12px;border-radius:10px;background:var(--card);border:1px solid var(--line)}
+.stackline i{color:var(--vio);margin-right:6px}
+
+/* roadmap + metrics */
+.road2{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;counter-reset:r}
+.road2 li{display:grid;gap:8px;align-content:start;padding:20px;border-radius:18px;background:var(--card);border:1px solid var(--line)}
+.road2 li.now{border:2px solid var(--green)}
+.road2 .when{font:700 12.5px var(--mono);color:var(--vio)}
+.road2 ul{margin:0;padding-left:18px;font-size:14px;color:var(--muted);display:grid;gap:4px}
+.metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:22px}
+.metrics div{padding:20px;border-radius:18px;border:1.5px dashed var(--line);display:grid;gap:6px}
+.metrics b{font-size:16.5px}
+.metrics p{font-size:14px;color:var(--muted)}
+.metrics i{color:var(--cyan);font-size:18px}
+
+/* why it wins */
+.wins{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.win{display:grid;gap:10px;align-content:start;padding:26px;border-radius:22px;background:var(--card);border:1px solid var(--line);position:relative;overflow:hidden}
+.win::before{content:"";position:absolute;inset:0 0 auto;height:4px;background:var(--c)}
+.win .crit{font:700 12.5px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--c)}
+.win h3{font-size:21px}
+.win p{font-size:15px;color:var(--muted)}
+
+/* close */
+.close{background:var(--hero-bg);color:var(--hero-ink);text-align:center;overflow:hidden;min-height:90svh;display:grid;align-items:center}
+.close::before{content:"";position:absolute;inset:0;background:radial-gradient(50% 55% at 50% 45%,rgba(124,58,237,.35),transparent 70%)}
+.close .wrap{position:relative;display:grid;gap:30px;justify-items:center}
+.close h2{font-size:clamp(40px,6vw,84px);font-weight:900;letter-spacing:-.04em;max-width:1000px}
+.close h2 em{font-style:normal;background:linear-gradient(90deg,#c084fc,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+.close .lede{color:var(--hero-muted);text-align:center}
+.asks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%;max-width:1000px;text-align:left}
+.asks div{padding:20px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+.asks b{display:block;font-size:17px;margin-bottom:4px}
+.asks p{font-size:14.5px;color:var(--hero-muted)}
+footer{padding:28px 0 40px;font-size:13.5px;color:var(--muted);background:var(--bg)}
+footer .wrap{display:grid;gap:6px}
+
+/* presenting: one slide per screen, keys move between them */
+html.present{scroll-snap-type:y mandatory}
+html.present .slide{min-height:100svh;scroll-snap-align:start;display:grid;align-content:center}
+html.present .presenthint{opacity:1}
+.presenthint{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:42;font:600 12.5px var(--f);padding:8px 14px;border-radius:999px;background:rgba(10,14,30,.8);color:#fff;opacity:0;pointer-events:none;transition:opacity .3s}
+
+@media (max-width:1100px){
+  .breaks{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .gates,.sdgs,.metrics,.flywheel{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .road2{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .flywheel div::after{display:none}
+}
+@media (max-width:900px){
+  .hero .wrap,.pov,.play,.proofgrid,.calc{grid-template-columns:minmax(0,1fr)}
+  .tiers,.built,.wins,.asks{grid-template-columns:minmax(0,1fr)}
+  .loopviz{max-width:420px}
+  .dots{display:none}
+  .vs{grid-template-columns:1fr}.vs>i{transform:rotate(90deg);justify-self:center}
+}
+@media (max-width:640px){
+  body{font-size:16px}
+  .wrap{padding-inline:16px}
+  .breaks,.gates,.sdgs,.metrics,.flywheel,.road2,.pov-tabs{grid-template-columns:minmax(0,1fr)}
+  .brk{min-height:0}
+  .node{width:110px;font-size:12.5px}.node i{width:50px;height:50px;font-size:18px}
+  .loopcore b{font-size:26px}
+  .top .hide-sm{display:none}
+  .money .big b{font-size:34px}
+  .btn{width:100%}
+  .hero .row .btn{width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .reveal,.stagger>*{opacity:1;transform:none;transition:none}
+  .scrollcue i{animation:none}
+  *{transition-duration:.01ms!important}
+}
+@media print{.top,.dots,.bar,.presenthint,.scrollcue{display:none}.reveal,.stagger>*{opacity:1;transform:none}.slide{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="bar" id="bar"></div>
+<header class="top" id="top">
+  <a class="brand" href="#s-hero"><i class="fa-solid fa-location-dot" aria-hidden="true"></i>UrbOasis</a>
+  <a class="tbtn hide-sm" href="index.html"><i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>Live app</a>
+  <button class="tbtn" id="present" type="button" aria-pressed="false" title="Present (P). Arrow keys move between slides"><i class="fa-solid fa-display" aria-hidden="true"></i><span class="hide-sm">Present</span></button>
+  <button class="tbtn icon" id="theme" type="button" aria-label="Switch light or dark theme"><i class="fa-solid fa-circle-half-stroke" aria-hidden="true"></i></button>
+</header>
+<nav class="dots" id="dots" aria-label="Slides"></nav>
+<div class="presenthint" aria-hidden="true">← → or Space to move · Esc to stop presenting</div>
+
+<main>
+<!-- 1 HERO -->
+<section class="slide hero" id="s-hero" data-title="UrbOasis" data-dark>
+  <div class="wrap">
+    <div class="hstack">
+      <p class="eyebrow" style="color:#c084fc"><b style="background:rgba(192,132,252,.15)">BLR</b>Civic tech · Bengaluru · SDG 11</p>
+      <h1>Filing a complaint is easy. <em>Getting it fixed</em> is the hard part.</h1>
+      <p class="lede">UrbOasis closes the loop. Residents report once. The city sees one ranked queue instead of a pile of duplicates. Contractors prove the fix on site. And the resident has the final word.</p>
+      <div class="row"><a class="btn go" href="index.html#demo"><i class="fa-solid fa-play" aria-hidden="true"></i>Watch the 60-second loop</a><a class="btn ghost" href="index.html#report"><i class="fa-solid fa-plus" aria-hidden="true"></i>Report a problem, live</a></div>
+      <div class="chips"><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i>Working app, live today</span><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i>Official channels, each verified on the department’s site</span><span><i class="fa-solid fa-circle-check" aria-hidden="true"></i>₹0 server cost</span></div>
+    </div>
+    <div class="loopviz" id="loopviz" aria-label="The UrbOasis loop: a resident reports, the city prioritises, a contractor fixes with proof, the resident confirms">
+      <svg viewBox="0 0 400 400" aria-hidden="true">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c084fc"/><stop offset="1" stop-color="#22d3ee"/></linearGradient></defs>
+        <circle cx="200" cy="200" r="150" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="2"/>
+        <circle id="looparc" cx="200" cy="200" r="150" fill="none" stroke="url(#lg)" stroke-width="4" stroke-linecap="round" stroke-dasharray="942.5" stroke-dashoffset="942.5" transform="rotate(-90 200 200)" style="filter:drop-shadow(0 0 8px #a855f7)"/>
+        <circle id="loopdot" r="7" fill="#fff" style="filter:drop-shadow(0 0 10px #fff)"/>
+      </svg>
+      <div class="node" style="left:50%;top:12.5%;--c:#c084fc"><i class="fa-solid fa-user" aria-hidden="true"></i>Resident reports<small>2 minutes, no account</small></div>
+      <div class="node" style="left:87.5%;top:50%;--c:#22d3ee"><i class="fa-solid fa-building-columns" aria-hidden="true"></i>City prioritises<small>one ranked queue</small></div>
+      <div class="node" style="left:50%;top:87.5%;--c:#fbbf24"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i>Contractor fixes<small>photo proof on site</small></div>
+      <div class="node" style="left:12.5%;top:50%;--c:#34d399"><i class="fa-solid fa-circle-check" aria-hidden="true"></i>Resident confirms<small>or reopens it</small></div>
+      <div class="loopcore"><b id="loopword">Report</b><span>closed loop</span></div>
+    </div>
+  </div>
+  <a class="scrollcue" href="#s-problem">SCROLL<i class="fa-solid fa-chevron-down" aria-hidden="true"></i></a>
+</section>
+
+<!-- 2 PROBLEM -->
+<section class="slide" id="s-problem" data-title="The problem">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>01</b>The problem</p><h2>A complaint gets filed. Then it disappears.</h2>
+      <p class="lede">Civic complaints don’t fail at reporting. They fail at the five points after it. Flip the switch to see what changes.</p></div>
+    <div class="toggle reveal" role="group" aria-label="Compare"><button type="button" aria-pressed="true" data-mode="without">Today</button><button type="button" aria-pressed="false" data-mode="with">With UrbOasis</button></div>
+    <div class="breaks stagger" id="breaks">
+      <div class="brk"><span class="n">1 · ROUTING</span><i class="ic fa-solid fa-sitemap" aria-hidden="true"></i><h3>Wrong desk</h3><p class="bad">Roads, garbage and lights sit with the city corporation, water with BWSSB, power with BESCOM, signals with Traffic Police. Residents guess.</p><p class="fix">11 problem types map to the right department and corporation automatically, and send through its official channel in one tap.</p></div>
+      <div class="brk"><span class="n">2 · DUPLICATES</span><i class="ic fa-solid fa-clone" aria-hidden="true"></i><h3>A hundred tickets for one pothole</h3><p class="bad">Every neighbour files separately. The city sees noise, not a signal.</p><p class="fix">Reports of the same problem within 50 m merge into one issue. More reports raise its priority instead of the pile.</p></div>
+      <div class="brk"><span class="n">3 · PRIORITY</span><i class="ic fa-solid fa-ranking-star" aria-hidden="true"></i><h3>First come, first served</h3><p class="bad">A sparking wire outside a school waits behind a faded road marking.</p><p class="fix">A transparent 0–100 score: severity, public demand, overdue days, location risk and category. Officials can see why it ranks where it does.</p></div>
+      <div class="brk"><span class="n">4 · FOLLOW-UP</span><i class="ic fa-solid fa-hourglass-half" aria-hidden="true"></i><h3>Nobody chases it</h3><p class="bad">Fix windows pass quietly. Residents give up.</p><p class="fix">Every complaint runs on a clock: follow-up, escalation to the named officer, then a one-tap RTI application.</p></div>
+      <div class="brk"><span class="n">5 · CLOSURE</span><i class="ic fa-solid fa-eye-slash" aria-hidden="true"></i><h3>“Closed” isn’t “fixed”</h3><p class="bad">Tickets get closed without anyone checking the street.</p><p class="fix">Verified fixed only with on-site before and after photos, city approval and the resident’s confirmation.</p></div>
+    </div>
+    <p class="verdict reveal" id="verdict">Result today: <span>the loop never closes.</span></p>
+  </div>
+</section>
+
+<!-- 3 INSIGHT -->
+<section class="slide insight" id="s-insight" data-title="The insight" data-dark>
+  <div class="wrap">
+    <p class="eyebrow reveal" style="color:#c084fc"><b style="background:rgba(192,132,252,.15)">02</b>The insight</p>
+    <blockquote class="reveal">Every system is built to <em>receive</em> complaints. Nobody owns the <em>loop</em>.</blockquote>
+    <div class="vs stagger">
+      <div class="old"><b>Everyone else</b><p>A better inbox: easier filing, one more portal, one more ticket number.</p></div>
+      <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+      <div class="new"><b>UrbOasis</b><p>The follow-through layer: route, rank, assign, prove, verify. From “that’s broken” to “verified fixed”.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 4 THREE USERS -->
+<section class="slide" id="s-users" data-title="Three users">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>03</b>One loop, three users</p><h2>Everyone who touches the problem, in one product.</h2></div>
+    <div class="pov-tabs reveal" role="tablist" aria-label="Choose a point of view">
+      <button class="pov-tab c-cit" role="tab" id="t-cit" aria-controls="p-cit" aria-selected="true"><i class="fa-solid fa-user" aria-hidden="true"></i><b>Resident</b><small>Report once, see it fixed</small></button>
+      <button class="pov-tab c-city" role="tab" id="t-city" aria-controls="p-city" aria-selected="false"><i class="fa-solid fa-building-columns" aria-hidden="true"></i><b>City official</b><small>Fix the right thing first</small></button>
+      <button class="pov-tab c-con" role="tab" id="t-con" aria-controls="p-con" aria-selected="false"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i><b>Contractor</b><small>Get jobs, prove the work</small></button>
+    </div>
+
+    <div class="pov c-cit reveal" role="tabpanel" id="p-cit" aria-labelledby="t-cit">
+      <div><ul>
+        <li><i class="fa-solid fa-hand-pointer" aria-hidden="true"></i><div><b>Report in about two minutes</b><span>Pick the problem (English and <span class="kn">ಕನ್ನಡ</span>), drop a pin or let the photo’s location do it. No account.</span></div></li>
+        <li><i class="fa-solid fa-paper-plane" aria-hidden="true"></i><div><b>Sent to the right department in one tap</b><span>Through its official WhatsApp, email or form, published on the department’s own site. It lands on the official record.</span></div></li>
+        <li><i class="fa-solid fa-bell" aria-hidden="true"></i><div><b>Chased for you</b><span>Ready-made follow-ups, escalation letters and an RTI application when it’s overdue.</span></div></li>
+        <li><i class="fa-solid fa-thumbs-up" aria-hidden="true"></i><div><b>The final say</b><span>See before and after photos. Confirm it’s fixed, or reopen it in one tap.</span></div></li>
+      </ul><p class="quote">The promise: report once, always know who has it and when it’s due, and decide yourself whether it’s really fixed.</p></div>
+      <div class="phone" aria-hidden="true"><div class="screen"><div class="sbar"><span>9:41</span><span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-battery-three-quarters"></i></span></div><div class="sbody">
+        <p class="m-h">What’s the problem?</p>
+        <div class="m-grid"><div class="on"><i class="fa-solid fa-road-circle-exclamation"></i>Pothole</div><div><i class="fa-solid fa-trash-can"></i>Garbage</div><div><i class="fa-solid fa-lightbulb"></i>Light</div><div><i class="fa-solid fa-faucet-drip"></i>Water</div><div><i class="fa-solid fa-bolt"></i>Power</div><div><i class="fa-solid fa-tree"></i>Tree</div></div>
+        <div class="m-photo"></div>
+        <div class="m-card"><span class="m-pill" style="background:#e3f2ec;color:#167a5b">Goes to: South City Corporation</span><b>Pothole outside the school gate</b><small>80 Feet Road, Koramangala · photo location used</small></div>
+        <div class="m-btn"><i class="fa-brands fa-whatsapp"></i> Send it for me</div>
+        <div class="m-card"><span class="m-pill" style="background:#e8eefc;color:#2353b8">City progress</span><b>Assigned to a contractor, due 1 Nov</b><small>Merged with 11 other reports nearby</small></div>
+      </div></div></div>
+    </div>
+
+    <div class="pov c-city reveal" role="tabpanel" id="p-city" aria-labelledby="t-city" hidden>
+      <div><ul>
+        <li><i class="fa-solid fa-layer-group" aria-hidden="true"></i><div><b>One issue, not a hundred tickets</b><span>Reports of the same category within 50 m merge, with every reporter kept anonymous.</span></div></li>
+        <li><i class="fa-solid fa-ranking-star" aria-hidden="true"></i><div><b>A ranked queue with reasons</b><span>A 0–100 priority score, a “why this rank” sentence, and weight sliders the city controls.</span></div></li>
+        <li><i class="fa-solid fa-user-check" aria-hidden="true"></i><div><b>Assign the best match</b><span>Contractors ranked by specialisation, workload, distance, on-time record, reopen rate and rating. Bulk assign with a deadline.</span></div></li>
+        <li><i class="fa-solid fa-chart-column" aria-hidden="true"></i><div><b>Accountability built in</b><span>Live KPIs, a contractor leaderboard that flags poor work, a ward scorecard, CSV and a printable report.</span></div></li>
+      </ul><p class="quote">The promise: show your ward exactly what was fixed first, and why.</p></div>
+      <div class="laptop" aria-hidden="true"><div class="lscreen"><div class="lui">
+        <div style="display:flex;justify-content:space-between"><b style="font-size:13px">What to fix first</b><span style="color:#fbbf24;font-size:10px">Prototype · sample data</span></div>
+        <div class="lk"><div><small>Open</small><b>24</b></div><div><small>Critical</small><b style="color:#fb7185">2</b></div><div><small>SLA met</small><b>63%</b></div><div><small>Reopened</small><b>14%</b></div></div>
+        <div class="lrow"><span>#1</span><div>Loose wire over the footpath<small>Indiranagar · danger · bus stop</small></div><span class="lsc c">84 Crit</span></div>
+        <div class="lrow"><span>#2</span><div>Manhole overflowing<small>HSR Layout · reopened · school</small></div><span class="lsc c">81 Crit</span></div>
+        <div class="lrow"><span>#3</span><div>Pothole outside the school gate<small>Koramangala · 12 reports</small></div><span class="lsc h">71 High</span></div>
+        <div class="lrow"><span>#4</span><div>Pothole before the signal<small>Silk Board · overdue</small></div><span class="lsc m">59 Med</span></div>
+      </div></div><div class="lbase"></div></div>
+    </div>
+
+    <div class="pov c-con reveal" role="tabpanel" id="p-con" aria-labelledby="t-con" hidden>
+      <div><ul>
+        <li><i class="fa-solid fa-inbox" aria-hidden="true"></i><div><b>Jobs on the phone</b><span>New, in progress, submitted, completed. Each with a deadline countdown, distance and cost. Tabs in English and <span class="kn">ಕನ್ನಡ</span>.</span></div></li>
+        <li><i class="fa-solid fa-circle-question" aria-hidden="true"></i><div><b>Context, not just an address</b><span>Directions, the city’s notes and why the job is a priority.</span></div></li>
+        <li><i class="fa-solid fa-location-crosshairs" aria-hidden="true"></i><div><b>Proof that can’t be faked from a desk</b><span>Before and after photos must be taken within 100 m of the site, checked by the photo’s location or the phone’s.</span></div></li>
+        <li><i class="fa-solid fa-trophy" aria-hidden="true"></i><div><b>Good work wins more work</b><span>On-time rate and reopen rate feed the best-match ranking.</span></div></li>
+      </ul><p class="quote">The promise: do it right first time and the next job comes to you.</p></div>
+      <div class="phone" aria-hidden="true"><div class="screen"><div class="sbar"><span>9:41</span><span><i class="fa-solid fa-signal"></i> <i class="fa-solid fa-battery-three-quarters"></i></span></div><div class="sbody">
+        <p class="m-h">Pothole outside the school gate</p>
+        <div style="display:flex;gap:6px"><span class="m-pill" style="background:#ffedd5;color:#c2410c">71 High</span><span class="m-pill" style="background:#fef3c7;color:#92400e">7d 13h left</span></div>
+        <div class="m-card"><b>1. Before photo ✓</b><small><i class="fa-solid fa-location-dot"></i> 12 m from the job · 25 Oct, 10:08</small></div>
+        <div class="m-card" style="border-color:#e11d48"><b>2. After photo</b><small style="color:#be123c"><i class="fa-solid fa-ban"></i> Taken 689 m away. Must be within 100 m.</small></div>
+        <div class="m-btn alt"><i class="fa-solid fa-camera"></i> Retake on site</div>
+        <div class="m-btn" style="opacity:.45">Submit as fixed</div>
+      </div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- 5 PRIORITY PLAYGROUND -->
+<section class="slide alt" id="s-score" data-title="Priority score">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>04</b>For the city · try it</p><h2>Fix the most dangerous thing first. Show your working.</h2>
+      <p class="lede">The same formula the City Console uses. Change the inputs and watch the score, the band and the explanation update.</p></div>
+    <div class="play reveal">
+      <div class="controls card">
+        <fieldset class="seg ctl"><legend>How serious is it?</legend>
+          <button type="button" data-sev="low" aria-pressed="false">Inconvenience</button><button type="button" data-sev="hazard" aria-pressed="true">Hazard</button><button type="button" data-sev="danger" aria-pressed="false">Danger to life</button></fieldset>
+        <div class="ctl"><label for="p-rep">Residents who reported or backed it <output id="o-rep" for="p-rep">12</output></label><input type="range" id="p-rep" min="1" max="60" value="12"></div>
+        <div class="ctl"><label for="p-od">Days past its fix date <output id="o-od" for="p-od">2</output></label><input type="range" id="p-od" min="0" max="10" value="2"></div>
+        <div class="ctl"><span style="font-weight:700;font-size:15px">Where is it?</span><div class="flags" id="p-flags">
+          <button type="button" data-f="school" aria-pressed="true"><i class="fa-solid fa-school" aria-hidden="true"></i>Near a school</button><button type="button" data-f="hospital" aria-pressed="false"><i class="fa-solid fa-hospital" aria-hidden="true"></i>Near a hospital</button>
+          <button type="button" data-f="mainRoad" aria-pressed="true"><i class="fa-solid fa-road" aria-hidden="true"></i>Main road</button><button type="button" data-f="busStop" aria-pressed="false"><i class="fa-solid fa-bus" aria-hidden="true"></i>Bus stop</button></div></div>
+        <div class="ctl"><span style="font-weight:700;font-size:15px">What kind of problem?</span><div class="cats" id="p-cats">
+          <button type="button" data-c="power" aria-pressed="false"><i class="fa-solid fa-bolt" aria-hidden="true"></i>Loose wire</button><button type="button" data-c="sewage" aria-pressed="false"><i class="fa-solid fa-water" aria-hidden="true"></i>Sewage</button>
+          <button type="button" data-c="pothole" aria-pressed="true"><i class="fa-solid fa-road-circle-exclamation" aria-hidden="true"></i>Pothole</button><button type="button" data-c="garbage" aria-pressed="false"><i class="fa-solid fa-trash-can" aria-hidden="true"></i>Garbage</button><button type="button" data-c="dogs" aria-pressed="false"><i class="fa-solid fa-dog" aria-hidden="true"></i>Stray dog</button></div></div>
+      </div>
+      <div class="result" id="result" aria-live="polite">
+        <div class="ring"><svg viewBox="0 0 200 200" aria-hidden="true"><circle class="trk" cx="100" cy="100" r="86"/><circle class="val" id="ringval" cx="100" cy="100" r="86" stroke-dasharray="540.35" stroke-dashoffset="540.35"/></svg>
+          <div class="num"><b id="score" class="mono">0</b><span id="bandl">Low</span></div></div>
+        <div class="stack" id="stack" aria-hidden="true"></div>
+        <div class="legend" id="slegend"></div>
+        <div class="why"><b>Why this rank</b><span id="whytext"></span></div>
+        <p class="note" style="color:var(--hero-muted)">Bands: Critical 80+, High 60–79, Medium 40–59, Low under 40. Reopened issues get +10. Weights are adjustable in the console.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 6 CONTRACTOR PROOF -->
+<section class="slide" id="s-proof" data-title="Proof of fix">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>05</b>For contractors · try it</p><h2>Proof from the site, or it doesn’t count.</h2>
+      <p class="lede">Before and after photos must be taken within 100 m of the job. Drag the crew away from the site and watch the app refuse the photo.</p></div>
+    <div class="proofgrid reveal">
+      <div class="geo">
+        <div class="geomap" aria-hidden="true">
+          <svg viewBox="0 0 400 300" preserveAspectRatio="none"><g stroke="#7c3aed" stroke-opacity=".55" stroke-width="5" fill="none"><path d="M0 150H400"/><path d="M200 0V300"/></g><g stroke="#22d3ee" stroke-opacity=".25" stroke-width="2" fill="none"><path d="M0 60H400M0 240H400M70 0V300M330 0V300"/></g></svg>
+          <div class="fence"></div><div class="site"></div><div class="me" id="me"><i class="fa-solid fa-helmet-safety"></i></div>
+          <span class="geolbl">100 m GEOFENCE</span>
+        </div>
+        <div class="ctl"><label for="p-dist">Crew’s distance from the job <output id="o-dist" for="p-dist">20 m</output></label><input type="range" id="p-dist" min="0" max="400" value="20" style="accent-color:var(--amber)"></div>
+        <div class="geostatus ok" id="geostatus" role="status"><i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Photo accepted: 20 m from the job. Time and place recorded.</span></div>
+      </div>
+      <div class="geo">
+        <div class="ba" id="ba">
+          <div><div class="sky after"></div><div class="road"></div><div class="patch"></div></div>
+          <div class="bef"><div class="sky"></div><div class="road"></div><div class="hole"></div></div>
+          <span class="lbl" style="left:12px">BEFORE</span><span class="lbl" style="right:12px">AFTER</span>
+          <input type="range" min="0" max="100" value="50" aria-label="Slide to compare before and after">
+        </div>
+        <p class="note">This before and after view appears for the official approving the fix and for the resident who reported it. Illustration.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 7 TRUST -->
+<section class="slide alt" id="s-trust" data-title="Verified fixed">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>06</b>Trust</p><h2>Nobody marks their own homework.</h2>
+      <p class="lede">A contractor can’t close their own job. “Verified fixed” needs independent sign-off, and a bad fix has consequences.</p></div>
+    <div class="gates stagger">
+      <div class="gate"><span class="k" style="background:var(--amber-s);color:var(--amber)"><i class="fa-solid fa-camera" aria-hidden="true"></i></span><span class="op">STEP 1</span><h3>Contractor submits proof</h3><p>Before and after photos, both within 100 m, time-stamped.</p></div>
+      <div class="gate"><span class="k" style="background:var(--cyan-s);color:var(--cyan)"><i class="fa-solid fa-stamp" aria-hidden="true"></i></span><span class="op">AND</span><h3>City approves</h3><p>The official checks the photos, or sends it back as not fixed.</p></div>
+      <div class="gate"><span class="k" style="background:var(--vio-s);color:var(--vio)"><i class="fa-solid fa-user-check" aria-hidden="true"></i></span><span class="op">AND</span><h3>A resident confirms</h3><p>Or 72 hours pass with no dispute from anyone who reported it.</p></div>
+      <div class="gate"><span class="k" style="background:var(--rose-s);color:var(--rose)"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i></span><span class="op">IF NOT</span><h3>Reopened</h3><p>Back to the same contractor at higher priority, and it counts against their reopen rate.</p></div>
+    </div>
+    <p class="eq reveal"><i class="fa-solid fa-circle-check" aria-hidden="true"></i> Verified fixed = <code>proof</code> + <code>city approval</code> + (<code>resident confirms</code> or <code>72 h, no dispute</code>)</p>
+  </div>
+</section>
+
+<!-- 8 SDG -->
+<section class="slide" id="s-sdg" data-title="SDG impact">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>07</b>SDG alignment</p><h2>Built for SDG 11. Reinforces 16, 6 and 3.</h2>
+      <p class="lede">Tap a goal to see the specific UN targets, and exactly how UrbOasis moves them.</p></div>
+    <div class="sdgs stagger" id="sdgs"></div>
+    <div class="targets" id="targets" aria-live="polite"></div>
+  </div>
+</section>
+
+<!-- 9 BUSINESS -->
+<section class="slide alt" id="s-biz" data-title="Business model">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>08</b>Business model</p><h2>Free for residents. Paid by the people who chase problems for a living.</h2>
+      <p class="lede">Residents bring the reports. Housing societies and RWAs already spend volunteer hours chasing the same pothole every month, so they pay. City corporations are the long-term buyer.</p></div>
+    <div class="tiers stagger">
+      <div class="tier"><span class="tag live">Live</span><h3>Residents</h3><p class="amt">Free</p><ul><li>Report, send and track</li><li>Follow-ups, escalation and RTI letters</li><li>Community board voting</li></ul><p class="note">Drives adoption and the data.</p></div>
+      <div class="tier feat"><span class="tag proto">Pilot first</span><h3>Housing societies and RWAs</h3><p class="amt">₹999<small> / month, proposed</small></p><ul><li>Free 3-month pilot</li><li>Shared board for the whole society</li><li>Monthly report for committee meetings</li><li>Every open complaint followed up</li></ul><p class="note">Price is a hypothesis, to be validated in the pilot.</p></div>
+      <div class="tier fut"><span class="tag next">Future</span><h3>City corporations (B2G)</h3><p class="amt">Pilot pricing</p><ul><li>City Console and Contractor app for one ward or zone</li><li>Priced per pilot</li><li>Scorecards for wards and contractors</li></ul><p class="note">No government contract or partnership exists today.</p></div>
+    </div>
+    <div class="calc card reveal">
+      <div class="controls">
+        <h3>Society revenue, your assumptions</h3>
+        <div class="ctl"><label for="c-n">Paying societies <output id="o-n" for="c-n">100</output></label><input type="range" id="c-n" min="10" max="1000" step="10" value="100" style="accent-color:var(--vio)"></div>
+        <div class="ctl"><label for="c-p">Price per society per month <output id="o-p" for="c-p">₹999</output></label><input type="range" id="c-p" min="299" max="2999" step="100" value="999" style="accent-color:var(--vio)"></div>
+        <p class="note">Running cost estimate: ₹2,000 + ₹13 per society per month (hosting, database, messaging). Excludes salaries, sales and support. Homes reached assumes about 150 per society. Illustrative only.</p>
+      </div>
+      <div class="money" aria-live="polite">
+        <div class="big"><span>Annual recurring revenue</span><b id="m-arr"></b></div>
+        <div><span>Monthly revenue</span><b id="m-mrr"></b></div>
+        <div><span>Gross margin</span><b id="m-margin"></b></div>
+        <div><span>Running cost / month</span><b id="m-cost"></b></div>
+        <div><span>Homes reached</span><b id="m-homes"></b></div>
+      </div>
+    </div>
+    <div class="flywheel stagger">
+      <div><b>More residents report</b><p>Free, two minutes, no account.</p></div>
+      <div><b>Better data per ward</b><p>Merged issues, fix times, reopen rates.</p></div>
+      <div><b>Societies get results</b><p>And pay to keep their board.</p></div>
+      <div><b>Cities buy the console</b><p>Evidence of what works, ward by ward.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 INNOVATION -->
+<section class="slide" id="s-edge" data-title="Why it’s different">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>09</b>Innovation</p><h2>We don’t replace official channels. We make them close.</h2>
+      <p class="lede">Every complaint still goes through the official route, so it lands on the department’s record. UrbOasis adds everything that happens after.</p></div>
+    <div class="tscroll reveal"><table class="cmp">
+      <thead><tr><th scope="col">Capability</th><th scope="col">Official helplines and apps</th><th scope="col">Social media</th><th scope="col">Civic reporting portals</th><th scope="col" class="us">UrbOasis</th></tr></thead>
+      <tbody id="cmp"></tbody></table></div>
+    <p class="note" style="margin-top:12px"><i class="fa-solid fa-circle-check y"></i> yes · <i class="fa-solid fa-circle-half-stroke p"></i> partly · <i class="fa-regular fa-circle n"></i> no. Based on how each channel typically works.</p>
+  </div>
+</section>
+
+<!-- 11 BUILT -->
+<section class="slide alt" id="s-built" data-title="Built and working">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>10</b>Feasibility</p><h2>Not a slide deck. It runs today.</h2>
+      <p class="lede">Open it on your phone right now. Everything marked Live is built and tested. The prototype parts run end to end on sample data.</p></div>
+    <div class="built stagger">
+      <div class="card"><span class="tag live">Live</span><h3>Resident app</h3><p>Four-step reporting, automatic routing to 4 departments and 5 city corporations, photo location, one-tap sending, follow-up and RTI engine.</p></div>
+      <div class="card"><span class="tag live">Live</span><h3>Verified contact directory</h3><p>Every department channel carries its source and a verified flag. Unverified channels are hidden, never guessed.</p></div>
+      <div class="card"><span class="tag live">Live</span><h3>Community board</h3><p>Public issues ranked by votes, one vote per Google account, enforced by database rules.</p></div>
+      <div class="card"><span class="tag proto">Prototype</span><h3>City Console</h3><p>Merging, priority scoring, best-match assignment, leaderboard, ward scorecard, CSV and print. Sample data.</p></div>
+      <div class="card"><span class="tag proto">Prototype</span><h3>Contractor app</h3><p>Job tabs, accept or decline, 100 m geofenced photo proof, verification and reopening. Sample data.</p></div>
+      <div class="card"><span class="tag live">Live</span><h3>Private by design</h3><p>No account to report. Photos are re-saved without location metadata. Built with the DPDP Act 2023 in mind.</p></div>
+    </div>
+    <div class="stackline reveal"><span><i class="fa-solid fa-code" aria-hidden="true"></i>Static site, no build step</span><span><i class="fa-solid fa-map" aria-hidden="true"></i>OpenStreetMap, no API fees</span><span><i class="fa-solid fa-fire" aria-hidden="true"></i>Firebase for the shared board</span><span><i class="fa-solid fa-mobile-screen" aria-hidden="true"></i>Works on any phone browser</span><span><i class="fa-solid fa-indian-rupee-sign" aria-hidden="true"></i>₹0 server cost today</span></div>
+  </div>
+</section>
+
+<!-- 12 ROADMAP -->
+<section class="slide" id="s-road" data-title="Roadmap">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>11</b>Roadmap and impact</p><h2>From a working tool to a ward-level accountability network.</h2></div>
+    <ol class="road2 stagger">
+      <li class="now"><span class="when">NOW</span><h3>Working product</h3><ul><li>Resident app live</li><li>Console and contractor prototype</li><li>Pilot sign-ups open</li></ul></li>
+      <li><span class="when">MONTHS 0–3</span><h3>Validate</h3><ul><li>10 RWA interviews</li><li>Free pilots with up to 20 societies</li></ul></li>
+      <li><span class="when">MONTHS 3–6</span><h3>Shared boards</h3><ul><li>Society accounts</li><li>WhatsApp reminders</li><li>First paid societies</li></ul></li>
+      <li><span class="when">MONTHS 6–12</span><h3>Scorecards</h3><ul><li>Ward fix-time scorecards</li><li>Full Kannada interface</li></ul></li>
+      <li><span class="when">AFTER</span><h3>B2G pilot</h3><ul><li>One ward, if a corporation agrees</li><li>Real contractors and SLAs</li></ul></li>
+    </ol>
+    <h3 class="reveal" style="margin-top:44px">What a pilot will measure</h3><p class="note reveal" style="margin-top:6px">No results yet, so no numbers. These are the four we’ll report.</p>
+    <div class="metrics stagger">
+      <div><i class="fa-solid fa-stopwatch" aria-hidden="true"></i><b>Median days to fix</b><p>First report to verified fixed, against the same ward before the pilot.</p></div>
+      <div><i class="fa-solid fa-calendar-check" aria-hidden="true"></i><b>SLA compliance</b><p>Share fixed by the date the city set.</p></div>
+      <div><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><b>Reopen rate</b><p>“Fixed” issues residents reopen because the fix didn’t hold.</p></div>
+      <div><i class="fa-solid fa-layer-group" aria-hidden="true"></i><b>Duplicates merged</b><p>Repeat reports folded into one issue, so crews aren’t sent twice.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 13 WHY IT WINS -->
+<section class="slide alt" id="s-win" data-title="Why it wins">
+  <div class="wrap">
+    <div class="shead reveal"><p class="eyebrow"><b>12</b>The case</p><h2>Why UrbOasis deserves to win.</h2></div>
+    <div class="wins stagger">
+      <div class="win" style="--c:var(--vio)"><span class="crit">Impact</span><h3>It targets the step where complaints die</h3><p>Not reporting, but follow-through: routing, ranking, proof and verification. Directly on SDG 11 and 16.</p></div>
+      <div class="win" style="--c:var(--cyan)"><span class="crit">Innovation</span><h3>A closed loop with three users</h3><p>Duplicate merging, an explainable priority score, geofenced proof and resident sign-off, together in one product.</p></div>
+      <div class="win" style="--c:var(--green)"><span class="crit">Feasibility</span><h3>It works today</h3><p>A live app with verified official channels, a shared board on Firebase, and an end-to-end console prototype. ₹0 to run.</p></div>
+      <div class="win" style="--c:var(--amber)"><span class="crit">Viability</span><h3>Someone already pays for this pain</h3><p>Societies and RWAs chase civic problems every month. Free for residents keeps the data flowing.</p></div>
+      <div class="win" style="--c:var(--rose)"><span class="crit">Scalability</span><h3>Config, not code, per city</h3><p>Departments, channels and fix windows live in one config block. A new city is a new directory, not a rebuild.</p></div>
+      <div class="win" style="--c:var(--vio)"><span class="crit">Integrity</span><h3>Honest by design</h3><p>Unverified contacts are hidden, prototypes are labelled, and no number on this page is made up.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 14 CLOSE -->
+<section class="slide close" id="s-close" data-title="Try it" data-dark>
+  <div class="wrap">
+    <p class="eyebrow reveal" style="color:#c084fc"><b style="background:rgba(192,132,252,.15)">13</b>See it for yourself</p>
+    <h2 class="reveal">Report it once. <em>See it fixed.</em> Prove it.</h2>
+    <p class="lede reveal">Sixty seconds, three users, one pothole: from a resident’s report to a verified fix, with the numbers updating live.</p>
+    <div class="row reveal" style="justify-content:center"><a class="btn go" href="index.html#demo"><i class="fa-solid fa-play" aria-hidden="true"></i>Run the 60-second demo</a><a class="btn ghost" href="index.html#city"><i class="fa-solid fa-building-columns" aria-hidden="true"></i>Open the City Console</a><a class="btn ghost" href="index.html#contractor"><i class="fa-solid fa-helmet-safety" aria-hidden="true"></i>Open the Contractor app</a></div>
+    <div class="asks stagger">
+      <div><b>20 pilot societies</b><p>Housing societies or RWAs for a free 3-month pilot.</p></div>
+      <div><b>RWA federation introductions</b><p>Groups whose member societies could join and shape the ward scorecard.</p></div>
+      <div><b>One mentor</b><p>Govtech or B2B SaaS experience, an hour every two weeks.</p></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer><div class="wrap">
+  <p><b style="color:var(--ink)">UrbOasis</b> is an independent civic tool for Bengaluru. It is not a government website and is not connected to GBA, the city corporations, BWSSB, BESCOM or the police.</p>
+  <p>The City Console and Contractor app are a prototype on sample data with fictional contractors and wards. Prices and costs are illustrative estimates. SDG names are from the United Nations Sustainable Development Goals.</p>
+  <p><a href="pitch.html">Detailed pitch and feasibility</a> · <a href="index.html">Open the app</a></p>
+</div></footer>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const RM=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const inr=n=>'₹'+Math.round(n).toLocaleString('en-IN');
+const inrShort=n=>n>=1e7?`₹${(n/1e7).toFixed(2)} Cr`:n>=1e5?`₹${(n/1e5).toFixed(1)} L`:inr(n);
+
+/* theme */
+try{const t=localStorage.getItem('uo2-theme');if(t)document.documentElement.dataset.theme=JSON.parse(t)}catch{}
+const isDark=()=>{const t=document.documentElement.dataset.theme;return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches};
+$('#theme').addEventListener('click',()=>{const t=isDark()?'light':'dark';document.documentElement.dataset.theme=t;try{localStorage.setItem('uo2-theme',JSON.stringify(t))}catch{}});
+
+/* slides: dots, progress, reveals, solid header */
+const slides=$$('.slide');
+$('#dots').innerHTML=slides.map(s=>`<a href="#${s.id}" aria-label="${s.dataset.title}"><span>${s.dataset.title}</span></a>`).join('');
+const dots=$$('#dots a');
+let cur=0;
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in')}}),{threshold:.15});
+$$('.reveal,.stagger').forEach(el=>io.observe(el));
+function onScroll(){
+  const y=scrollY,h=document.documentElement.scrollHeight-innerHeight;
+  $('#bar').style.transform=`scaleX(${h>0?y/h:0})`;
+  let i=0;slides.forEach((s,n)=>{if(s.offsetTop-innerHeight*.45<=y)i=n});cur=i;
+  dots.forEach((d,n)=>d.classList.toggle('on',n===i));
+  const dark=slides[i].hasAttribute('data-dark');
+  $('#top').classList.toggle('solid',!dark);$('#dots').classList.toggle('dark',dark);
+}
+addEventListener('scroll',onScroll,{passive:true});addEventListener('resize',onScroll);onScroll();
+
+/* present mode: P to toggle, arrows / space / page keys move one slide */
+const go=n=>{n=Math.max(0,Math.min(slides.length-1,n));slides[n].scrollIntoView({behavior:RM?'auto':'smooth'})};
+function setPresent(on){
+  document.documentElement.classList.toggle('present',on);$('#present').setAttribute('aria-pressed',String(on));
+  if(on){document.documentElement.requestFullscreen?.().catch(()=>{});go(cur)}else if(document.fullscreenElement)document.exitFullscreen?.().catch(()=>{});
+}
+$('#present').addEventListener('click',()=>setPresent(!document.documentElement.classList.contains('present')));
+document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&document.documentElement.classList.contains('present'))setPresent(false)});
+addEventListener('keydown',e=>{
+  if(e.target.matches?.('input,textarea,select'))return;
+  const pres=document.documentElement.classList.contains('present');
+  if(e.key==='p'||e.key==='P'){setPresent(!pres);return}
+  if(!pres)return;
+  if(['ArrowDown','ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(cur+1)}
+  if(['ArrowUp','ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(cur-1)}
+  if(e.key==='Home'){e.preventDefault();go(0)}if(e.key==='End'){e.preventDefault();go(slides.length-1)}
+  if(e.key==='Escape')setPresent(false);
+});
+
+/* hero loop: the dot travels the ring, lighting each user in turn */
+(function(){
+  const arc=$('#looparc'),dot=$('#loopdot'),nodes=$$('#loopviz .node'),words=['Report','Prioritise','Fix','Verify'],C=942.5;
+  const place=f=>{const a=-Math.PI/2+f*2*Math.PI;dot.setAttribute('cx',200+150*Math.cos(a));dot.setAttribute('cy',200+150*Math.sin(a))};
+  if(RM){arc.style.strokeDashoffset=0;place(0);nodes.forEach(n=>n.classList.add('lit'));return}
+  let t0=null,last=-1;
+  const tick=t=>{if(t0==null)t0=t;const f=((t-t0)/9000)%1;arc.style.strokeDashoffset=C*(1-f);place(f);
+    const q=Math.min(3,Math.floor(((f+0.02)%1)*4));if(q!==last){last=q;nodes.forEach((n,i)=>n.classList.toggle('lit',i===q));$('#loopword').textContent=words[q]}
+    requestAnimationFrame(tick)};
+  requestAnimationFrame(tick);
+})();
+
+/* problem toggle */
+$$('.toggle button').forEach(b=>b.addEventListener('click',()=>{
+  const w=b.dataset.mode==='with';$$('.toggle button').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));
+  $('#breaks').classList.toggle('with',w);const v=$('#verdict');v.classList.toggle('with',w);
+  v.innerHTML=w?'Result with UrbOasis: <span>every complaint has an owner, a rank, a deadline and proof.</span>':'Result today: <span>the loop never closes.</span>';
+}));
+
+/* point-of-view tabs (arrow keys move between tabs) */
+const tabs=$$('.pov-tab');
+function selTab(t){tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',String(on));x.tabIndex=on?0:-1;$('#'+x.getAttribute('aria-controls')).hidden=!on});const p=$('#'+t.getAttribute('aria-controls'));p.classList.add('in')}
+tabs.forEach((t,i)=>{t.addEventListener('click',()=>selTab(t));t.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];n.focus();selTab(n)}});t.tabIndex=i?-1:0});
+
+/* priority playground: same formula as the City Console (default weights) */
+const SEV_PTS={low:8,hazard:18,danger:30},FLAG_PTS={school:6,hospital:6,mainRoad:4,busStop:3},CAT_RISK={power:10,sewage:9,pothole:7,garbage:5,dogs:4};
+const FLAG_TXT={school:'it’s near a school',hospital:'it’s near a hospital',mainRoad:'it’s on a main road',busStop:'it’s at a bus stop'};
+const PARTS=[['sev','Severity','#e8475f',30],['demand','Public demand','#9b5de5',25],['overdue','Overdue','#f59e0b',20],['loc','Location risk','#06b6d4',15],['cat','Category risk','#10b981',10]];
+const P={sev:'hazard',rep:12,od:2,flags:new Set(['school','mainRoad']),cat:'pothole'};
+function calc(){
+  const v={sev:SEV_PTS[P.sev],demand:Math.min(25,25*Math.log2(1+P.rep)/Math.log2(31)),overdue:Math.min(20,P.od*2.5),loc:Math.min(15,[...P.flags].reduce((s,f)=>s+FLAG_PTS[f],0)),cat:CAT_RISK[P.cat]};
+  const s=Math.round(Object.values(v).reduce((a,b)=>a+b,0));
+  const b=s>=80?['Critical','#fb7185']:s>=60?['High','#fb923c']:s>=40?['Medium','#facc15']:['Low','#60a5fa'];
+  $('#score').textContent=s;$('#bandl').textContent=b[0];$('#result').style.setProperty('--bc',b[1]);
+  $('#ringval').style.strokeDashoffset=540.35*(1-s/100);
+  $('#stack').innerHTML=PARTS.map(([k,,c])=>`<i style="width:${v[k]}%;background:${c}"></i>`).join('');
+  $('#slegend').innerHTML=PARTS.map(([k,l,c,m])=>`<span><i style="background:${c}"></i>${l} ${Math.round(v[k])}/${m}</span>`).join('');
+  const bits=[`${P.rep===1?'1 resident has':`${P.rep} residents have`} reported or backed it`];
+  if(P.sev==='danger')bits.push('it’s a danger to life');else if(P.sev==='hazard')bits.push('it can hurt people or vehicles');
+  [...P.flags].slice(0,2).forEach(f=>bits.push(FLAG_TXT[f]));
+  if(P.od>0)bits.push(`it’s ${P.od} day${P.od===1?'':'s'} past its fix date`);
+  const t=bits.length>1?bits.slice(0,-1).join(', ')+' and '+bits.at(-1):bits[0];$('#whytext').textContent=t[0].toUpperCase()+t.slice(1)+'.';
+}
+$$('[data-sev]').forEach(b=>b.addEventListener('click',()=>{P.sev=b.dataset.sev;$$('[data-sev]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));calc()}));
+$$('[data-f]').forEach(b=>b.addEventListener('click',()=>{const f=b.dataset.f;P.flags.has(f)?P.flags.delete(f):P.flags.add(f);b.setAttribute('aria-pressed',String(P.flags.has(f)));calc()}));
+$$('[data-c]').forEach(b=>b.addEventListener('click',()=>{P.cat=b.dataset.c;$$('[data-c]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));calc()}));
+$('#p-rep').addEventListener('input',e=>{P.rep=+e.target.value;$('#o-rep').textContent=P.rep;calc()});
+$('#p-od').addEventListener('input',e=>{P.od=+e.target.value;$('#o-od').textContent=P.od;calc()});
+calc();
+
+/* geofence + before/after */
+function geo(){
+  const d=+$('#p-dist').value,ok=d<=100;$('#o-dist').textContent=d+' m';
+  $('#me').style.left=`calc(50% + ${Math.min(d,400)/400*46}%)`;
+  const s=$('#geostatus');s.className='geostatus '+(ok?'ok':'no');
+  s.innerHTML=ok?`<i class="fa-solid fa-circle-check" aria-hidden="true"></i><span>Photo accepted: ${d} m from the job. Time and place recorded.</span>`
+    :`<i class="fa-solid fa-ban" aria-hidden="true"></i><span>Photo blocked: taken ${d} m from the job. It must be within 100 m.</span>`;
+}
+$('#p-dist').addEventListener('input',geo);geo();
+$('#ba input').addEventListener('input',e=>$('#ba').style.setProperty('--p',e.target.value+'%'));
+
+/* SDG goals and targets (targets as numbered by the UN) */
+const SDG=[
+  {n:11,name:'Sustainable cities and communities',c:'var(--sdg11)',primary:true,t:[
+    ['11.1','Access to basic services','Broken water, power, sewage and waste services reach the department responsible and are tracked until restored.'],
+    ['11.2','Safe transport systems','Potholes, broken footpaths and faulty signals are ranked by danger and location, so the riskiest get fixed first.'],
+    ['11.3','Participatory planning and management','Residents and RWAs take part in managing their neighbourhood, with votes and monthly reports.'],
+    ['11.6','Municipal waste management','Garbage black spots are routed, merged and followed up within a 2-day window.']]},
+  {n:16,name:'Peace, justice and strong institutions',c:'var(--sdg16)',t:[
+    ['16.6','Effective, accountable institutions','Every fix needs on-site proof and independent sign-off. Contractor reopen rates are visible.'],
+    ['16.7','Responsive, participatory decision-making','Residents have the final say on whether a fix is real.'],
+    ['16.10','Public access to information','One-tap RTI applications under the RTI Act, 2005.']]},
+  {n:6,name:'Clean water and sanitation',c:'var(--sdg6)',t:[
+    ['6.2','Sanitation for all','Sewage overflows and blocked drains go straight to BWSSB with a 2-day fix window.'],
+    ['6.4','Water-use efficiency','Leaking mains are reported and chased quickly, cutting water lost from the network.']]},
+  {n:3,name:'Good health and well-being',c:'var(--sdg3)',t:[
+    ['3.6','Fewer road traffic deaths and injuries','Danger-to-life reports near schools and main roads rise to the top of the queue.'],
+    ['3.3','Communicable diseases','Stagnant water and mosquito breeding spots are reported for quick clearance.']]},
+];
+let sdgSel=11;
+function sdgRender(){
+  $('#sdgs').innerHTML=SDG.map(g=>`<button class="sdg" style="--c:${g.c}" aria-pressed="${g.n===sdgSel}" data-g="${g.n}"><small>${g.primary?'Primary goal':'Supporting goal'}</small><span class="gn">${g.n}</span><b>${g.name}</b></button>`).join('');
+  const g=SDG.find(x=>x.n===sdgSel);
+  $('#targets').innerHTML=g.t.map(([id,t,d])=>`<div class="tgt" style="--tc:${g.c}"><span class="id">${id}</span><b>${t}</b><p>${d}</p></div>`).join('');
+}
+$('#sdgs').addEventListener('click',e=>{const b=e.target.closest('[data-g]');if(!b)return;sdgSel=+b.dataset.g;sdgRender();$(`[data-g="${sdgSel}"]`).focus()});
+sdgRender();
+
+/* revenue calculator */
+function money(){
+  const n=+$('#c-n').value,p=+$('#c-p').value,mrr=n*p,cost=2000+13*n;
+  $('#o-n').textContent=n;$('#o-p').textContent=inr(p);
+  $('#m-arr').textContent=inrShort(mrr*12);$('#m-mrr').textContent=inrShort(mrr);$('#m-cost').textContent=inr(cost);
+  $('#m-margin').textContent=Math.round(100*(mrr-cost)/mrr)+'%';$('#m-homes').textContent=(n*150).toLocaleString('en-IN');
+}
+$('#c-n').addEventListener('input',money);$('#c-p').addEventListener('input',money);money();
+
+/* comparison */
+const CMP=[
+  ['Sends the complaint to the right department for you','p','n','p','y'],
+  ['Merges duplicate reports into one issue','n','n','p','y'],
+  ['Ranks issues by risk, with a reason','n','n','n','y'],
+  ['Chases overdue complaints (follow-up, escalation, RTI)','n','n','n','y'],
+  ['Assigns the best-matched contractor','p','n','n','y'],
+  ['Fix proven with on-site, geofenced photos','n','n','n','y'],
+  ['Resident confirms or reopens the fix','n','p','p','y'],
+  ['Works without an account','n','n','n','y'],
+];
+const IC={y:'<i class="fa-solid fa-circle-check y" aria-label="Yes"></i>',p:'<i class="fa-solid fa-circle-half-stroke p" aria-label="Partly"></i>',n:'<i class="fa-regular fa-circle n" aria-label="No"></i>'};
+$('#cmp').innerHTML=CMP.map(r=>`<tr><td>${r[0]}</td>${r.slice(1).map((v,i)=>`<td class="${i===3?'us':''}">${IC[v]}</td>`).join('')}</tr>`).join('');
+</script>
+</body>
+</html>
