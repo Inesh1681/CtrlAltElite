@@ -1,0 +1,53 @@
+# UrbOasis Bengaluru
+
+A civic complaint desk for Bengaluru residents. It routes a street-level problem to the agency that
+fixes it (GBA, BWSSB, BESCOM or Traffic Police), writes the complaint, and then tells the resident
+when to follow up, when to escalate and when to file an RTI, with each document ready to copy or print.
+
+## What it does
+
+- **Report in four steps:** category (English + Kannada), pin on the map (tap, GPS, place search, or
+  the GPS tag inside a photo), landmark and photo, then a generated complaint with a strength score.
+- **Tracks every complaint against a fix window** per category, and moves it through
+  *Not filed → Waiting → Follow up → Escalate → RTI → Fixed*.
+- **Writes the documents:** follow-up, escalation letter addressed to the right officer, X post, and
+  an RTI application under Section 6(1) with the five questions that get a written answer.
+- **Community board:** a public list of issues ranked by resident votes (one vote per Google account,
+  enforced by Firestore rules), with a map, filters by department and city corporation, and a printable
+  top-issues list for the ward office. Letters quote the vote count. Needs a Firebase project, see
+  [FIREBASE-SETUP.md](FIREBASE-SETUP.md). Until then it shows a labelled preview.
+- **Neighbour co-signing:** a share link (WhatsApp, native share with photo, or copy) opens the same
+  complaint pre-filled so neighbours can file their own.
+- **City Console and Contractor app (prototype, sample data):** use **View as** in the header, or open
+  `#city` and `#contractor`. Reports of the same category within 50 m merge into one issue, scored 0-100
+  (severity, public demand, overdue, location risk, category risk) with weight sliders. Officials assign
+  the best-matched contractor; contractors accept, then prove the fix with before and after photos that
+  must be taken within 100 m. An issue is verified only when the city approves and a resident confirms
+  (or 72 hours pass with no dispute). "Not fixed" reopens it to the same contractor. State is in
+  `localStorage` (`uo-ops`, versioned) and syncs live across tabs. `index.html#demo` runs a 60-second
+  guided demo and restores your data afterwards. Not a live government system: every contractor, ward,
+  cost and seeded report is fictional.
+- **Private by design:** no account and no server. Data lives in `localStorage`, photos in IndexedDB,
+  re-encoded so their location metadata is removed. JSON backup/restore and CSV export.
+
+## Run locally
+
+It's two static files: `index.html` (the app) and `pitch.html` (for judges and investors). From the repo folder, serve it with any static server, for example:
+
+```bash
+npx serve .
+```
+
+Deploy by uploading the folder to Vercel, Netlify, GitHub Pages or Cloudflare Pages. It needs
+HTTPS for "Use my location".
+
+Everything that still needs checking against official sources is listed in [TODO-VERIFY.md](TODO-VERIFY.md).
+
+## Before going public
+
+- Re-check every channel in `CONTACTS` (each has a `source` and `verified` flag) against the department's
+  own site. The GBA restructuring in 2025 may change channels.
+- Fix windows (`days` in `CATS`) are guidelines, not official service levels. The page says so.
+- Address search and lookup use the public Nominatim API (OpenStreetMap). Its usage policy allows
+  light use only, so put a geocoder you control behind it if traffic grows.
+- Map tiles come from OpenFreeMap (free, no key).
